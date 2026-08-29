@@ -55,14 +55,29 @@
       }
     </style>
     <script>
-      // Diagnostic handler: catch unhandled bootstrap errors
+      // Diagnostic handler: catch unhandled bootstrap errors & slow mount
+      window.__appMounted = false;
       window.addEventListener('error', function(e) {
         var el = document.getElementById('boot-error-diag');
-        if (el && e && e.message) {
+        if (el && e) {
           el.style.display = 'block';
-          el.innerText = 'Bootstrap Note: ' + e.message;
+          el.innerHTML = '<div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); padding: 8px 12px; border-radius: 4px; margin-top: 10px;">' +
+            '<strong>App Loader Notice:</strong> ' + (e.message || 'Script execution pending') +
+            '</div>';
         }
       });
+      setTimeout(function() {
+        if (!window.__appMounted) {
+          var el = document.getElementById('boot-error-diag');
+          if (el) {
+            el.style.display = 'block';
+            el.innerHTML = '<div style="background: rgba(200,184,154,0.1); border: 1px solid rgba(200,184,154,0.25); padding: 10px 14px; border-radius: 4px; font-family: monospace; font-size: 10px; color: #c8b89a; margin-top: 12px; text-align: center; max-width: 320px; line-height: 1.6;">' +
+              'If this takes more than a few seconds, verify that GitHub Pages is set to deploy from <strong>gh-pages</strong> branch or <strong>GitHub Actions</strong>.' +
+              '<div style="margin-top: 8px;"><a href="javascript:location.reload()" style="color: #f3efe6; text-decoration: underline; font-weight: bold; cursor: pointer;">Tap to Reload</a></div>' +
+              '</div>';
+          }
+        }
+      }, 3500);
     </script>
   </head>
   <body class="bg-[#0e0d0b] text-[#f3efe6] antialiased overflow-x-hidden select-none" style="background-color: #0e0d0b; color: #f3efe6;">
