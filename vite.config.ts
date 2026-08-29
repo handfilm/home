@@ -4,8 +4,11 @@ import path from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
+  // Use '/' by default for custom domains (handsandhead.com) or custom base if set via env
+  const base = process.env.VITE_BASE_PATH || process.env.BASE_PATH || '/';
+
   return {
-    base: './',
+    base,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
@@ -17,6 +20,13 @@ export default defineConfig(() => {
       outDir: 'dist',
       assetsDir: 'assets',
       sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'lucide-react', 'motion'],
+          },
+        },
+      },
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',

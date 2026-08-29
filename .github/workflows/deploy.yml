@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,17 +35,24 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci || npm install
 
-      - name: Build project
+      - name: Build production bundle
         run: npm run build
 
-      - name: Deploy to gh-pages branch (for branch-based deployments)
+      - name: Verify static files in dist
+        run: |
+          ls -la dist/
+          test -f dist/index.html || (echo "Missing dist/index.html!" && exit 1)
+
+      - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           cname: handsandhead.com
+          keep_files: false
+          enable_jekyll: false
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -56,4 +65,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
