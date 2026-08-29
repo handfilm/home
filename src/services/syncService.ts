@@ -1,18 +1,19 @@
 import { TaskItem, SectionItem, ConnectedDevice } from '../types';
+import { safeStorage } from '../utils/safeStorage';
 
 export function getDeviceId(): string {
-  let id = localStorage.getItem('rawx_device_id');
+  let id = safeStorage.getItem('rawx_device_id');
   if (!id) {
     id = 'dev_' + Math.random().toString(36).substring(2, 9);
-    localStorage.setItem('rawx_device_id', id);
+    safeStorage.setItem('rawx_device_id', id);
   }
   return id;
 }
 
 export function getDeviceName(): string {
-  let name = localStorage.getItem('rawx_device_name');
+  let name = safeStorage.getItem('rawx_device_name');
   if (!name) {
-    const ua = navigator.userAgent;
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
     let type = 'Desktop Device';
     if (/iPhone/i.test(ua)) type = 'iPhone';
     else if (/iPad/i.test(ua)) type = 'iPad';
@@ -22,26 +23,31 @@ export function getDeviceName(): string {
     else if (/Linux/i.test(ua)) type = 'Linux Workstation';
 
     name = `${type} (${Math.floor(100 + Math.random() * 900)})`;
-    localStorage.setItem('rawx_device_name', name);
+    safeStorage.setItem('rawx_device_name', name);
   }
   return name;
 }
 
 export function getStoredRoomId(): string {
-  // Check URL query param ?sync=ROOM_ID first
-  const params = new URLSearchParams(window.location.search);
-  const queryRoom = params.get('sync');
-  if (queryRoom) {
-    const normalized = queryRoom.toUpperCase().trim();
-    localStorage.setItem('rawx_sync_room', normalized);
-    return normalized;
+  try {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const queryRoom = params.get('sync');
+      if (queryRoom) {
+        const normalized = queryRoom.toUpperCase().trim();
+        safeStorage.setItem('rawx_sync_room', normalized);
+        return normalized;
+      }
+    }
+  } catch {
+    // ignore
   }
 
-  const stored = localStorage.getItem('rawx_sync_room');
+  const stored = safeStorage.getItem('rawx_sync_room');
   if (stored) return stored.toUpperCase().trim();
 
   const generated = 'SYNC-' + Math.floor(1000 + Math.random() * 9000);
-  localStorage.setItem('rawx_sync_room', generated);
+  safeStorage.setItem('rawx_sync_room', generated);
   return generated;
 }
 
@@ -75,13 +81,17 @@ export class MultiDeviceSyncEngine {
     const normalized = newRoomId.toUpperCase().trim();
     if (this.roomId === normalized) return;
     this.roomId = normalized;
-    localStorage.setItem('rawx_sync_room', normalized);
+    safeStorage.setItem('rawx_sync_room', normalized);
     this.disconnect();
     this.connect();
   }
 
   public connect() {
     this.disconnect();
+
+    if (typeof window === 'undefined' || typeof EventSource === 'undefined') {
+      return;
+    }
 
     const streamUrl = `/api/sync/stream/${encodeURIComponent(this.roomId)}?deviceId=${encodeURIComponent(this.deviceId)}&deviceName=${encodeURIComponent(this.deviceName)}`;
 
@@ -121,11 +131,11 @@ export class MultiDeviceSyncEngine {
         this.eventSource?.close();
         this.eventSource = null;
 
-        // Auto retry connecting after 3 seconds
+        // Auto retry connecting after 5 seconds
         clearTimeout(this.retryTimeout);
         this.retryTimeout = setTimeout(() => {
           this.connect();
-        }, 3000);
+        }, 5000);
       };
     } catch (err) {
       console.warn('Failed to initialize SSE stream, falling back to polling:', err);
@@ -152,14 +162,14 @@ export class MultiDeviceSyncEngine {
         }
       }
     } catch (err) {
-      console.error('Fetch room error:', err);
+      // Non-fatal on static/standalone hosting
     }
   }
 
   public async broadcast(tasks: TaskItem[], sections: SectionItem[], actionDescription?: string) {
     // Save to local cache first
-    localStorage.setItem(`rawx_tasks_${this.roomId}`, JSON.stringify(tasks));
-    localStorage.setItem(`rawx_sections_${this.roomId}`, JSON.stringify(sections));
+    safeStorage.setItem(`rawx_tasks_${this.roomId}`, JSON.stringify(tasks));
+    safeStorage.setItem(`rawx_sections_${this.roomId}`, JSON.stringify(sections));
 
     try {
       const response = await fetch(`/api/sync/room/${encodeURIComponent(this.roomId)}`, {
@@ -177,7 +187,6 @@ export class MultiDeviceSyncEngine {
       });
       return response.ok;
     } catch (err) {
-      console.warn('Failed to broadcast sync update across devices:', err);
       return false;
     }
   }
@@ -190,3 +199,4 @@ export class MultiDeviceSyncEngine {
     }
   }
 }
+

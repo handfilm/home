@@ -10,38 +10,38 @@ export default function GrainCanvas() {
     if (!ctx) return;
 
     let animId: number;
+    let isRunning = true;
 
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
+    // Use a fixed optimized buffer size (256x256) scaled up via CSS to avoid allocating tens of MB on 4K/Retina displays
+    const BUFFER_WIDTH = 256;
+    const BUFFER_HEIGHT = 256;
+    canvas.width = BUFFER_WIDTH;
+    canvas.height = BUFFER_HEIGHT;
+
+    const img = ctx.createImageData(BUFFER_WIDTH, BUFFER_HEIGHT);
+    const d = img.data;
 
     const generateGrain = () => {
-      const w = canvas.width;
-      const h = canvas.height;
-      if (w === 0 || h === 0) return;
+      if (!isRunning) return;
 
-      const img = ctx.createImageData(w, h);
-      const d = img.data;
       for (let i = 0; i < d.length; i += 4) {
         const v = (Math.random() * 255) | 0;
         d[i] = v;
         d[i + 1] = v;
         d[i + 2] = v;
-        d[i + 3] = 22; // subtle opacity
+        d[i + 3] = 26; // subtle grain opacity
       }
       ctx.putImageData(img, 0, 0);
+
       animId = window.setTimeout(() => {
         requestAnimationFrame(generateGrain);
       }, 70);
     };
 
-    resize();
-    window.addEventListener('resize', resize);
     generateGrain();
 
     return () => {
-      window.removeEventListener('resize', resize);
+      isRunning = false;
       clearTimeout(animId);
     };
   }, []);
@@ -51,7 +51,8 @@ export default function GrainCanvas() {
       ref={canvasRef}
       id="rawx-grain"
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.045] mix-blend-overlay"
+      className="fixed inset-0 w-full h-full pointer-events-none z-[9999] opacity-[0.045] mix-blend-overlay object-cover"
     />
   );
 }
+

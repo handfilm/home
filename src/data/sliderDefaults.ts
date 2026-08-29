@@ -1,4 +1,5 @@
 import { AllSlidersData } from '../types';
+import { safeStorage } from '../utils/safeStorage';
 
 export const DEFAULT_SLIDERS_DATA: AllSlidersData = {
   // §01 · MASTER HERO · 21:9
@@ -378,7 +379,7 @@ const STORAGE_KEY = 'rawx_master_sliders_data_v3';
 
 export function getStoredSlidersData(): AllSlidersData {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = safeStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_SLIDERS_DATA;
     const parsed = JSON.parse(raw);
     return { ...DEFAULT_SLIDERS_DATA, ...parsed };
@@ -390,7 +391,7 @@ export function getStoredSlidersData(): AllSlidersData {
 
 export function saveSlidersData(data: AllSlidersData): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    safeStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     console.error('Failed to save sliders data to storage:', e);
   }
@@ -398,9 +399,10 @@ export function saveSlidersData(data: AllSlidersData): void {
 
 export function resetSlidersData(): AllSlidersData {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    safeStorage.removeItem(STORAGE_KEY);
   } catch (e) {
     console.error(e);
   }
   return DEFAULT_SLIDERS_DATA;
 }
+

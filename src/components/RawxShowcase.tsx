@@ -1412,7 +1412,9 @@ export default function RawxShowcase({ onOpenLightbox, speed, onBackToEcosystem 
               <div key={i} className="flex-shrink-0 w-full h-full relative overflow-hidden bg-cover bg-center" style={{ backgroundImage: `url('${slide.url}')` }}>
                 {slide.videoUrl ? (
                   <video
-                    ref={(el) => (videoRefs.current[i] = el)}
+                    ref={(el) => {
+                      videoRefs.current[i] = el;
+                    }}
                     src={slide.videoUrl}
                     poster={slide.url}
                     autoPlay
