@@ -1,0 +1,146 @@
+import { SectionItem, TaskItem, GradeOption, EasingOption } from '../types';
+import d2cImage from '../assets/images/d2c_shop_vault_1788023609155.jpg';
+import arutemikaImage from '../assets/images/arutemika_b2b_leather_1788023629277.jpg';
+import rawxosImage from '../assets/images/rawxos_editorial_hero_1788023645113.jpg';
+
+export const INITIAL_SECTIONS: SectionItem[] = [
+  {
+    id: 'd2c',
+    category: '01 / COMMERCE',
+    title: 'D2C SHOP',
+    sub: 'Hands & Head Consumer Commerce',
+    desc: 'Direct-to-consumer products, drops, catalogue and WhatsApp-first ordering.',
+    url: 'shop.handsandhead.com',
+    dest: 'https://shop.handsandhead.com/',
+    cta: 'ENTER SHOP',
+    tex: 'tex-d2c',
+    accent: '#b14a26',
+    imageUrl: d2cImage,
+    isCustom: false,
+  },
+  {
+    id: 'b2b',
+    category: '02 / B2B',
+    title: 'ARUTEMIKA',
+    sub: 'B2B, Corporate & Wholesale Commerce',
+    desc: 'A dedicated environment for corporate and wholesale buyers — sourcing, bulk catalogue and account ordering.',
+    url: 'arutemika.handsandhead.com',
+    dest: 'https://arutemika.handsandhead.com/',
+    cta: 'ENTER B2B',
+    tex: 'tex-b2b',
+    accent: '#4a6670',
+    imageUrl: arutemikaImage,
+    isCustom: false,
+  },
+  {
+    id: 'articles',
+    category: '03 / EDITORIAL',
+    title: 'ARTICLES',
+    sub: 'Ideas, Research & Stories',
+    desc: 'Long-form thinking on business, technology, design, AI and culture from the H&H studio.',
+    url: 'articles.handsandhead.com',
+    dest: 'https://articles.handsandhead.com/',
+    cta: 'READ ARTICLES',
+    tex: 'tex-art',
+    accent: '#c79a3d',
+    imageUrl: rawxosImage,
+    isCustom: false,
+  },
+];
+
+export const INITIAL_TASKS: TaskItem[] = [
+  {
+    id: 'task-1',
+    title: 'Optimize mobile checkout flow for WhatsApp orders',
+    description: 'Streamline payment routing and instant SMS / WhatsApp order confirmations for D2C Shop.',
+    sectionId: 'd2c',
+    priority: 'high',
+    status: 'in_progress',
+    dueDate: '2026-09-02',
+    tags: ['E-Commerce', 'Checkout', 'Mobile'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deviceOrigin: 'Master Console',
+  },
+  {
+    id: 'task-2',
+    title: 'Arutemika wholesale client account portal rollout',
+    description: 'Deploy bulk ordering tier matrix and automated invoice dispatch for enterprise clients.',
+    sectionId: 'b2b',
+    priority: 'urgent',
+    status: 'todo',
+    dueDate: '2026-09-05',
+    tags: ['Wholesale', 'ERP', 'B2B'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deviceOrigin: 'Master Console',
+  },
+  {
+    id: 'task-3',
+    title: 'Publish editorial essay: "Industrial Realism & AI Systems"',
+    description: 'Format typography, pull quotes, and Hasselblad 8K medium format plate galleries.',
+    sectionId: 'articles',
+    priority: 'medium',
+    status: 'done',
+    dueDate: '2026-08-30',
+    tags: ['Editorial', 'Design', 'Publishing'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deviceOrigin: 'Master Console',
+  },
+  {
+    id: 'task-4',
+    title: 'Sync operations tasks to iPad field terminal & smartphone',
+    description: 'Scan the pairing QR code to verify instantaneous live bidirectional synchronization across devices.',
+    sectionId: 'd2c',
+    priority: 'high',
+    status: 'in_progress',
+    dueDate: '2026-08-31',
+    tags: ['Multi-Device', 'Cloud Sync', 'Realtime'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deviceOrigin: 'Master Console',
+  },
+  {
+    id: 'task-5',
+    title: 'Curate Drop 02 RAWx color grading LUT profiles',
+    description: 'Finalize Teal & Steel, Amber Pulse, and Deep Noir film emulation profiles for video pipeline.',
+    sectionId: 'articles',
+    priority: 'low',
+    status: 'todo',
+    dueDate: '2026-09-10',
+    tags: ['RAWx', 'Color Grading', 'LUTs'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deviceOrigin: 'Master Console',
+  }
+];
+
+export const GRADES: GradeOption[] = [
+  { id: 'off', label: 'OFF', name: 'Original Look', cls: '' },
+  { id: 'teal', label: 'TEAL & STEEL', name: 'Teal & Steel', cls: 'rx-grade-teal' },
+  { id: 'amber', label: 'AMBER PULSE', name: 'Amber Pulse', cls: 'rx-grade-amber' },
+  { id: 'noir', label: 'DEEP NOIR', name: 'Deep Noir', cls: 'rx-grade-noir' },
+  { id: 'bleach', label: 'BLEACH BYPASS', name: 'Bleach Bypass', cls: 'rx-grade-bleach' },
+];
+
+export const EASING_OPTIONS: EasingOption[] = [
+  { id: 'ease', label: 'EASE', css: 'cubic-bezier(0.77, 0, 0.18, 1)' },
+  { id: 'snap', label: 'SNAP', css: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+  { id: 'brutal', label: 'BRUTAL', css: 'steps(1)' },
+  { id: 'elastic', label: 'ELASTIC', css: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)' },
+];
+
+export const TICKER_ITEMS = [
+  { text: 'RAWx Master OS', hot: true },
+  { text: 'Cinematic Color Grading', hot: false },
+  { text: 'Multi-Device Seamless Task Sync', hot: true },
+  { text: '8K Grain Engine', hot: false },
+  { text: 'Film Emulation', hot: true },
+  { text: 'Hasselblad Profiles', hot: false },
+  { text: 'Live Cross-Device Cloud Sync', hot: true },
+  { text: 'Industrial Realism', hot: false },
+  { text: 'Teal & Steel · Amber Pulse · Deep Noir', hot: true },
+  { text: 'Ultra Wide Cinematic', hot: false },
+  { text: 'Hands & Head Digital Ecosystem', hot: true },
+];

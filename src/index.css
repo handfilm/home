@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0e0d0b;
+  --ink-2: #141310;
+  --paper: #f3efe6;
+  --paper-dim: rgba(243, 239, 230, 0.62);
+  --paper-faint: rgba(243, 239, 230, 0.15);
+  --paper-hair: rgba(243, 239, 230, 0.10);
+  --accent-d2c: #b14a26;
+  --accent-b2b: #4a6670;
+  --accent-art: #c79a3d;
+  --accent: var(--accent-d2c);
+  --ease: cubic-bezier(.16, .84, .32, 1);
+  --dur-fast: 420ms;
+  --dur-med: 700ms;
+
+  --rx-void: #050505;
+  --rx-deep: #0a0a0a;
+  --rx-surface: #111111;
+  --rx-edge: #1c1c1c;
+  --rx-wire: #2a2a2a;
+  --rx-ash: #444444;
+  --rx-mist: #888888;
+  --rx-paper: #c8b89a;
+  --rx-linen: #e8e0d0;
+  --rx-white: #f4f0e8;
+  --rx-hot: #ff4d1a;
+  --rx-ease: cubic-bezier(0.77, 0, 0.18, 1);
+  --rx-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body {
+  background-color: var(--ink);
+  color: var(--paper);
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+.serif-display {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+/* Textures */
+.tex-d2c {
+  background-color: #1a100b;
+  background-image:
+    repeating-linear-gradient(115deg, rgba(243,239,230,0.05) 0px, rgba(243,239,230,0.05) 1px, transparent 1px, transparent 14px),
+    repeating-linear-gradient(25deg, rgba(177,74,38,0.16) 0px, rgba(177,74,38,0.16) 2px, transparent 2px, transparent 22px),
+    radial-gradient(circle at 30% 25%, rgba(177,74,38,0.35), transparent 55%);
+}
+
+.tex-b2b {
+  background-color: #0e1416;
+  background-image:
+    linear-gradient(rgba(243,239,230,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,239,230,0.06) 1px, transparent 1px),
+    radial-gradient(circle at 70% 30%, rgba(74,102,112,0.45), transparent 55%);
+  background-size: 46px 46px, 46px 46px, 100% 100%;
+}
+
+.tex-art {
+  background-color: #15120a;
+  background-image:
+    radial-gradient(rgba(243,239,230,0.14) 1px, transparent 1.4px);
+  background-size: 9px 9px;
+  background-position: 0 0;
+  position: relative;
+}
+
+.tex-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 65% 35%, rgba(199,154,61,0.32), transparent 55%);
+}
+
+.tex-custom {
+  background-color: #121016;
+  background-image:
+    radial-gradient(ellipse at top right, rgba(147, 51, 234, 0.25), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px;
+}
+
+/* Color Grade LUT Filters */
+.rx-grade-teal {
+  filter: saturate(.85) hue-rotate(8deg) contrast(1.08) !important;
+}
+
+.rx-grade-amber {
+  filter: saturate(1.1) sepia(.25) contrast(1.05) brightness(1.03) !important;
+}
+
+.rx-grade-noir {
+  filter: grayscale(.9) contrast(1.25) brightness(.92) !important;
+}
+
+.rx-grade-bleach {
+  filter: saturate(.55) contrast(1.35) brightness(1.07) !important;
+}
+
+/* Scanlines and Vignettes */
+.rx-scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.06) 2px, rgba(0,0,0,.06) 4px);
+  opacity: .4;
+}
+
+.rx-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(5,5,5,.7) 100%);
+}
+
+.rx-grad-b {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(5,5,5,.95) 0%, rgba(5,5,5,.3) 50%, transparent 100%);
+}
+
+.rx-grad-l {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(5,5,5,.9) 0%, transparent 60%);
+}
+
+/* Keyframes */
+@keyframes rx-zoom-burst {
+  0% { transform: scale(1.14); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: scale(1.0); opacity: 1; }
+}
+
+@keyframes rx-zoom-exit {
+  0% { transform: scale(1.0); opacity: 1; }
+  100% { transform: scale(.93); opacity: 0; }
+}
+
+@keyframes rx-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes rx-wipe-r {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes rx-wipe-l {
+  from { clip-path: inset(0 0 0 100%); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes rx-wipe-u {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes rx-wipe-d {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+.animate-tape {
+  animation: rx-scroll 35s linear infinite;
+}
+
+.zb-enter {
+  animation: rx-zoom-burst 0.9s var(--rx-ease) forwards;
+}
+
+.zb-exit {
+  animation: rx-zoom-exit 0.5s ease forwards;
+}
+
+.wipe-r {
+  animation: rx-wipe-r 0.72s var(--rx-ease) forwards;
+}
+
+.wipe-l {
+  animation: rx-wipe-l 0.72s var(--rx-ease) forwards;
+}
+
+.wipe-u {
+  animation: rx-wipe-u 0.72s var(--rx-ease) forwards;
+}
+
+.wipe-d {
+  animation: rx-wipe-d 0.72s var(--rx-ease) forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
