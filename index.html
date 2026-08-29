@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HANDS & HEAD — Master</title>
+<meta name="description" content="Hands & Head digital ecosystem — commerce, B2B, articles, media, apps and projects." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Fraunces:ital,wght@0,400;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0e0d0b;
+    --ink-2:#141310;
+    --paper:#f3efe6;
+    --paper-dim:rgba(243,239,230,0.62);
+    --paper-faint:rgba(243,239,230,0.15);
+    --paper-hair:rgba(243,239,230,0.10);
+    --accent-d2c:#b14a26;
+    --accent-b2b:#4a6670;
+    --accent-art:#c79a3d;
+    --accent: var(--accent-d2c);
+    --ease: cubic-bezier(.16,.84,.32,1);
+    --dur-fast: 420ms;
+    --dur-med: 700ms;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Space Grotesk', sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+    height:100vh;
+    height:100dvh;
+  }
+  ::selection{ background:var(--accent); color:var(--ink); }
+
+  a{ color:inherit; text-decoration:none; }
+
+  .mono{ font-family:'JetBrains Mono', monospace; letter-spacing:0.02em; }
+
+  /* focus visibility */
+  :focus-visible{
+    outline: 1.5px solid var(--paper);
+    outline-offset: 4px;
+  }
+
+  /* ---------- LOADER ---------- */
+  #loader{
+    position:fixed; inset:0; z-index:200;
+    background:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:14px;
+    transition: opacity 600ms var(--ease), visibility 600ms;
+  }
+  #loader.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+  #loader .mark{
+    font-size:14px; letter-spacing:0.28em; text-transform:uppercase;
+    display:flex; gap:10px; align-items:center; color:var(--paper-dim);
+  }
+  #loader .mark b{ color:var(--paper); font-weight:500; }
+  #loader .bar{
+    width:180px; height:1px; background:var(--paper-faint); position:relative; overflow:hidden;
+  }
+  #loader .bar span{
+    position:absolute; left:0; top:0; height:100%; width:0%;
+    background:var(--paper); animation: load 1000ms var(--ease) forwards;
+  }
+  @keyframes load{ to{ width:100%; } }
+
+  /* ---------- SHELL ---------- */
+  #shell{ position:relative; width:100%; height:100%; }
+
+  header.top{
+    position:fixed; top:0; left:0; right:0; z-index:60;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:26px 34px;
+    pointer-events:none;
+  }
+  header.top *{ pointer-events:auto; }
+  .logo{
+    font-size:15px; font-weight:700; letter-spacing:0.06em;
+    display:flex; align-items:center; gap:8px;
+    cursor:pointer; background:none; border:none; color:var(--paper); font-family:inherit;
+  }
+  .logo .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); transition:background var(--dur-fast) var(--ease); }
+  .top-right{ display:flex; align-items:center; gap:22px; }
+  .index-btn{
+    font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+    background:none; border:1px solid var(--paper-faint); color:var(--paper-dim);
+    padding:9px 16px; cursor:pointer; font-family:'JetBrains Mono', monospace;
+    transition: all var(--dur-fast) var(--ease);
+  }
+  .index-btn:hover{ border-color:var(--paper); color:var(--paper); }
+
+  /* ---------- NAV RAIL ---------- */
+  nav.rail{
+    position:fixed; right:34px; top:50%; transform:translateY(-50%);
+    z-index:55; display:flex; flex-direction:column; gap:16px; align-items:flex-end;
+  }
+  nav.rail button{
+    background:none; border:none; cursor:pointer; color:var(--paper-dim);
+    font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.12em;
+    display:flex; align-items:center; gap:10px; text-transform:uppercase;
+    padding:4px 0;
+  }
+  nav.rail button .tick{
+    width:18px; height:1px; background:var(--paper-faint); transition: all var(--dur-fast) var(--ease);
+  }
+  nav.rail button.active{ color:var(--paper); }
+  nav.rail button.active .tick{ width:30px; background:var(--accent); }
+  nav.rail button:hover .tick{ background:var(--paper); }
+
+  /* ---------- STAGE / SLIDER ---------- */
+  #stage{
+    position:relative; width:100%; height:100%;
+    display:flex;
+    width:300%;
+    height:100%;
+    transition: transform var(--dur-med) var(--ease);
+    will-change: transform;
+  }
+  .panel{
+    position:relative; width:33.3333%; height:100%; flex-shrink:0;
+    overflow:hidden;
+    cursor: pointer;
+  }
+  .panel-bg{
+    position:absolute; inset:0;
+    transition: transform 1200ms var(--ease), filter var(--dur-med) var(--ease);
+    transform:scale(1.06);
+  }
+  .panel.active .panel-bg{ transform:scale(1); }
+  .panel:hover .panel-bg, .panel.touch-active .panel-bg{ transform:scale(1.035); }
+
+  .panel-scrim{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 100%, rgba(0,0,0,0.72) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.25) 65%, rgba(0,0,0,0.75) 100%);
+    z-index:2;
+  }
+
+  /* per-section generated texture, standing in for photography */
+  .tex-d2c{
+    background-color:#1a100b;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(243,239,230,0.05) 0px, rgba(243,239,230,0.05) 1px, transparent 1px, transparent 14px),
+      repeating-linear-gradient(25deg, rgba(177,74,38,0.16) 0px, rgba(177,74,38,0.16) 2px, transparent 2px, transparent 22px),
+      radial-gradient(circle at 30% 25%, rgba(177,74,38,0.35), transparent 55%);
+  }
+  .tex-b2b{
+    background-color:#0e1416;
+    background-image:
+      linear-gradient(rgba(243,239,230,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(243,239,230,0.06) 1px, transparent 1px),
+      radial-gradient(circle at 70% 30%, rgba(74,102,112,0.45), transparent 55%);
+    background-size: 46px 46px, 46px 46px, 100% 100%;
+  }
+  .tex-art{
+    background-color:#15120a;
+    background-image:
+      radial-gradient(rgba(243,239,230,0.14) 1px, transparent 1.4px);
+    background-size: 9px 9px;
+    background-position: 0 0;
+    position:relative;
+  }
+  .tex-art::after{
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(circle at 65% 35%, rgba(199,154,61,0.32), transparent 55%);
+  }
+
+  .panel-content{
+    position:relative; z-index:3; height:100%;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding: 0 clamp(24px, 5vw, 70px) clamp(56px, 9vh, 96px);
+  }
+
+  .panel-eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.16em;
+    color:var(--paper-dim); text-transform:uppercase;
+    display:flex; align-items:center; gap:10px; margin-bottom:18px;
+    opacity:0; transform:translateY(10px);
+    transition: all var(--dur-med) var(--ease);
+  }
+  .panel-eyebrow .num{ color:var(--accent-inline, var(--paper)); }
+
+  .panel-title{
+    font-size: clamp(48px, 9vw, 122px);
+    font-weight:700; line-height:0.92; letter-spacing:-0.01em;
+    text-transform:uppercase;
+    margin-bottom: 0;
+  }
+  .panel-title .line{ overflow:hidden; }
+  .panel-title .line span{
+    display:inline-block; transform:translateY(105%);
+    transition: transform 760ms var(--ease);
+  }
+  .panel.entered .panel-title .line span{ transform:translateY(0); }
+
+  .panel-reveal{
+    max-height:0; opacity:0; overflow:hidden;
+    transition: max-height var(--dur-med) var(--ease), opacity var(--dur-fast) var(--ease), margin var(--dur-med) var(--ease);
+    margin-top:0;
+  }
+  .panel.active .panel-reveal, .panel.touch-active .panel-reveal{
+    max-height:220px; opacity:1; margin-top:22px;
+  }
+  .panel.entered .panel-eyebrow{ opacity:1; transform:translateY(0); transition-delay:120ms; }
+
+  .panel-sub{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:400;
+    font-size: clamp(16px, 1.6vw, 21px);
+    color:var(--paper); margin-bottom:14px; max-width:520px;
+  }
+  .panel-desc{
+    font-size:14px; line-height:1.6; color:var(--paper-dim);
+    max-width:420px; margin-bottom:22px;
+  }
+  .panel-meta-row{
+    display:flex; align-items:center; gap:22px; flex-wrap:wrap;
+  }
+  .panel-url{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:0.06em;
+    color:var(--paper-dim); text-transform:uppercase;
+    border-bottom:1px solid var(--paper-faint); padding-bottom:2px;
+  }
+  .panel-cta{
+    font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase;
+    display:inline-flex; align-items:center; gap:8px; color:var(--ink);
+    background:var(--paper); padding:11px 20px;
+    transition: gap var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  }
+  .panel:hover .panel-cta{ gap:14px; background:var(--accent-inline, var(--paper)); color:var(--paper); }
+
+  .panel-category{
+    position:absolute; top:30px; left:34px; z-index:3;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.14em;
+    color:var(--paper-dim); text-transform:uppercase;
+    opacity:0; transition: opacity var(--dur-fast) var(--ease);
+  }
+  .panel.entered .panel-category{ opacity:1; }
+
+  /* ---------- FOOTER STRIP ---------- */
+  footer.master-footer{
+    position:fixed; bottom:0; left:0; right:0; z-index:56;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 20px 34px;
+    pointer-events:none;
+  }
+  footer.master-footer *{ pointer-events:auto; }
+  .counter{
+    font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.08em; color:var(--paper);
+    display:flex; align-items:baseline; gap:6px;
+  }
+  .counter .of{ color:var(--paper-dim); }
+  .foot-links{
+    display:flex; gap:20px; font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--paper-dim);
+  }
+  .foot-links a:hover{ color:var(--paper); }
+  .hint{
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--paper-dim);
+    letter-spacing:0.08em; text-transform:uppercase;
+    display:flex; align-items:center; gap:8px;
+  }
+  .hint .key{
+    border:1px solid var(--paper-faint); border-radius:3px; padding:2px 6px; font-size:10px;
+  }
+
+  /* ---------- SIDE ARROWS ---------- */
+  .arrow{
+    position:fixed; top:50%; transform:translateY(-50%); z-index:57;
+    background:none; border:none; color:var(--paper); cursor:pointer;
+    width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+    opacity:0.55; transition: opacity var(--dur-fast) var(--ease);
+  }
+  .arrow:hover{ opacity:1; }
+  .arrow.prev{ left:6px; }
+  .arrow.next{ right:6px; }
+  .arrow svg{ width:20px; height:20px; }
+
+  /* ---------- CUSTOM CURSOR (desktop signature element) ---------- */
+  #cursor{
+    position:fixed; top:0; left:0; z-index:59; pointer-events:none;
+    width:64px; height:64px; margin:-32px 0 0 -32px;
+    opacity:0; transition: opacity 200ms var(--ease);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace;
+  }
+  #cursor.show{ opacity:1; }
+  #cursor svg{ position:absolute; inset:0; width:100%; height:100%; }
+  #cursor .cursor-label{
+    position:absolute; top:70px; left:50%; transform:translateX(-50%);
+    font-size:10px; letter-spacing:0.14em; white-space:nowrap; color:var(--paper);
+    background:var(--ink); padding:3px 8px; border:1px solid var(--paper-faint);
+  }
+
+  /* ---------- INDEX OVERLAY ---------- */
+  #indexOverlay{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(14,13,11,0.98);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transition: opacity var(--dur-med) var(--ease), visibility var(--dur-med);
+  }
+  #indexOverlay.open{ opacity:1; visibility:visible; }
+  .index-close{
+    position:absolute; top:26px; right:34px; background:none; border:none; color:var(--paper);
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.12em; cursor:pointer;
+    text-transform:uppercase; display:flex; align-items:center; gap:8px;
+  }
+  .index-list{ width:min(760px, 88vw); }
+  .index-list .index-head{
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--paper-dim);
+    letter-spacing:0.16em; text-transform:uppercase; margin-bottom:26px;
+  }
+  .index-row{
+    display:flex; align-items:center; gap:26px; padding:22px 4px;
+    border-top:1px solid var(--paper-hair);
+    cursor:pointer; background:none; border-left:none; border-right:none; border-bottom:none;
+    width:100%; text-align:left; color:var(--paper); font-family:inherit;
+  }
+  .index-list .index-row:last-child{ border-bottom:1px solid var(--paper-hair); }
+  .index-row .idx-num{ font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--paper-dim); width:28px; }
+  .index-row .idx-title{ font-size:clamp(22px,3.4vw,36px); font-weight:700; text-transform:uppercase; flex:1; transition: transform var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
+  .index-row .idx-url{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--paper-dim); text-transform:uppercase; }
+  .index-row:hover .idx-title{ transform:translateX(10px); }
+  .index-row:hover{ color:var(--accent-row, var(--paper)); }
+  .index-row:hover .idx-title{ color:var(--accent-row, var(--paper)); }
+
+  /* ---------- REDUCED MOTION ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration: 1ms !important; animation-duration: 1ms !important; }
+  }
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width: 780px){
+    nav.rail{ display:none; }
+    .arrow{ display:none; }
+    #cursor{ display:none; }
+    #stage{ flex-direction:column; width:100%; height:300%; }
+    .panel{ width:100%; height:33.3333%; }
+    .panel-title{ font-size: clamp(34px, 11vw, 56px); }
+    .panel-content{ padding: 0 20px clamp(30px, 8vh, 54px); }
+    header.top{ padding:18px 18px; }
+    footer.master-footer{ padding:16px 18px; }
+    .foot-links{ display:none; }
+    .panel-reveal{ max-height:0; }
+    .panel.touch-active .panel-reveal{ max-height:260px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="mark"><b>HANDS &amp; HEAD</b> — MASTER</div>
+  <div class="bar"><span></span></div>
+</div>
+
+<div id="shell">
+
+  <header class="top">
+    <button class="logo" id="logoHome" aria-label="Return to first section">
+      <span class="dot" id="logoDot"></span> HANDS &amp; HEAD
+    </button>
+    <div class="top-right">
+      <span class="mono" style="font-size:10.5px; letter-spacing:.14em; color:var(--paper-dim);">MASTER OS</span>
+      <button class="index-btn" id="openIndex">INDEX</button>
+    </div>
+  </header>
+
+  <nav class="rail" id="rail" aria-label="Section navigation"></nav>
+
+  <button class="arrow prev" id="prevBtn" aria-label="Previous section">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="arrow next" id="nextBtn" aria-label="Next section">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+
+  <main id="stage" role="list"></main>
+
+  <footer class="master-footer">
+    <div class="counter"><span id="counterCur">01</span><span class="of">/ <span id="counterTotal">03</span></span></div>
+    <div class="hint"><span class="key">&larr;</span><span class="key">&rarr;</span> NAVIGATE &nbsp; <span class="key">ENTER</span> OPEN</div>
+    <div class="foot-links">
+      <a href="https://shop.handsandhead.com/">SHOP</a>
+      <a href="https://arutemika.handsandhead.com/">B2B</a>
+      <a href="https://articles.handsandhead.com/">ARTICLES</a>
+    </div>
+  </footer>
+
+  <div id="cursor" aria-hidden="true">
+    <svg viewBox="0 0 64 64">
+      <line x1="32" y1="4" x2="32" y2="18" stroke="currentColor" stroke-width="1"/>
+      <line x1="32" y1="46" x2="32" y2="60" stroke="currentColor" stroke-width="1"/>
+      <line x1="4" y1="32" x2="18" y2="32" stroke="currentColor" stroke-width="1"/>
+      <line x1="46" y1="32" x2="60" y2="32" stroke="currentColor" stroke-width="1"/>
+      <circle cx="32" cy="32" r="2" fill="currentColor"/>
+    </svg>
+    <div class="cursor-label" id="cursorLabel">ENTER →</div>
+  </div>
+</div>
+
+<div id="indexOverlay">
+  <button class="index-close" id="closeIndex">CLOSE &nbsp; ✕</button>
+  <div class="index-list">
+    <div class="index-head">MASTER INDEX — ALL SECTIONS</div>
+    <div id="indexRows"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SECTIONS = [
+    {
+      id:'d2c', category:'01 / COMMERCE', title:'D2C SHOP',
+      sub:'Hands & Head Consumer Commerce',
+      desc:'Direct-to-consumer products, drops, catalogue and WhatsApp-first ordering.',
+      url:'shop.handsandhead.com', dest:'https://shop.handsandhead.com/',
+      cta:'ENTER SHOP', tex:'tex-d2c', accent:'var(--accent-d2c)'
+    },
+    {
+      id:'b2b', category:'02 / B2B', title:'ARUTEMIKA',
+      sub:'B2B, Corporate & Wholesale Commerce',
+      desc:'A dedicated environment for corporate and wholesale buyers — sourcing, bulk catalogue and account ordering.',
+      url:'arutemika.handsandhead.com', dest:'https://arutemika.handsandhead.com/',
+      cta:'ENTER B2B', tex:'tex-b2b', accent:'var(--accent-b2b)'
+    },
+    {
+      id:'articles', category:'03 / EDITORIAL', title:'ARTICLES',
+      sub:'Ideas, Research & Stories',
+      desc:'Long-form thinking on business, technology, design, AI and culture from the H&H studio.',
+      url:'articles.handsandhead.com', dest:'https://articles.handsandhead.com/',
+      cta:'READ ARTICLES', tex:'tex-art', accent:'var(--accent-art)'
+    }
+  ];
+
+  const stage = document.getElementById('stage');
+  const rail = document.getElementById('rail');
+  const indexRows = document.getElementById('indexRows');
+  let current = 0;
+  let isMobile = window.matchMedia('(max-width: 780px)').matches;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // build panels
+  SECTIONS.forEach((s, i) => {
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    panel.dataset.index = i;
+    panel.setAttribute('role','listitem');
+    panel.setAttribute('tabindex','0');
+    panel.setAttribute('aria-label', s.title + ' — ' + s.sub);
+    panel.style.setProperty('--accent-inline', s.accent);
+    panel.innerHTML = `
+      <div class="panel-bg ${s.tex}"></div>
+      <div class="panel-scrim"></div>
+      <div class="panel-category mono">${s.category}</div>
+      <div class="panel-content">
+        <div class="panel-eyebrow"><span class="num">${String(i+1).padStart(2,'0')}</span> / ${String(SECTIONS.length).padStart(2,'0')} &nbsp; — &nbsp; H&amp;H WORLD</div>
+        <h2 class="panel-title"><div class="line"><span>${s.title}</span></div></h2>
+        <div class="panel-reveal">
+          <div class="panel-sub">${s.sub}</div>
+          <div class="panel-desc">${s.desc}</div>
+          <div class="panel-meta-row">
+            <span class="panel-url mono">${s.url}</span>
+            <span class="panel-cta">${s.cta} →</span>
+          </div>
+        </div>
+      </div>
+    `;
+    panel.addEventListener('click', () => handleActivate(i));
+    panel.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){ handleActivate(i); }
+    });
+    panel.addEventListener('mouseenter', () => { if(!isMobile) previewOnly(i); });
+    stage.appendChild(panel);
+
+    // rail
+    const btn = document.createElement('button');
+    btn.innerHTML = `<span class="tick"></span><span>${s.id === 'articles' ? 'ARTICLES' : (s.id === 'b2b' ? 'B2B' : 'D2C')}</span>`;
+    btn.addEventListener('click', () => goTo(i));
+    rail.appendChild(btn);
+
+    // index overlay row
+    const row = document.createElement('button');
+    row.className = 'index-row';
+    row.style.setProperty('--accent-row', s.accent);
+    row.innerHTML = `<span class="idx-num mono">${String(i+1).padStart(2,'0')}</span><span class="idx-title">${s.title}</span><span class="idx-url mono">${s.url}</span>`;
+    row.addEventListener('click', () => { goTo(i); closeIndex(); });
+    indexRows.appendChild(row);
+  });
+
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  const railBtns = Array.from(rail.querySelectorAll('button'));
+
+  function handleActivate(i){
+    if(isMobile){
+      const p = panels[i];
+      if(!p.classList.contains('touch-active')){
+        panels.forEach(pn => pn.classList.remove('touch-active'));
+        p.classList.add('touch-active');
+        return;
+      }
+    }
+    window.open(SECTIONS[i].dest, '_blank', 'noopener');
+    logEvent('MASTER_SECTION_CLICK', SECTIONS[i].id);
+  }
+
+  function previewOnly(i){
+    goTo(i, true);
+  }
+
+  function goTo(i, isHover){
+    if(i < 0) i = SECTIONS.length - 1;
+    if(i >= SECTIONS.length) i = 0;
+    current = i;
+    stage.style.transform = `translateX(-${i * (100/SECTIONS.length)}%)`;
+    panels.forEach((p, idx) => {
+      p.classList.toggle('active', idx === i);
+      if(idx === i){
+        p.classList.add('entered');
+      }
+    });
+    railBtns.forEach((b, idx) => b.classList.toggle('active', idx === i));
+    document.getElementById('counterCur').textContent = String(i+1).padStart(2,'0');
+    document.body.style.setProperty('--accent', SECTIONS[i].accent);
+    document.getElementById('logoDot').style.background = SECTIONS[i].accent;
+    document.getElementById('cursorLabel').textContent = SECTIONS[i].cta + ' →';
+    if(!isHover) logEvent('MASTER_SECTION_VIEW', SECTIONS[i].id);
+  }
+
+  function logEvent(name, id){
+    // analytics-ready hook — wire to real analytics later
+    console.log('[analytics]', name, id);
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
+  document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+  document.getElementById('logoHome').addEventListener('click', () => goTo(0));
+
+  // keyboard nav
+  window.addEventListener('keydown', (e) => {
+    if(document.getElementById('indexOverlay').classList.contains('open')){
+      if(e.key === 'Escape') closeIndex();
+      return;
+    }
+    if(e.key === 'ArrowRight'){ goTo(current + 1); }
+    else if(e.key === 'ArrowLeft'){ goTo(current - 1); }
+    else if(e.key === 'Home'){ goTo(0); }
+    else if(e.key === 'End'){ goTo(SECTIONS.length - 1); }
+    else if(e.key === 'Enter' && document.activeElement.classList.contains('panel')){ /* handled by panel listener */ }
+  });
+
+  // wheel navigation (debounced)
+  let wheelLock = false;
+  window.addEventListener('wheel', (e) => {
+    if(isMobile) return;
+    if(wheelLock) return;
+    if(Math.abs(e.deltaY) < 12 && Math.abs(e.deltaX) < 12) return;
+    wheelLock = true;
+    if(e.deltaY > 0 || e.deltaX > 0) goTo(current + 1); else goTo(current - 1);
+    setTimeout(() => wheelLock = false, 750);
+  }, { passive:true });
+
+  // touch swipe (vertical, since mobile stacks panels vertically)
+  let touchStartY = null;
+  window.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, {passive:true});
+  window.addEventListener('touchend', (e) => {
+    if(touchStartY === null || !isMobile) return;
+    const dy = touchStartY - e.changedTouches[0].clientY;
+    if(Math.abs(dy) > 60){
+      // handled natively by scroll on mobile stacked layout; keep rail sync via IntersectionObserver below
+    }
+    touchStartY = null;
+  }, {passive:true});
+
+  // custom cursor (desktop)
+  const cursor = document.getElementById('cursor');
+  if(!isMobile){
+    window.addEventListener('mousemove', (e) => {
+      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    });
+    panels.forEach(p => {
+      p.addEventListener('mouseenter', () => cursor.classList.add('show'));
+      p.addEventListener('mouseleave', () => cursor.classList.remove('show'));
+    });
+  }
+
+  // index overlay
+  const overlay = document.getElementById('indexOverlay');
+  function openIndexFn(){ overlay.classList.add('open'); }
+  function closeIndex(){ overlay.classList.remove('open'); }
+  document.getElementById('openIndex').addEventListener('click', openIndexFn);
+  document.getElementById('closeIndex').addEventListener('click', closeIndex);
+
+  // resize listener
+  window.addEventListener('resize', () => {
+    isMobile = window.matchMedia('(max-width: 780px)').matches;
+  });
+
+  // mobile: IntersectionObserver to sync counter with scroll position
+  if(isMobile){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting && entry.intersectionRatio > 0.6){
+          const idx = Number(entry.target.dataset.index);
+          current = idx;
+          document.getElementById('counterCur').textContent = String(idx+1).padStart(2,'0');
+          document.body.style.setProperty('--accent', SECTIONS[idx].accent);
+          entry.target.classList.add('entered');
+        }
+      });
+    }, { threshold: 0.6 });
+    panels.forEach(p => io.observe(p));
+    stage.style.overflowY = 'auto';
+    stage.style.transform = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  // init
+  goTo(0);
+  setTimeout(() => { panels[0].classList.add('entered'); }, 60);
+
+  // loader
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+    }, reducedMotion ? 0 : 500);
+  });
+  // fallback in case load already fired
+  setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1400);
+})();
+</script>
+
+</body>
+</html>
