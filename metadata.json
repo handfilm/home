@@ -1,0 +1,6 @@
+{
+  "name": "HANDS & HEAD — Master OS & Multi-Device Task Sync",
+  "description": "Unified Hands & Head and RAWx Master OS ecosystem with modular sections, cinematic slider system, and seamless multi-device task synchronization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
