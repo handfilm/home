@@ -51,6 +51,60 @@ export interface SyncState {
 
 export type ColorGrade = 'off' | 'teal' | 'amber' | 'noir' | 'bleach';
 
+export interface SlideData {
+  id?: string;
+  url: string;
+  tag?: string;
+  title?: string;
+  sub?: string;
+  videoUrl?: string;
+}
+
+export interface AllSlidersData {
+  s1: SlideData[];
+  s2a: SlideData[];
+  s2b: SlideData[];
+  s2c: SlideData[];
+  s2d: SlideData[];
+  s3: SlideData[];
+  s4a: SlideData[];
+  s4b: SlideData[];
+  s5a: SlideData[];
+  s5b: SlideData[];
+  s5c: SlideData[];
+  s6: SlideData[];
+  s7a: SlideData[];
+  s7b: SlideData[];
+  s7c: SlideData[];
+  s7d: SlideData[];
+  s8a: SlideData[];
+  s8b: SlideData[];
+  s9: SlideData[];
+  s10: SlideData[];
+  s11: {
+    beforeUrl: string;
+    afterUrl: string;
+    beforeLabel: string;
+    afterLabel: string;
+    title: string;
+    tag: string;
+    sub: string;
+    filterMode: string;
+  };
+  s12: SlideData[];
+  sA: SlideData[];
+  sB: {
+    cells: { title: string; sets: string[] }[];
+  };
+  sC: SlideData[];
+  sD: {
+    left: SlideData[];
+    right: SlideData[];
+  };
+  sE: SlideData[];
+  sF: SlideData[];
+}
+
 export interface GradeOption {
   id: ColorGrade;
   label: string;
