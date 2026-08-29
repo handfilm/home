@@ -1,15 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>HANDS & HEAD — Redirecting</title>
-    <script>
-      // Single Page Application redirect for static web servers
-      sessionStorage.redirect = location.href;
+    <meta charset="utf-8" />
+    <title>HANDS &amp; HEAD — Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        background-color: #0e0d0b;
+        color: #f3efe6;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+      }
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 2px solid rgba(243, 239, 230, 0.15);
+        border-top-color: #c8b89a;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 1rem;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    <script type="text/javascript">
+      // GitHub Pages SPA Redirect
+      // Converts path, query parameters, and hash into query string for index.html
+      // Supports custom domains (pathSegmentsToKeep = 0) and github.io/<repo> subpaths
+      var isProjectPage = window.location.pathname.startsWith('/applet') || 
+                          (window.location.hostname.endsWith('github.io') && window.location.pathname.split('/')[1] && !['', 'index.html'].includes(window.location.pathname.split('/')[1]));
+      var pathSegmentsToKeep = isProjectPage ? 1 : 0;
+
+      var l = window.location;
+      var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+      var routePath = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~');
+      var queryString = l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '';
+      
+      var targetUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        (repoBase ? repoBase : '') + '/?/' +
+        routePath + queryString + l.hash;
+
+      l.replace(targetUrl);
     </script>
-    <meta http-equiv="refresh" content="0;URL='/'">
   </head>
-  <body style="background:#0e0d0b;color:#f3efe6;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
-    <p>REDIRECTING TO MASTER OS...</p>
+  <body>
+    <div class="spinner"></div>
+    <p style="font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #c8b89a;">
+      Redirecting to Master OS...
+    </p>
   </body>
 </html>
