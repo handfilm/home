@@ -2,6 +2,7 @@ import { SectionItem, TaskItem, GradeOption, EasingOption } from '../types';
 import d2cImage from '../assets/images/d2c_shop_vault_1788023609155.jpg';
 import arutemikaImage from '../assets/images/arutemika_b2b_leather_1788023629277.jpg';
 import rawxosImage from '../assets/images/rawxos_editorial_hero_1788023645113.jpg';
+import handFilmPoster from '../assets/images/hand_film_cinematic_poster_1788025510409.jpg';
 
 export const INITIAL_SECTIONS: SectionItem[] = [
   {
@@ -17,6 +18,7 @@ export const INITIAL_SECTIONS: SectionItem[] = [
     accent: '#b14a26',
     imageUrl: d2cImage,
     isCustom: false,
+    sectionType: 'static',
   },
   {
     id: 'b2b',
@@ -31,6 +33,7 @@ export const INITIAL_SECTIONS: SectionItem[] = [
     accent: '#4a6670',
     imageUrl: arutemikaImage,
     isCustom: false,
+    sectionType: 'static',
   },
   {
     id: 'articles',
@@ -45,6 +48,24 @@ export const INITIAL_SECTIONS: SectionItem[] = [
     accent: '#c79a3d',
     imageUrl: rawxosImage,
     isCustom: false,
+    sectionType: 'static',
+  },
+  {
+    id: 'handfilm',
+    category: '04 / LIVE PORTAL',
+    title: 'HAND FILM',
+    sub: 'Cinematic World — Live Preview',
+    desc: 'Live atmospheric stream into Hand Film cinematic world, narrative productions, and film archive.',
+    url: 'handfilm.myshopify.com',
+    dest: 'https://handfilm.myshopify.com/',
+    cta: 'ENTER FILM',
+    tex: 'tex-film',
+    accent: '#e05d26',
+    imageUrl: handFilmPoster,
+    isCustom: false,
+    sectionType: 'live-embed',
+    embedUrl: 'https://handfilm.myshopify.com/',
+    embedFallback: handFilmPoster,
   },
 ];
 
@@ -90,6 +111,19 @@ export const INITIAL_TASKS: TaskItem[] = [
   },
   {
     id: 'task-4',
+    title: 'Live stream audio-visual synchronization check for Hand Film portal',
+    description: 'Calibrate the live embed fallback pipeline, verify 35mm grain shader overlay and responsive frame cropping.',
+    sectionId: 'handfilm',
+    priority: 'urgent',
+    status: 'in_progress',
+    dueDate: '2026-09-01',
+    tags: ['Hand Film', 'Live Embed', 'Cinema'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deviceOrigin: 'Master Console',
+  },
+  {
+    id: 'task-5',
     title: 'Sync operations tasks to iPad field terminal & smartphone',
     description: 'Scan the pairing QR code to verify instantaneous live bidirectional synchronization across devices.',
     sectionId: 'd2c',
@@ -102,18 +136,18 @@ export const INITIAL_TASKS: TaskItem[] = [
     deviceOrigin: 'Master Console',
   },
   {
-    id: 'task-5',
-    title: 'Curate Drop 02 RAWx color grading LUT profiles',
+    id: 'task-6',
+    title: 'Curate Drop 02 RAWx color grading LUT profiles for Hand Film reels',
     description: 'Finalize Teal & Steel, Amber Pulse, and Deep Noir film emulation profiles for video pipeline.',
-    sectionId: 'articles',
-    priority: 'low',
+    sectionId: 'handfilm',
+    priority: 'medium',
     status: 'todo',
     dueDate: '2026-09-10',
-    tags: ['RAWx', 'Color Grading', 'LUTs'],
+    tags: ['Hand Film', 'RAWx', 'Color Grading'],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     deviceOrigin: 'Master Console',
-  }
+  },
 ];
 
 export const GRADES: GradeOption[] = [

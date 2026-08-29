@@ -80,39 +80,46 @@ export default function MasterHeader({
       </div>
 
       {/* Center: Main View Navigation */}
-      <nav className="hidden lg:flex items-center gap-1 bg-[#161512] p-1 rounded border border-[#f3efe6]/10 font-mono text-[11px] tracking-wider uppercase">
+      <nav className="flex items-center gap-1 bg-[#161512] p-1 rounded-lg border border-[#f3efe6]/15 font-mono text-[10.5px] sm:text-[11.5px] tracking-wider uppercase shadow-inner">
         <button
           onClick={() => setActiveTab('ecosystem')}
-          className={`px-3.5 py-1.5 rounded transition-all cursor-pointer flex items-center gap-1.5 ${
+          className={`px-2.5 sm:px-3.5 py-1.5 rounded transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'ecosystem'
               ? 'bg-[#f3efe6] text-[#0e0d0b] font-bold shadow-sm'
               : 'text-[#f3efe6]/60 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
-          <span>Ecosystem Stage</span>
+          <span className="hidden xs:inline sm:inline">Stage</span>
+          <span className="hidden md:inline">Ecosystem</span>
         </button>
+
         <button
           onClick={() => setActiveTab('rawx-showcase')}
-          className={`px-3.5 py-1.5 rounded transition-all cursor-pointer flex items-center gap-1.5 ${
+          title="Open RAWx Master OS Ultra Slider System with all 16 slider architectures"
+          className={`px-2.5 sm:px-3.5 py-1.5 rounded transition-all cursor-pointer flex items-center gap-1.5 relative ${
             activeTab === 'rawx-showcase'
-              ? 'bg-[#f3efe6] text-[#0e0d0b] font-bold shadow-sm'
-              : 'text-[#f3efe6]/60 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
+              ? 'bg-amber-400 text-[#0e0d0b] font-bold shadow-md shadow-amber-400/20'
+              : 'text-amber-300 hover:text-amber-200 hover:bg-amber-400/10 border border-amber-400/30'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>RAWx Sliders (16)</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:animate-spin" />
+          <span className="font-bold">16 Sliders</span>
+          <span className="hidden sm:inline text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            ULTRA
+          </span>
         </button>
+
         <button
           onClick={() => setActiveTab('tasks-hub')}
-          className={`px-3.5 py-1.5 rounded transition-all cursor-pointer flex items-center gap-1.5 ${
+          className={`px-2.5 sm:px-3.5 py-1.5 rounded transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'tasks-hub'
               ? 'bg-[#f3efe6] text-[#0e0d0b] font-bold shadow-sm'
               : 'text-[#f3efe6]/60 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
           }`}
         >
           <CheckSquare className="w-3.5 h-3.5" />
-          <span>Task Sync Hub</span>
+          <span className="hidden xs:inline sm:inline">Tasks</span>
           {tasksCount.pending > 0 && (
             <span
               className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold ${

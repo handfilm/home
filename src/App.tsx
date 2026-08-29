@@ -299,12 +299,14 @@ export default function App() {
             onOpenSectionManager={() => setIsSectionManagerOpen(true)}
             onOpenTasksForSection={handleOpenTasksForSection}
             sectionTasksCount={sectionTasksCount}
+            onOpenSliders={() => setActiveTab('rawx-showcase')}
           />
         )}
 
         {activeTab === 'rawx-showcase' && (
           <RawxShowcase
             speed={speed}
+            onBackToEcosystem={() => setActiveTab('ecosystem')}
             onOpenLightbox={(items, startIndex) => {
               setLightboxState({
                 isOpen: true,
@@ -344,6 +346,10 @@ export default function App() {
         onOpenSectionManager={() => {
           setIsIndexOpen(false);
           setIsSectionManagerOpen(true);
+        }}
+        onOpenSliders={() => {
+          setIsIndexOpen(false);
+          setActiveTab('rawx-showcase');
         }}
       />
 

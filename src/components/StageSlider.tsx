@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SectionItem } from '../types';
-import { ArrowLeft, ArrowRight, ExternalLink, Plus, Sparkles, CheckSquare } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, Plus, Sparkles, CheckSquare, Radio } from 'lucide-react';
+import LiveEmbedPortal from './LiveEmbedPortal';
 
 interface StageSliderProps {
   sections: SectionItem[];
@@ -10,6 +11,7 @@ interface StageSliderProps {
   onOpenSectionManager: () => void;
   onOpenTasksForSection: (sectionId: string) => void;
   sectionTasksCount: Record<string, number>;
+  onOpenSliders?: () => void;
 }
 
 export default function StageSlider({
@@ -20,6 +22,7 @@ export default function StageSlider({
   onOpenSectionManager,
   onOpenTasksForSection,
   sectionTasksCount,
+  onOpenSliders,
 }: StageSliderProps) {
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -136,6 +139,16 @@ export default function StageSlider({
           <span>+ ADD SITE</span>
           <span className="w-3 h-[1px] bg-[#f3efe6]/20" />
         </button>
+        {onOpenSliders && (
+          <button
+            onClick={onOpenSliders}
+            title="Open RAWx Master OS Ultra 16-Slider System"
+            className="flex items-center gap-2 py-1 mt-1 text-amber-400 hover:text-amber-300 font-bold cursor-pointer text-[9.5px] border-t border-amber-500/20 pt-2"
+          >
+            <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
+            <span>16 SLIDERS ↗</span>
+          </button>
+        )}
       </nav>
 
       {/* Prev / Next Floating Arrows */}
@@ -201,25 +214,40 @@ export default function StageSlider({
                 width: window.innerWidth > 780 ? `${100 / sections.length}%` : '100%',
               }}
             >
-              {/* Background with image or texture and zoom effect */}
-              {section.imageUrl ? (
-                <div
-                  className={`absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
-                    isActive ? 'scale-100 opacity-80' : 'scale-105 opacity-40'
-                  }`}
-                  style={{ backgroundImage: `url('${section.imageUrl}')` }}
+              {/* Background Layer: Live Embed Portal OR Image/Texture */}
+              {section.sectionType === 'live-embed' || section.embedUrl ? (
+                <LiveEmbedPortal
+                  embedUrl={section.embedUrl || section.dest}
+                  fallbackImage={section.embedFallback || section.imageUrl}
+                  fallbackTexture={section.tex || 'tex-film'}
+                  isActive={isActive}
+                  isAdjacent={Math.abs(idx - currentSectionIndex) <= 1}
+                  title={section.title}
+                  accent={section.accent}
+                  onOpenDirect={() => handleActivate(section)}
                 />
               ) : (
-                <div
-                  className={`absolute inset-0 transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
-                    section.tex || 'tex-d2c'
-                  } ${isActive ? 'scale-100 opacity-100' : 'scale-105 opacity-60'}`}
-                />
-              )}
+                <>
+                  {section.imageUrl ? (
+                    <div
+                      className={`absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
+                        isActive ? 'scale-100 opacity-80' : 'scale-105 opacity-40'
+                      }`}
+                      style={{ backgroundImage: `url('${section.imageUrl}')` }}
+                    />
+                  ) : (
+                    <div
+                      className={`absolute inset-0 transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
+                        section.tex || 'tex-d2c'
+                      } ${isActive ? 'scale-100 opacity-100' : 'scale-105 opacity-60'}`}
+                    />
+                  )}
 
-              {/* Scrim Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0b] via-[#0e0d0b]/60 to-[#0e0d0b]/40 pointer-events-none z-10" />
-              <div className="rx-scanlines z-10 opacity-30" />
+                  {/* Scrim Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0b] via-[#0e0d0b]/60 to-[#0e0d0b]/40 pointer-events-none z-10" />
+                  <div className="rx-scanlines z-10 opacity-30" />
+                </>
+              )}
 
               {/* Category tag top left */}
               <div className="absolute top-6 left-6 sm:left-12 z-20 font-mono text-[11px] sm:text-[12px] tracking-[0.2em] text-[#f3efe6]/70 uppercase flex items-center gap-2">
@@ -228,6 +256,12 @@ export default function StageSlider({
                   style={{ backgroundColor: section.accent }}
                 />
                 <span>{section.category}</span>
+                {section.sectionType === 'live-embed' && (
+                  <span className="text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
+                    <Radio className="w-2.5 h-2.5 animate-pulse text-amber-400" />
+                    LIVE PORTAL
+                  </span>
+                )}
                 {section.isCustom && (
                   <span className="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">
                     CUSTOM
@@ -267,18 +301,46 @@ export default function StageSlider({
 
                 {/* Action Buttons Row */}
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono text-[11px] sm:text-[12px] tracking-wider uppercase">
-                  {/* Enter destination link */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleActivate(section);
-                    }}
-                    className="flex items-center gap-2.5 px-5 py-3 rounded font-bold transition-all duration-300 cursor-pointer text-[#0e0d0b] shadow-lg group hover:scale-[1.02]"
-                    style={{ backgroundColor: section.accent || '#f3efe6', color: '#f3efe6' }}
-                  >
-                    <span>{section.cta}</span>
-                    <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
-                  </button>
+                  {/* If RAWx section, offer primary 16 sliders launcher */}
+                  {(section.id === 'articles' || section.title.toLowerCase().includes('rawx')) && onOpenSliders ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenSliders();
+                      }}
+                      className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer bg-amber-400 text-[#0e0d0b] shadow-xl shadow-amber-400/25 group hover:scale-[1.03] hover:bg-amber-300"
+                    >
+                      <Sparkles className="w-4 h-4 text-[#0e0d0b] animate-spin" />
+                      <span>OPEN 16 ULTRA SLIDERS</span>
+                    </button>
+                  ) : (
+                    /* Standard Enter destination link */
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleActivate(section);
+                      }}
+                      className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer text-[#0e0d0b] shadow-lg group hover:scale-[1.02]"
+                      style={{ backgroundColor: section.accent || '#f3efe6', color: '#f3efe6' }}
+                    >
+                      <span>{section.cta}</span>
+                      <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
+                    </button>
+                  )}
+
+                  {/* Secondary external link for RAWx if on RAWx */}
+                  {(section.id === 'articles' || section.title.toLowerCase().includes('rawx')) && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleActivate(section);
+                      }}
+                      className="flex items-center gap-2 px-4 py-3 bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6]/80 hover:text-[#f3efe6] border border-[#f3efe6]/20 rounded-lg transition-all cursor-pointer"
+                    >
+                      <span>VISIT RAWX.COM</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-[#f3efe6]/60" />
+                    </button>
+                  )}
 
                   {/* Open Section Tasks */}
                   <button
@@ -286,7 +348,7 @@ export default function StageSlider({
                       e.stopPropagation();
                       onOpenTasksForSection(section.id);
                     }}
-                    className="flex items-center gap-2 px-4 py-3 bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6] border border-[#f3efe6]/20 hover:border-[#f3efe6]/50 rounded transition-all cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-3 bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6] border border-[#f3efe6]/20 hover:border-[#f3efe6]/50 rounded-lg transition-all cursor-pointer"
                   >
                     <CheckSquare className="w-4 h-4 text-emerald-400" />
                     <span>Manage Tasks</span>
@@ -308,25 +370,32 @@ export default function StageSlider({
       </div>
 
       {/* Footer Status Strip */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-12 py-4 bg-[#0e0d0b]/90 border-t border-[#f3efe6]/10 backdrop-blur-md font-mono text-[11px] text-[#f3efe6]/60">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-12 py-3.5 bg-[#0e0d0b]/90 border-t border-[#f3efe6]/10 backdrop-blur-md font-mono text-[11px] text-[#f3efe6]/60">
         {/* Left: Counter */}
         <div className="flex items-center gap-2 tracking-widest text-[#f3efe6]">
           <span className="font-bold text-[13px]">{String(currentSectionIndex + 1).padStart(2, '0')}</span>
           <span className="text-[#f3efe6]/40">/ {String(sections.length).padStart(2, '0')} SECTIONS</span>
         </div>
 
-        {/* Center: Navigation Keyboard Hint */}
-        <div className="hidden md:flex items-center gap-2 text-[10px] tracking-wider uppercase text-[#f3efe6]/50">
+        {/* Center: Navigation Keyboard Hint & 16 Sliders Quick Trigger */}
+        <div className="hidden md:flex items-center gap-3 text-[10px] tracking-wider uppercase text-[#f3efe6]/50">
           <span className="border border-[#f3efe6]/20 px-1.5 py-0.5 rounded text-[#f3efe6]">←</span>
           <span className="border border-[#f3efe6]/20 px-1.5 py-0.5 rounded text-[#f3efe6]">→</span>
           <span>NAVIGATE</span>
           <span className="mx-2 text-[#f3efe6]/20">|</span>
-          <span className="border border-[#f3efe6]/20 px-1.5 py-0.5 rounded text-[#f3efe6]">ENTER</span>
-          <span>OPEN SITE</span>
+          {onOpenSliders && (
+            <button
+              onClick={onOpenSliders}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors font-bold cursor-pointer"
+            >
+              <Sparkles className="w-3 h-3 text-amber-400" />
+              <span>LAUNCH 16 ULTRA SLIDERS</span>
+            </button>
+          )}
         </div>
 
         {/* Right: Quick Jump Links */}
-        <div className="flex items-center gap-4 text-[10px] tracking-wider uppercase">
+        <div className="flex items-center gap-3 sm:gap-4 text-[10px] tracking-wider uppercase">
           {sections.slice(0, 4).map((s, idx) => (
             <button
               key={s.id}

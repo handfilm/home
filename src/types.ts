@@ -29,6 +29,9 @@ export interface SectionItem {
   accent: string;
   imageUrl?: string;
   isCustom?: boolean;
+  sectionType?: 'static' | 'live-embed';
+  embedUrl?: string | null;
+  embedFallback?: string;
 }
 
 export interface ConnectedDevice {

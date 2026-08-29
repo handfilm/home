@@ -94,6 +94,32 @@ body {
   background-size: 100% 100%, 32px 32px;
 }
 
+.tex-film {
+  background-color: #0b0908;
+  background-image:
+    radial-gradient(ellipse at center, rgba(224, 93, 38, 0.22) 0%, transparent 65%),
+    linear-gradient(rgba(243,239,230,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,239,230,0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+}
+
+@keyframes live-portal-drift {
+  0% { transform: scale(1.08) translate(0%, 0%); }
+  50% { transform: scale(1.14) translate(-1.5%, -1%); }
+  100% { transform: scale(1.08) translate(0%, 0%); }
+}
+
+.animate-live-drift {
+  animation: live-portal-drift 24s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-live-drift {
+    animation: none !important;
+    transform: scale(1.05) !important;
+  }
+}
+
 /* Color Grade LUT Filters */
 .rx-grade-teal {
   filter: saturate(.85) hue-rotate(8deg) contrast(1.08) !important;

@@ -28,9 +28,10 @@ import {
 interface RawxShowcaseProps {
   onOpenLightbox: (items: LightboxItem[], startIndex: number) => void;
   speed: number;
+  onBackToEcosystem?: () => void;
 }
 
-export default function RawxShowcase({ onOpenLightbox, speed }: RawxShowcaseProps) {
+export default function RawxShowcase({ onOpenLightbox, speed, onBackToEcosystem }: RawxShowcaseProps) {
   // Dynamic Sliders Media State with localStorage persistence
   const [slidersData, setSlidersData] = useState<AllSlidersData>(() => getStoredSlidersData());
 
@@ -388,14 +389,23 @@ export default function RawxShowcase({ onOpenLightbox, speed }: RawxShowcaseProp
       {/* Dynamic Master Control Toolbar & Quick Jump Bar */}
       <div className="sticky top-[65px] z-40 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#1c1c1c] px-4 sm:px-8 py-2.5 shadow-xl">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Left Actions: Photo Studio, Autoplay, Lightbox Trigger */}
+          {/* Left Actions: Return button, Photo Studio, Autoplay, Lightbox Trigger */}
           <div className="flex items-center gap-2 flex-wrap">
+            {onBackToEcosystem && (
+              <button
+                onClick={onBackToEcosystem}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#1f1e1a] border border-[#f3efe6]/25 hover:border-[#f3efe6]/60 text-xs text-[#f3efe6] tracking-wider uppercase transition-all cursor-pointer font-bold"
+              >
+                <span>← Ecosystem Stage</span>
+              </button>
+            )}
+
             <button
               onClick={() => openPhotoManagerFor('s1')}
               className="flex items-center gap-2 px-3.5 py-1.5 rounded bg-[#c8b89a] text-black font-bold text-xs tracking-wider uppercase hover:bg-white transition-all cursor-pointer shadow-md"
             >
               <Camera className="w-4 h-4" />
-              <span>Customize Photos &amp; Content</span>
+              <span>Customize Photos</span>
             </button>
 
             <button

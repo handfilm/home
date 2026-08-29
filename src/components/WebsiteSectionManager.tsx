@@ -37,6 +37,8 @@ export default function WebsiteSectionManager({
   const [cta, setCta] = useState('');
   const [accent, setAccent] = useState('#4f46e5');
   const [tex, setTex] = useState('tex-custom');
+  const [isLiveEmbed, setIsLiveEmbed] = useState(false);
+  const [embedUrl, setEmbedUrl] = useState('');
 
   if (!isOpen) return null;
 
@@ -44,17 +46,28 @@ export default function WebsiteSectionManager({
     e.preventDefault();
     if (!title.trim() || !dest.trim()) return;
 
+    const finalDest = dest.startsWith('http') ? dest : `https://${dest}`;
+    const finalEmbed = isLiveEmbed
+      ? embedUrl.trim()
+        ? embedUrl.startsWith('http')
+          ? embedUrl
+          : `https://${embedUrl}`
+        : finalDest
+      : undefined;
+
     onAddSection({
       title: title.trim(),
-      category: category.trim() || `0${sections.length + 1} / WEBSITE`,
+      category: category.trim() || `0${sections.length + 1} / ${isLiveEmbed ? 'LIVE PORTAL' : 'WEBSITE'}`,
       sub: sub.trim() || `${title.trim()} Online Portal`,
       desc: desc.trim() || `Explore the ${title.trim()} ecosystem section and digital tools.`,
       url: url.trim() || dest.replace(/^https?:\/\//, ''),
-      dest: dest.startsWith('http') ? dest : `https://${dest}`,
+      dest: finalDest,
       cta: cta.trim() || `ENTER ${title.trim().toUpperCase()}`,
       accent,
-      tex,
+      tex: isLiveEmbed ? 'tex-film' : tex,
       isCustom: true,
+      sectionType: isLiveEmbed ? 'live-embed' : 'static',
+      embedUrl: finalEmbed,
     });
 
     // Reset
@@ -65,6 +78,8 @@ export default function WebsiteSectionManager({
     setUrl('');
     setDest('');
     setCta('');
+    setIsLiveEmbed(false);
+    setEmbedUrl('');
     onClose();
   };
 
@@ -231,6 +246,38 @@ export default function WebsiteSectionManager({
                 placeholder="Brief summary of what this website section represents..."
                 className="w-full bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none focus:border-indigo-400"
               />
+            </div>
+
+            {/* Live Embed Toggle Option */}
+            <div className="p-3 bg-[#0e0d0b] border border-[#f3efe6]/10 rounded-lg space-y-2">
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isLiveEmbed}
+                  onChange={(e) => setIsLiveEmbed(e.target.checked)}
+                  className="w-4 h-4 rounded bg-[#1a1815] border-[#f3efe6]/30 text-amber-500 focus:ring-0 cursor-pointer"
+                />
+                <span className="text-[11px] font-bold text-[#f3efe6] uppercase">
+                  Enable Live Animated Portal Stream (Embed Mode)
+                </span>
+              </label>
+              {isLiveEmbed && (
+                <div className="pl-6 pt-1">
+                  <label className="block text-[#f3efe6]/60 uppercase text-[9px] mb-1">
+                    Live Stream Embed URL (defaults to Destination URL)
+                  </label>
+                  <input
+                    type="text"
+                    value={embedUrl}
+                    onChange={(e) => setEmbedUrl(e.target.value)}
+                    placeholder="https://handfilm.myshopify.com/"
+                    className="w-full bg-[#161512] border border-amber-500/30 rounded-lg px-3 py-1.5 text-xs text-[#f3efe6] focus:outline-none focus:border-amber-400"
+                  />
+                  <p className="text-[9px] text-[#f3efe6]/40 mt-1">
+                    Renders an ambient live interactive/animated stream as the section backdrop with automatic fallback.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Accent Color Picker */}
