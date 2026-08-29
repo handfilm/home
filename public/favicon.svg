@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="12" fill="#0e0d0b"/>
+  <circle cx="32" cy="32" r="24" stroke="#c8b89a" stroke-width="2" fill="none" opacity="0.4"/>
+  <text x="32" y="38" font-family="'Courier New', monospace" font-size="16" font-weight="700" fill="#f3efe6" text-anchor="middle" letter-spacing="1">H&amp;H</text>
+</svg>
