@@ -41,21 +41,104 @@
     <meta name="twitter:image" content="https://handsandhead.com/og-image.jpg" />
     <meta name="twitter:image:alt" content="HANDS & HEAD Master OS Interface Preview" />
 
-    <!-- Structured Data (JSON-LD) for Search Engines -->
+    <!-- Structured Data (JSON-LD) for Search Engines & Rich Results -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "HANDS & HEAD",
-        "url": "https://handsandhead.com/",
-        "description": "Unified Hands & Head and RAWx Master OS ecosystem with modular sections, cinematic slider system, and seamless multi-device task synchronization.",
-        "applicationCategory": "DesignApplication",
-        "operatingSystem": "All",
-        "image": "https://handsandhead.com/og-image.jpg",
-        "author": {
-          "@type": "Organization",
-          "name": "Hands & Head"
-        }
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://handsandhead.com/#organization",
+            "name": "Hands & Head",
+            "legalName": "Hands & Head / RAWx Collective",
+            "url": "https://handsandhead.com/",
+            "logo": "https://handsandhead.com/favicon.svg",
+            "image": "https://handsandhead.com/og-image.jpg",
+            "description": "Unified Hands & Head and RAWx Master OS ecosystem with modular sections, cinematic slider systems, luxury craft, and seamless multi-device task synchronization.",
+            "slogan": "Crafted Minds. Master Systems.",
+            "foundingDate": "2024",
+            "sameAs": [
+              "https://github.com/handsandhead",
+              "https://instagram.com/handsandhead"
+            ],
+            "knowsAbout": [
+              "Industrial Design",
+              "Leather Craftsmanship",
+              "Master OS Software",
+              "Multi-Device Synchronization",
+              "Cinematic Visual Production"
+            ]
+          },
+          {
+            "@type": "ProfessionalService",
+            "@id": "https://handsandhead.com/#localbusiness",
+            "name": "Hands & Head Studio & OS Lab",
+            "image": "https://handsandhead.com/og-image.jpg",
+            "url": "https://handsandhead.com/",
+            "priceRange": "$$$$",
+            "telephone": "+1-800-HANDS-HEAD",
+            "email": "contact@handsandhead.com",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Global Digital Vault / Studio",
+              "addressCountry": "US"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": "37.7749",
+              "longitude": "-122.4194"
+            },
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "opens": "00:00",
+              "closes": "23:59"
+            },
+            "areaServed": "Worldwide",
+            "currenciesAccepted": "USD, EUR, GBP, JPY"
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://handsandhead.com/#webapplication",
+            "name": "HANDS & HEAD Master OS",
+            "url": "https://handsandhead.com/",
+            "description": "Unified Hands & Head and RAWx Master OS workspace ecosystem with modular showcases, cinematic media gallery, and real-time multi-device task synchronization.",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "All",
+            "browserRequirements": "Requires JavaScript. Requires HTML5.",
+            "image": "https://handsandhead.com/og-image.jpg",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "author": {
+              "@id": "https://handsandhead.com/#organization"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://handsandhead.com/#website",
+            "url": "https://handsandhead.com/",
+            "name": "HANDS & HEAD",
+            "publisher": {
+              "@id": "https://handsandhead.com/#organization"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://handsandhead.com/?search={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
