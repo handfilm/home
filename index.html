@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="background-color: #0e0d0b; color: #f3efe6;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,10 +12,74 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      html, body {
+        background-color: #0e0d0b !important;
+        color: #f3efe6 !important;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        width: 100%;
+        overflow-x: hidden;
+      }
+      #root {
+        min-height: 100vh;
+        width: 100%;
+        background-color: #0e0d0b;
+      }
+      .boot-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #0e0d0b;
+        color: #f3efe6;
+        font-family: 'Courier New', Courier, monospace;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        z-index: 9999;
+      }
+      .boot-spinner {
+        width: 36px;
+        height: 36px;
+        border: 2px solid rgba(243, 239, 230, 0.15);
+        border-top-color: #c8b89a;
+        border-radius: 50%;
+        animation: boot-spin 0.8s linear infinite;
+        margin-bottom: 1rem;
+      }
+      @keyframes boot-spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    <script>
+      // Diagnostic handler: catch unhandled bootstrap errors
+      window.addEventListener('error', function(e) {
+        var el = document.getElementById('boot-error-diag');
+        if (el && e && e.message) {
+          el.style.display = 'block';
+          el.innerText = 'Bootstrap Note: ' + e.message;
+        }
+      });
+    </script>
   </head>
-  <body class="bg-[#0e0d0b] text-[#f3efe6] antialiased overflow-x-hidden select-none">
-    <div id="root"></div>
+  <body class="bg-[#0e0d0b] text-[#f3efe6] antialiased overflow-x-hidden select-none" style="background-color: #0e0d0b; color: #f3efe6;">
+    <div id="root">
+      <div class="boot-loader" id="boot-screen">
+        <div class="boot-spinner"></div>
+        <div style="font-size: 11px; font-weight: 700; color: #c8b89a; margin-bottom: 4px;">HANDS &amp; HEAD</div>
+        <div style="font-size: 9px; color: rgba(243, 239, 230, 0.5);">INITIALIZING MASTER OS...</div>
+        <div id="boot-error-diag" style="display:none; margin-top: 16px; font-size: 10px; color: #ff6b6b; max-width: 80%; word-break: break-all;"></div>
+      </div>
+      <noscript>
+        <div style="padding: 2rem; text-align: center; font-family: monospace; color: #f3efe6;">
+          <h2>JavaScript Required</h2>
+          <p>Please enable JavaScript to launch the Hands &amp; Head Master OS.</p>
+        </div>
+      </noscript>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
