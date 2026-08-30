@@ -32,6 +32,14 @@ export interface SectionItem {
   sectionType?: 'static' | 'live-embed';
   embedUrl?: string | null;
   embedFallback?: string;
+  subtitle?: string;
+  description?: string;
+  destinationUrl?: string;
+  texture?: string;
+  displayOrder?: number;
+  status?: string;
+  featured?: boolean;
+  eyebrow?: string;
 }
 
 export interface ConnectedDevice {

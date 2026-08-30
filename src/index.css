@@ -103,6 +103,241 @@ body {
   background-size: 100% 100%, 24px 24px, 24px 24px;
 }
 
+/* CATEGORY & PORTAL TEXTURE SYSTEM */
+.tex-commerce {
+  background-color: #1a100b;
+  background-image:
+    repeating-linear-gradient(115deg, rgba(243,239,230,0.05) 0px, rgba(243,239,230,0.05) 1px, transparent 1px, transparent 14px),
+    repeating-linear-gradient(25deg, rgba(177,74,38,0.16) 0px, rgba(177,74,38,0.16) 2px, transparent 2px, transparent 22px),
+    radial-gradient(circle at 30% 25%, rgba(177,74,38,0.35), transparent 55%);
+}
+
+.tex-media {
+  background-color: #15120a;
+  background-image: radial-gradient(rgba(243,239,230,0.14) 1px, transparent 1.4px);
+  background-size: 9px 9px;
+  position: relative;
+}
+.tex-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 65% 35%, rgba(199,154,61,0.35), transparent 55%);
+}
+
+.tex-manuf {
+  background-color: #0e1214;
+  background-image:
+    linear-gradient(rgba(243,239,230,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,239,230,0.06) 1px, transparent 1px),
+    radial-gradient(circle at 70% 30%, rgba(74,74,74,0.45), transparent 55%);
+  background-size: 42px 42px, 42px 42px, 100% 100%;
+}
+
+.tex-craft {
+  background-color: #161009;
+  background-image:
+    radial-gradient(rgba(243,239,230,0.13) 1.4px, transparent 1.8px),
+    radial-gradient(circle at 35% 70%, rgba(156,122,74,0.35), transparent 55%);
+  background-size: 13px 13px, 100% 100%;
+}
+
+.tex-agro-cat {
+  background-color: #10130d;
+  background-image:
+    repeating-linear-gradient(180deg, rgba(243,239,230,0.045) 0px, rgba(243,239,230,0.045) 1px, transparent 1px, transparent 26px),
+    radial-gradient(circle at 60% 60%, rgba(111,140,78,0.35), transparent 60%);
+}
+
+.tex-tools {
+  background-color: #0b0e10;
+  background-image:
+    linear-gradient(90deg, rgba(243,239,230,0.05) 1px, transparent 1px),
+    radial-gradient(rgba(243,239,230,0.10) 1px, transparent 1.3px),
+    radial-gradient(circle at 50% 40%, rgba(92,154,111,0.35), transparent 60%);
+  background-size: 64px 100%, 22px 22px, 100% 100%;
+}
+
+/* Specific Manufacturing & Special Division Textures */
+.tex-jute {
+  background-color: #16120c;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(107,90,60,0.2) 0px, rgba(107,90,60,0.2) 1.5px, transparent 1.5px, transparent 10px),
+    repeating-linear-gradient(-45deg, rgba(107,90,60,0.2) 0px, rgba(107,90,60,0.2) 1.5px, transparent 1.5px, transparent 10px),
+    radial-gradient(circle at 60% 30%, rgba(107,90,60,0.4), transparent 60%);
+  background-size: 16px 16px, 16px 16px, 100% 100%;
+}
+
+.tex-lingerie {
+  background-color: #170f14;
+  background-image:
+    radial-gradient(ellipse at center, rgba(106,74,85,0.45) 0%, transparent 65%),
+    radial-gradient(rgba(243,239,230,0.06) 1px, transparent 1px);
+  background-size: 100% 100%, 14px 14px;
+}
+
+.tex-gym {
+  background-color: #180d0d;
+  background-image:
+    repeating-linear-gradient(135deg, rgba(164,70,63,0.18) 0px, rgba(164,70,63,0.18) 2px, transparent 2px, transparent 24px),
+    linear-gradient(90deg, rgba(243,239,230,0.03) 1px, transparent 1px),
+    radial-gradient(circle at 75% 25%, rgba(164,70,63,0.4), transparent 60%);
+  background-size: 24px 24px, 100% 100%, 100% 100%;
+}
+
+.tex-bloomapp {
+  background-color: #0c1510;
+  background-image:
+    radial-gradient(ellipse at 40% 30%, rgba(92,154,111,0.4) 0%, transparent 65%),
+    linear-gradient(rgba(243,239,230,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,239,230,0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 20px 20px, 20px 20px;
+}
+
+.tex-apps {
+  background-color: #0d1217;
+  background-image:
+    linear-gradient(rgba(107,127,143,0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107,127,143,0.18) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(107,127,143,0.38), transparent 60%);
+  background-size: 32px 32px, 32px 32px, 100% 100%;
+}
+
+.tex-note {
+  background-color: #151410;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(176,168,136,0.15) 0px, rgba(176,168,136,0.15) 1px, transparent 1px, transparent 20px),
+    radial-gradient(circle at 30% 70%, rgba(176,168,136,0.32), transparent 60%);
+  background-size: 100% 20px, 100% 100%;
+}
+
+.tex-picseed {
+  background-color: #150f16;
+  background-image:
+    radial-gradient(circle at 20% 40%, rgba(154,92,138,0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 60%, rgba(92,92,156,0.35) 0%, transparent 50%),
+    radial-gradient(rgba(243,239,230,0.06) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 12px 12px;
+}
+
+.tex-hub {
+  background-color: #0b1517;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(63,138,143,0.42) 0%, transparent 65%),
+    linear-gradient(rgba(243,239,230,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,239,230,0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px, 28px 28px;
+}
+
+.tex-deeper {
+  background-color: #0e0e1a;
+  background-image:
+    radial-gradient(ellipse at 60% 40%, rgba(90,90,156,0.45) 0%, transparent 65%),
+    repeating-linear-gradient(45deg, rgba(243,239,230,0.03) 0px, rgba(243,239,230,0.03) 1px, transparent 1px, transparent 16px);
+  background-size: 100% 100%, 16px 16px;
+}
+
+.tex-hiya {
+  background-color: #190f0c;
+  background-image:
+    radial-gradient(circle at 40% 30%, rgba(194,106,90,0.4) 0%, transparent 60%),
+    radial-gradient(rgba(243,239,230,0.07) 1px, transparent 1.5px);
+  background-size: 100% 100%, 15px 15px;
+}
+
+.tex-me {
+  background-color: #141411;
+  background-image:
+    radial-gradient(circle at 50% 40%, rgba(143,143,122,0.38) 0%, transparent 60%),
+    linear-gradient(rgba(243,239,230,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,239,230,0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+}
+
+/* MANUFACTURING: Textiles (Warp & Weft thread mesh) */
+.tex-textiles {
+  background-color: #0c1219;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(73, 107, 136, 0.18) 0px, rgba(73, 107, 136, 0.18) 1px, transparent 1px, transparent 6px),
+    repeating-linear-gradient(90deg, rgba(243, 239, 230, 0.05) 0px, rgba(243, 239, 230, 0.05) 1px, transparent 1px, transparent 6px),
+    radial-gradient(circle at 75% 20%, rgba(73, 107, 136, 0.4), transparent 60%);
+  background-size: 12px 12px, 12px 12px, 100% 100%;
+}
+
+/* MANUFACTURING: RMG (Stitch line & geometric factory grid) */
+.tex-rmg {
+  background-color: #101214;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(93, 109, 126, 0.12) 0px, rgba(93, 109, 126, 0.12) 1.5px, transparent 1.5px, transparent 18px),
+    linear-gradient(rgba(243, 239, 230, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243, 239, 230, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 25% 70%, rgba(93, 109, 126, 0.35), transparent 55%);
+  background-size: 36px 36px, 18px 18px, 18px 18px, 100% 100%;
+}
+
+/* MANUFACTURING: Leather (Organic tannery grain & rust-leather hide) */
+.tex-leather {
+  background-color: #160e0a;
+  background-image:
+    radial-gradient(rgba(243, 239, 230, 0.08) 1px, transparent 1.5px),
+    repeating-linear-gradient(135deg, rgba(140, 88, 53, 0.14) 0px, rgba(140, 88, 53, 0.14) 2px, transparent 2px, transparent 20px),
+    radial-gradient(circle at 60% 40%, rgba(140, 88, 53, 0.42), transparent 60%);
+  background-size: 8px 8px, 100% 100%, 100% 100%;
+}
+
+/* MANUFACTURING: Jacket (Outerwear diamond ripstop baffle grid) */
+.tex-jacket {
+  background-color: #0b1115;
+  background-image:
+    linear-gradient(60deg, rgba(54, 79, 89, 0.2) 1px, transparent 1px),
+    linear-gradient(120deg, rgba(54, 79, 89, 0.2) 1px, transparent 1px),
+    linear-gradient(rgba(243, 239, 230, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 35% 25%, rgba(54, 79, 89, 0.45), transparent 65%);
+  background-size: 28px 48px, 28px 48px, 100% 100%, 100% 100%;
+}
+
+/* CRAFT: Bracelets (Braided cord fine tactile dot texture) */
+.tex-bracelets {
+  background-color: #17110c;
+  background-image:
+    radial-gradient(circle at center, rgba(196, 125, 78, 0.3) 1px, transparent 2px),
+    repeating-linear-gradient(70deg, rgba(196, 125, 78, 0.12) 0px, rgba(196, 125, 78, 0.12) 1px, transparent 1px, transparent 10px),
+    repeating-linear-gradient(-70deg, rgba(196, 125, 78, 0.12) 0px, rgba(196, 125, 78, 0.12) 1px, transparent 1px, transparent 10px),
+    radial-gradient(circle at 50% 50%, rgba(196, 125, 78, 0.35), transparent 60%);
+  background-size: 14px 14px, 100% 100%, 100% 100%, 100% 100%;
+}
+
+/* AGRICULTURE: Agro (Organic terrain furrow contour bands) */
+.tex-agro {
+  background-color: #0d140e;
+  background-image:
+    repeating-linear-gradient(175deg, rgba(108, 131, 92, 0.16) 0px, rgba(108, 131, 92, 0.16) 2px, transparent 2px, transparent 16px),
+    linear-gradient(rgba(243, 239, 230, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 30% 60%, rgba(108, 131, 92, 0.38), transparent 60%);
+  background-size: 100% 100%, 32px 32px, 100% 100%;
+}
+
+/* FOOD: Food (Restrained terracotta roasted grain stipple) */
+.tex-food {
+  background-color: #150f0c;
+  background-image:
+    radial-gradient(rgba(160, 97, 64, 0.28) 1.5px, transparent 2px),
+    radial-gradient(rgba(243, 239, 230, 0.05) 1px, transparent 1.5px),
+    radial-gradient(circle at 70% 40%, rgba(160, 97, 64, 0.38), transparent 58%);
+  background-size: 12px 12px, 6px 6px, 100% 100%;
+  background-position: 0 0, 3px 3px, 0 0;
+}
+
+/* LIFESTYLE: Bloom (Delicate organic petal wash & botanical flow) */
+.tex-bloom {
+  background-color: #140d13;
+  background-image:
+    radial-gradient(ellipse at 40% 30%, rgba(168, 101, 132, 0.38) 0%, transparent 65%),
+    radial-gradient(circle at 80% 75%, rgba(142, 91, 123, 0.28) 0%, transparent 55%),
+    radial-gradient(rgba(243, 239, 230, 0.06) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 16px 16px;
+}
+
 @keyframes live-portal-drift {
   0% { transform: scale(1.08) translate(0%, 0%); }
   50% { transform: scale(1.14) translate(-1.5%, -1%); }

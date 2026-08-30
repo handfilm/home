@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>HANDS &amp; HEAD — Offline Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0e0d0b" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background-color: #0e0d0b;
+        color: #f3efe6;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        text-align: center;
+      }
+      .logo-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        background: #181614;
+        border: 1px solid rgba(243, 239, 230, 0.15);
+        border-radius: 4px;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #c8b89a;
+        margin-bottom: 2rem;
+      }
+      h1 {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        letter-spacing: -0.02em;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+        text-transform: uppercase;
+      }
+      p {
+        color: rgba(243, 239, 230, 0.6);
+        max-width: 440px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0 0 2rem 0;
+      }
+      .retry-btn {
+        background: #f3efe6;
+        color: #0e0d0b;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: transform 0.2s, background 0.2s;
+      }
+      .retry-btn:hover {
+        background: #c8b89a;
+        transform: translateY(-1px);
+      }
+      .status-pill {
+        margin-top: 2rem;
+        font-size: 10px;
+        font-family: monospace;
+        letter-spacing: 0.15em;
+        color: rgba(243, 239, 230, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo-pill">
+      <span style="width:6px; height:6px; border-radius:50%; background:#b14a26;"></span>
+      HANDS &amp; HEAD · MASTER OS
+    </div>
+    <h1>CONNECTION OFFLINE</h1>
+    <p>
+      The network connection was lost. Cached workspace elements remain available. Please reconnect to sync tasks and stream live media portals.
+    </p>
+    <button class="retry-btn" onclick="window.location.reload()">
+      RETRY CONNECTION
+    </button>
+    <div class="status-pill">
+      STANDALONE PWA CACHE ACTIVE · LOCAL CLIENT ENGINE READY
+    </div>
+  </body>
+</html>

@@ -1,7 +1,13 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { TaskItem, SectionItem, SyncState, ActiveTab, ColorGrade, EasingType } from './types';
-import { INITIAL_SECTIONS, INITIAL_TASKS, GRADES, EASING_OPTIONS } from './data/initialData';
+import { INITIAL_SECTIONS, INITIAL_TASKS, GRADES } from './data/initialData';
 import { MultiDeviceSyncEngine, getStoredRoomId, getDeviceName } from './services/syncService';
+import { TRANSLATIONS, Language } from './i18n/translations';
+import { audioEngine } from './services/audioEngine';
+import { getInitialPortalFromUrl, updateUrlForPortal } from './services/deepLinkService';
+import { initPwa, subscribeToInstallPrompt, promptPwaInstall } from './services/pwaService';
+import { getStoredVisitorState, recordPortalVisit } from './services/visitorState';
+import { trackEvent } from './services/analytics';
 
 import GrainCanvas from './components/GrainCanvas';
 import CustomCursor from './components/CustomCursor';
@@ -15,11 +21,45 @@ import IndexOverlay from './components/IndexOverlay';
 import SpeedConsole from './components/SpeedConsole';
 import KeyboardHud from './components/KeyboardHud';
 import LightboxModal, { LightboxItem } from './components/LightboxModal';
+import AmbientShaderCanvas from './components/AmbientShaderCanvas';
+import CommandPalette from './components/CommandPalette';
+import StatusTicker from './components/StatusTicker';
+import ReturningVisitorBanner from './components/ReturningVisitorBanner';
+
+const LANGUAGE_STORAGE_KEY = 'hh_master_language';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<ActiveTab>('ecosystem');
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+
+  // Language State (EN | BN)
+  const [language, setLanguage] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      if (saved === 'bn' || saved === 'en') return saved;
+    } catch {
+      // ignore
+    }
+    return 'en';
+  });
+
+  const t = TRANSLATIONS[language];
+
+  // Ambient Sound State (Off by default)
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
+
+  // PWA State
+  const [canInstallPwa, setCanInstallPwa] = useState(false);
+
+  // Command Palette State
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Visited Portals State
+  const [visitedPortals, setVisitedPortals] = useState<string[]>(() => {
+    const state = getStoredVisitorState();
+    return state.visitedPortals;
+  });
 
   // Sections & Tasks State
   const [sections, setSections] = useState<SectionItem[]>(INITIAL_SECTIONS);
@@ -67,11 +107,41 @@ export default function App() {
   // Filter tasks for a specific section when jumped from Stage
   const [filterSectionId, setFilterSectionId] = useState<string | null>(null);
 
-  // Initialize Sync Engine
+  // 1. Initialize PWA
+  useEffect(() => {
+    initPwa();
+    const unsubscribe = subscribeToInstallPrompt((canInstall) => {
+      setCanInstallPwa(canInstall);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Initialize Deep Linking & initial section selection
+  useEffect(() => {
+    const initialPortalId = getInitialPortalFromUrl(sections[0]?.id || 'd2c');
+    const matchedIdx = sections.findIndex((s) => s.id.toLowerCase() === initialPortalId.toLowerCase());
+    if (matchedIdx !== -1) {
+      setCurrentSectionIndex(matchedIdx);
+    }
+  }, [sections]);
+
+  // 3. Update URL & Audio on section change
+  useEffect(() => {
+    const cur = sections[currentSectionIndex];
+    if (cur) {
+      updateUrlForPortal(cur.id, cur.title);
+      audioEngine.setPortal(cur.id);
+
+      const updated = recordPortalVisit(cur.id);
+      setVisitedPortals(updated.visitedPortals);
+    }
+  }, [currentSectionIndex, sections]);
+
+  // 4. Initialize Sync Engine
   useEffect(() => {
     const engine = new MultiDeviceSyncEngine(
       initialRoom,
-      (remoteTasks, remoteSections, remoteDevices, source) => {
+      (remoteTasks, remoteSections, remoteDevices) => {
         if (Array.isArray(remoteTasks) && remoteTasks.length > 0) {
           setTasks(remoteTasks);
         }
@@ -106,9 +176,42 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 600);
+    }, 450);
     return () => clearTimeout(timer);
   }, []);
+
+  // Language Switcher Handler
+  const handleToggleLanguage = useCallback(() => {
+    setLanguage((prev) => {
+      const next: Language = prev === 'en' ? 'bn' : 'en';
+      try {
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, next);
+      } catch {
+        // ignore
+      }
+      trackEvent('MASTER_LANGUAGE_TOGGLE', { language: next });
+      return next;
+    });
+  }, []);
+
+  // Ambient Sound Toggle Handler
+  const handleToggleSound = useCallback(() => {
+    setIsSoundEnabled((prev) => {
+      const next = !prev;
+      audioEngine.setEnabled(next);
+      trackEvent('MASTER_SOUND_TOGGLE', { enabled: next });
+      return next;
+    });
+  }, []);
+
+  // Color Grade Cycle
+  const cycleGrade = useCallback(() => {
+    const gradeKeys: ColorGrade[] = ['off', 'teal', 'amber', 'noir', 'bleach'];
+    const currIdx = gradeKeys.indexOf(currentGrade);
+    const nextGrade = gradeKeys[(currIdx + 1) % gradeKeys.length];
+    setCurrentGrade(nextGrade);
+    trackEvent('MASTER_COLOR_GRADE_CHANGE', { grade: nextGrade });
+  }, [currentGrade]);
 
   // Global Keyboard shortcuts
   useEffect(() => {
@@ -116,6 +219,20 @@ export default function App() {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) {
         return;
       }
+
+      // Cmd+K or Ctrl+K or / opens Command Palette
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+        return;
+      }
+
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+        return;
+      }
+
       if (e.key === 'g' || e.key === 'G') {
         cycleGrade();
       }
@@ -126,14 +243,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentGrade]);
-
-  const cycleGrade = () => {
-    const gradeKeys: ColorGrade[] = ['off', 'teal', 'amber', 'noir', 'bleach'];
-    const currIdx = gradeKeys.indexOf(currentGrade);
-    const nextGrade = gradeKeys[(currIdx + 1) % gradeKeys.length];
-    setCurrentGrade(nextGrade);
-  };
+  }, [cycleGrade]);
 
   const handleJoinRoom = (newRoomId: string) => {
     if (syncEngineRef.current) {
@@ -250,6 +360,12 @@ export default function App() {
       {/* Background Film Grain */}
       <GrainCanvas />
 
+      {/* GPU Ambient Shader Canvas */}
+      <AmbientShaderCanvas
+        accentColor={currentSection?.accent || '#b14a26'}
+        portalId={currentSection?.id || 'd2c'}
+      />
+
       {/* Custom Crosshair Desktop Cursor */}
       <CustomCursor label={cursorLabel} />
 
@@ -261,10 +377,10 @@ export default function App() {
         }`}
       >
         <div className="text-sm tracking-[0.3em] uppercase text-[#f3efe6]/80 font-mono flex items-center gap-2">
-          <b>HANDS &amp; HEAD</b> — MASTER OS
+          <b>{t.brand.name}</b> — {t.brand.tagline}
         </div>
         <div className="w-48 h-[1px] bg-[#f3efe6]/20 relative overflow-hidden">
-          <div className="absolute left-0 top-0 h-full w-full bg-[#f3efe6] animate-[load_1s_ease_forwards]" />
+          <div className="absolute left-0 top-0 h-full w-full bg-[#f3efe6] animate-[load_0.8s_ease_forwards]" />
         </div>
       </div>
 
@@ -286,6 +402,14 @@ export default function App() {
           pending: tasks.filter((t) => t.status !== 'done').length,
           done: tasks.filter((t) => t.status === 'done').length,
         }}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        isSoundEnabled={isSoundEnabled}
+        onToggleSound={handleToggleSound}
+        language={language}
+        onToggleLanguage={handleToggleLanguage}
+        canInstallPwa={canInstallPwa}
+        onPromptInstall={promptPwaInstall}
+        t={t}
       />
 
       {/* Main Tab Content */}
@@ -300,6 +424,8 @@ export default function App() {
             onOpenTasksForSection={handleOpenTasksForSection}
             sectionTasksCount={sectionTasksCount}
             onOpenSliders={() => setActiveTab('rawx-showcase')}
+            language={language}
+            t={t}
           />
         )}
 
@@ -334,6 +460,50 @@ export default function App() {
         )}
       </main>
 
+      {/* Ecosystem Status Ticker (bottom ambient bar) */}
+      <StatusTicker
+        sections={sections}
+        onSelectSection={(idx) => {
+          setCurrentSectionIndex(idx);
+          setActiveTab('ecosystem');
+        }}
+        currentSectionIndex={currentSectionIndex}
+        t={t}
+      />
+
+      {/* Subtle Returning Visitor Banner */}
+      <ReturningVisitorBanner
+        sections={sections}
+        onSelectSection={(idx) => {
+          setCurrentSectionIndex(idx);
+          setActiveTab('ecosystem');
+        }}
+        t={t}
+      />
+
+      {/* Command Palette (⌘K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        sections={sections}
+        onSelectSection={(idx) => {
+          setCurrentSectionIndex(idx);
+          setActiveTab('ecosystem');
+        }}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onToggleSound={handleToggleSound}
+        isSoundEnabled={isSoundEnabled}
+        language={language}
+        onToggleLanguage={handleToggleLanguage}
+        onCycleGrade={cycleGrade}
+        onOpenSyncModal={() => setIsSyncModalOpen(true)}
+        onOpenSpeedConsole={() => setIsConsoleOpen(true)}
+        onPromptInstall={promptPwaInstall}
+        canInstallPwa={canInstallPwa}
+        t={t}
+      />
+
       {/* Master Index Drawer Overlay */}
       <IndexOverlay
         isOpen={isIndexOpen}
@@ -351,6 +521,8 @@ export default function App() {
           setIsIndexOpen(false);
           setActiveTab('rawx-showcase');
         }}
+        visitedPortals={visitedPortals}
+        t={t}
       />
 
       {/* Device Sync Pairing QR Modal */}

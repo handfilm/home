@@ -14,8 +14,13 @@
     <link rel="canonical" href="https://handsandhead.com/" />
     <meta name="theme-color" content="#0e0d0b" />
     <meta name="color-scheme" content="dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="H&H Master OS" />
 
-    <!-- Favicon & Icons -->
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/og-image.jpg" />
 
@@ -137,6 +142,55 @@
               "target": "https://handsandhead.com/?search={search_term_string}",
               "query-input": "required name=search_term_string"
             }
+          },
+          {
+            "@type": "ItemList",
+            "@id": "https://handsandhead.com/#sitenavigation",
+            "name": "Hands & Head Ecosystem Navigation",
+            "itemListElement": [
+              {
+                "@type": "SiteNavigationElement",
+                "position": 1,
+                "name": "D2C Shop",
+                "description": "Consumer commerce, leather goods and direct drops",
+                "url": "https://handsandhead.com/#d2c"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 2,
+                "name": "Arutemika B2B",
+                "description": "Corporate & wholesale procurement portal",
+                "url": "https://handsandhead.com/#b2b"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 3,
+                "name": "Articles Editorial",
+                "description": "Essays on design, technology, AI and industrial realism",
+                "url": "https://handsandhead.com/#articles"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 4,
+                "name": "Hand Film Cinema",
+                "description": "Live cinematic world stream and media productions",
+                "url": "https://handsandhead.com/#handfilm"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 5,
+                "name": "RAWx 16 Sliders Engine",
+                "description": "Ultra slider architectural showcase with 16 variants",
+                "url": "https://handsandhead.com/#sliders"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 6,
+                "name": "Multi-Device Task Sync",
+                "description": "Real-time encrypted cross-device workspace synchronization",
+                "url": "https://handsandhead.com/#tasks"
+              }
+            ]
           }
         ]
       }

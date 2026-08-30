@@ -1,7 +1,22 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SectionItem } from '../types';
-import { ArrowLeft, ArrowRight, ExternalLink, Plus, Sparkles, CheckSquare, Radio } from 'lucide-react';
+import { PORTAL_CATEGORIES } from '../data/initialData';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ExternalLink,
+  Plus,
+  Sparkles,
+  CheckSquare,
+  Radio,
+  Share2,
+  Check,
+} from 'lucide-react';
 import LiveEmbedPortal from './LiveEmbedPortal';
+import { Language, TranslationDictionary } from '../i18n/translations';
+import { copyPortalShareLink } from '../services/deepLinkService';
+import { trackEvent } from '../services/analytics';
+import { recordPortalVisit } from '../services/visitorState';
 
 interface StageSliderProps {
   sections: SectionItem[];
@@ -12,6 +27,8 @@ interface StageSliderProps {
   onOpenTasksForSection: (sectionId: string) => void;
   sectionTasksCount: Record<string, number>;
   onOpenSliders?: () => void;
+  language: Language;
+  t: TranslationDictionary;
 }
 
 export default function StageSlider({
@@ -23,9 +40,13 @@ export default function StageSlider({
   onOpenTasksForSection,
   sectionTasksCount,
   onOpenSliders,
+  language,
+  t,
 }: StageSliderProps) {
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+  const [copiedSectionId, setCopiedSectionId] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   const total = sections.length;
@@ -37,14 +58,26 @@ export default function StageSlider({
       if (next < 0) next = total - 1;
       if (next >= total) next = 0;
       setCurrentSectionIndex(next);
+      if (sections[next]) {
+        recordPortalVisit(sections[next].id);
+        trackEvent('MASTER_SECTION_VIEW', { sectionId: sections[next].id, title: sections[next].title });
+      }
     },
-    [total, setCurrentSectionIndex]
+    [total, setCurrentSectionIndex, sections]
   );
+
+  // Parallax mouse move effect
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    const x = (clientX / innerWidth - 0.5) * 20;
+    const y = (clientY / innerHeight - 0.5) * 20;
+    setMouseOffset({ x, y });
+  };
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept if typing in an input or modal is open
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) {
         return;
       }
@@ -91,28 +124,66 @@ export default function StageSlider({
   }, [currentSectionIndex, goTo]);
 
   const handleActivate = (s: SectionItem) => {
+    trackEvent('MASTER_SECTION_CLICK', { sectionId: s.id, url: s.dest });
     if (s.dest) {
       window.open(s.dest, '_blank', 'noopener');
     }
   };
 
+  const handleShare = async (e: React.MouseEvent, section: SectionItem) => {
+    e.stopPropagation();
+    trackEvent('MASTER_SHARE_CLICK', { sectionId: section.id });
+    const copied = await copyPortalShareLink(section.id);
+    if (copied) {
+      setCopiedSectionId(section.id);
+      setTimeout(() => setCopiedSectionId(null), 2500);
+    }
+  };
+
+  // Helper to get translated content for standard and extended sections
+  const getDisplayDetails = (section: SectionItem) => {
+    const trans = t.sections[section.id];
+    if (trans) {
+      return {
+        title: trans.title,
+        category: trans.category,
+        sub: trans.sub,
+        desc: trans.desc,
+        cta: trans.cta,
+      };
+    }
+
+    return {
+      title: section.title,
+      category: section.category,
+      sub: section.sub || section.subtitle || '',
+      desc: section.desc || section.description || '',
+      cta: section.cta,
+    };
+  };
+
   return (
-    <div className="relative w-full h-[calc(100vh-65px)] mt-[65px] overflow-hidden bg-[#0e0d0b]">
+    <div
+      onMouseMove={handleMouseMove}
+      className="relative w-full h-[calc(100vh-65px)] mt-[65px] overflow-hidden bg-[#0e0d0b]"
+    >
       {/* Side Navigation Rail */}
       <nav
-        className="fixed right-6 sm:right-10 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-3.5 items-end font-mono text-[10px] tracking-[0.14em] uppercase"
+        className="fixed right-4 sm:right-8 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-1.5 sm:gap-2 items-end font-mono text-[9.5px] sm:text-[10px] tracking-[0.14em] uppercase max-h-[84vh] overflow-y-auto no-scrollbar py-2 pr-1"
         aria-label="Section Navigation Rail"
       >
         {sections.map((s, idx) => {
           const isActive = idx === currentSectionIndex;
           const pendingCount = sectionTasksCount[s.id] || 0;
+          const display = getDisplayDetails(s);
+
           return (
             <button
               key={s.id}
               onClick={() => goTo(idx)}
-              onMouseEnter={() => onSetCursorLabel(`VIEW ${s.title}`)}
-              className={`flex items-center gap-3 py-1 cursor-pointer transition-all duration-300 group ${
-                isActive ? 'text-[#f3efe6] font-bold' : 'text-[#f3efe6]/40 hover:text-[#f3efe6]'
+              onMouseEnter={() => onSetCursorLabel(`${t.actions.view} ${display.title}`)}
+              className={`flex items-center gap-2.5 py-0.5 cursor-pointer transition-all duration-200 group ${
+                isActive ? 'text-[#f3efe6] font-bold translate-x-0' : 'text-[#f3efe6]/40 hover:text-[#f3efe6] hover:translate-x-[-2px]'
               }`}
             >
               {pendingCount > 0 && (
@@ -120,12 +191,15 @@ export default function StageSlider({
                   {pendingCount}
                 </span>
               )}
-              <span>{s.title}</span>
+              <span className="text-[8.5px] text-[#f3efe6]/30 font-mono group-hover:text-[#f3efe6]/60">
+                {String(idx + 1).padStart(2, '0')}
+              </span>
+              <span>{display.title}</span>
               <span
-                className="h-[1px] transition-all duration-300"
+                className="h-[1.5px] transition-all duration-300 rounded-full"
                 style={{
-                  width: isActive ? '32px' : '16px',
-                  backgroundColor: isActive ? s.accent : 'rgba(243,239,230,0.2)',
+                  width: isActive ? '28px' : '10px',
+                  backgroundColor: isActive ? (s.accent || '#b14a26') : 'rgba(243,239,230,0.2)',
                 }}
               />
             </button>
@@ -133,19 +207,19 @@ export default function StageSlider({
         })}
         <button
           onClick={onOpenSectionManager}
-          title="Add another website as section"
-          className="flex items-center gap-2 py-1 mt-2 text-[#f3efe6]/40 hover:text-emerald-400 cursor-pointer text-[9px]"
+          title={t.nav.addSite}
+          className="flex items-center gap-2 py-1 mt-1 text-[#f3efe6]/40 hover:text-emerald-400 cursor-pointer text-[9px]"
         >
-          <span>+ ADD SITE</span>
-          <span className="w-3 h-[1px] bg-[#f3efe6]/20" />
+          <span>{t.nav.addSite}</span>
+          <span className="w-2.5 h-[1px] bg-[#f3efe6]/20" />
         </button>
         {onOpenSliders && (
           <button
             onClick={onOpenSliders}
             title="Open RAWx Master OS Ultra 16-Slider System"
-            className="flex items-center gap-2 py-1 mt-1 text-amber-400 hover:text-amber-300 font-bold cursor-pointer text-[9.5px] border-t border-amber-500/20 pt-2"
+            className="flex items-center gap-1.5 py-1 text-amber-400 hover:text-amber-300 font-bold cursor-pointer text-[9px] border-t border-amber-500/20 pt-1.5"
           >
-            <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
+            <Sparkles className="w-2.5 h-2.5 text-amber-400 animate-pulse" />
             <span>16 SLIDERS ↗</span>
           </button>
         )}
@@ -197,6 +271,8 @@ export default function StageSlider({
         {sections.map((section, idx) => {
           const isActive = idx === currentSectionIndex;
           const pendingTasks = sectionTasksCount[section.id] || 0;
+          const display = getDisplayDetails(section);
+          const isCopied = copiedSectionId === section.id;
 
           return (
             <div
@@ -206,7 +282,7 @@ export default function StageSlider({
                   goTo(idx);
                 }
               }}
-              onMouseEnter={() => onSetCursorLabel(`${section.cta} →`)}
+              onMouseEnter={() => onSetCursorLabel(`${display.cta} →`)}
               className={`relative h-full overflow-hidden transition-all duration-700 select-none ${
                 window.innerWidth > 780 ? 'flex-shrink-0' : 'w-full min-h-[85vh]'
               }`}
@@ -222,7 +298,7 @@ export default function StageSlider({
                   fallbackTexture={section.tex || 'tex-film'}
                   isActive={isActive}
                   isAdjacent={Math.abs(idx - currentSectionIndex) <= 1}
-                  title={section.title}
+                  title={display.title}
                   accent={section.accent}
                   onOpenDirect={() => handleActivate(section)}
                 />
@@ -233,13 +309,23 @@ export default function StageSlider({
                       className={`absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
                         isActive ? 'scale-100 opacity-80' : 'scale-105 opacity-40'
                       }`}
-                      style={{ backgroundImage: `url('${section.imageUrl}')` }}
+                      style={{
+                        backgroundImage: `url('${section.imageUrl}')`,
+                        transform: isActive
+                          ? `scale(1) translate(${mouseOffset.x * 0.4}px, ${mouseOffset.y * 0.4}px)`
+                          : 'scale(1.05)',
+                      }}
                     />
                   ) : (
                     <div
                       className={`absolute inset-0 transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
                         section.tex || 'tex-d2c'
                       } ${isActive ? 'scale-100 opacity-100' : 'scale-105 opacity-60'}`}
+                      style={{
+                        transform: isActive
+                          ? `scale(1) translate(${mouseOffset.x * 0.4}px, ${mouseOffset.y * 0.4}px)`
+                          : 'scale(1.05)',
+                      }}
                     />
                   )}
 
@@ -255,7 +341,7 @@ export default function StageSlider({
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: section.accent }}
                 />
-                <span>{section.category}</span>
+                <span>{display.category}</span>
                 {section.sectionType === 'live-embed' && (
                   <span className="text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
                     <Radio className="w-2.5 h-2.5 animate-pulse text-amber-400" />
@@ -270,7 +356,14 @@ export default function StageSlider({
               </div>
 
               {/* Main Content Area at Bottom */}
-              <div className="relative z-20 h-full flex flex-col justify-end px-6 sm:px-16 pb-20 sm:pb-24 max-w-4xl">
+              <div
+                className="relative z-20 h-full flex flex-col justify-end px-6 sm:px-16 pb-20 sm:pb-24 max-w-4xl transition-transform duration-300"
+                style={{
+                  transform: isActive
+                    ? `translate(${mouseOffset.x * -0.3}px, ${mouseOffset.y * -0.3}px)`
+                    : 'none',
+                }}
+              >
                 {/* Eyebrow */}
                 <div
                   className={`font-mono text-[11px] tracking-[0.2em] text-[#f3efe6]/60 uppercase mb-3 sm:mb-4 flex items-center gap-3 transition-all duration-500 ${
@@ -281,28 +374,29 @@ export default function StageSlider({
                     {String(idx + 1).padStart(2, '0')}
                   </span>
                   <span>/ {String(sections.length).padStart(2, '0')}</span>
-                  <span>— H&amp;H ECOSYSTEM</span>
+                  <span>— {t.brand.name}</span>
                 </div>
 
                 {/* Big Display Title */}
                 <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight text-[#f3efe6] leading-[0.9] mb-4">
-                  {section.title}
+                  {display.title}
                 </h1>
 
                 {/* Subtitle in elegant serif font */}
                 <p className="serif-display italic text-lg sm:text-2xl text-[#f3efe6]/90 mb-3 max-w-2xl font-light">
-                  {section.sub}
+                  {display.sub}
                 </p>
 
                 {/* Description */}
                 <p className="text-sm sm:text-base text-[#f3efe6]/70 max-w-xl mb-6 leading-relaxed">
-                  {section.desc}
+                  {display.desc}
                 </p>
 
                 {/* Action Buttons Row */}
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono text-[11px] sm:text-[12px] tracking-wider uppercase">
                   {/* If RAWx section, offer primary 16 sliders launcher */}
-                  {(section.id === 'articles' || section.title.toLowerCase().includes('rawx')) && onOpenSliders ? (
+                  {(section.id === 'articles' || section.title.toLowerCase().includes('rawx')) &&
+                  onOpenSliders ? (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -320,27 +414,30 @@ export default function StageSlider({
                         e.stopPropagation();
                         handleActivate(section);
                       }}
-                      className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer text-[#0e0d0b] shadow-lg group hover:scale-[1.02]"
-                      style={{ backgroundColor: section.accent || '#f3efe6', color: '#f3efe6' }}
+                      className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer shadow-lg group hover:scale-[1.02]"
+                      style={{
+                        backgroundColor: section.accent || '#f3efe6',
+                        color: '#f3efe6',
+                      }}
                     >
-                      <span>{section.cta}</span>
+                      <span>{display.cta}</span>
                       <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
                     </button>
                   )}
 
-                  {/* Secondary external link for RAWx if on RAWx */}
-                  {(section.id === 'articles' || section.title.toLowerCase().includes('rawx')) && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleActivate(section);
-                      }}
-                      className="flex items-center gap-2 px-4 py-3 bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6]/80 hover:text-[#f3efe6] border border-[#f3efe6]/20 rounded-lg transition-all cursor-pointer"
-                    >
-                      <span>VISIT RAWX.COM</span>
-                      <ExternalLink className="w-3.5 h-3.5 text-[#f3efe6]/60" />
-                    </button>
-                  )}
+                  {/* Share / Copy Deep Link Button */}
+                  <button
+                    onClick={(e) => handleShare(e, section)}
+                    title="Copy direct deep link to this ecosystem portal"
+                    className={`flex items-center gap-2 px-3.5 py-3 rounded-lg border transition-all cursor-pointer ${
+                      isCopied
+                        ? 'bg-emerald-500 text-black border-emerald-400 font-bold'
+                        : 'bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6]/80 hover:text-[#f3efe6] border-[#f3efe6]/20'
+                    }`}
+                  >
+                    {isCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5 text-[#c8b89a]" />}
+                    <span>{isCopied ? t.actions.linkCopied : t.actions.copyLink}</span>
+                  </button>
 
                   {/* Open Section Tasks */}
                   <button
@@ -351,7 +448,7 @@ export default function StageSlider({
                     className="flex items-center gap-2 px-4 py-3 bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6] border border-[#f3efe6]/20 hover:border-[#f3efe6]/50 rounded-lg transition-all cursor-pointer"
                   >
                     <CheckSquare className="w-4 h-4 text-emerald-400" />
-                    <span>Manage Tasks</span>
+                    <span>{t.nav.tasks}</span>
                     {pendingTasks > 0 && (
                       <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-[#b14a26] text-white font-bold">
                         {pendingTasks}
@@ -370,10 +467,10 @@ export default function StageSlider({
       </div>
 
       {/* Footer Status Strip */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-12 py-3.5 bg-[#0e0d0b]/90 border-t border-[#f3efe6]/10 backdrop-blur-md font-mono text-[11px] text-[#f3efe6]/60">
+      <footer className="fixed bottom-8 sm:bottom-8 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-12 py-2 bg-[#0e0d0b]/80 border-t border-[#f3efe6]/10 backdrop-blur-sm font-mono text-[10px] text-[#f3efe6]/50">
         {/* Left: Counter */}
         <div className="flex items-center gap-2 tracking-widest text-[#f3efe6]">
-          <span className="font-bold text-[13px]">{String(currentSectionIndex + 1).padStart(2, '0')}</span>
+          <span className="font-bold text-[12px]">{String(currentSectionIndex + 1).padStart(2, '0')}</span>
           <span className="text-[#f3efe6]/40">/ {String(sections.length).padStart(2, '0')} SECTIONS</span>
         </div>
 
@@ -386,32 +483,35 @@ export default function StageSlider({
           {onOpenSliders && (
             <button
               onClick={onOpenSliders}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors font-bold cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors font-bold cursor-pointer"
             >
               <Sparkles className="w-3 h-3 text-amber-400" />
-              <span>LAUNCH 16 ULTRA SLIDERS</span>
+              <span>16 ULTRA SLIDERS</span>
             </button>
           )}
         </div>
 
-        {/* Right: Quick Jump Links */}
-        <div className="flex items-center gap-3 sm:gap-4 text-[10px] tracking-wider uppercase">
-          {sections.slice(0, 4).map((s, idx) => (
-            <button
-              key={s.id}
-              onClick={() => goTo(idx)}
-              className={`hover:text-[#f3efe6] transition-colors cursor-pointer ${
-                idx === currentSectionIndex ? 'text-[#f3efe6] font-bold underline underline-offset-4' : ''
-              }`}
-            >
-              {s.title}
-            </button>
-          ))}
-          {sections.length > 4 && (
-            <button onClick={onOpenSectionManager} className="text-emerald-400 hover:underline">
-              +{sections.length - 4} MORE
-            </button>
-          )}
+        {/* Right: Quick Jump / Category selector */}
+        <div className="flex items-center gap-2 sm:gap-3 text-[10px] tracking-wider uppercase overflow-x-auto max-w-[50vw] sm:max-w-none no-scrollbar">
+          {PORTAL_CATEGORIES.map((cat) => {
+            const firstIdx = sections.findIndex((s) => cat.sectionIds.includes(s.id));
+            if (firstIdx < 0) return null;
+            const isCatActive = cat.sectionIds.includes(sections[currentSectionIndex]?.id);
+
+            return (
+              <button
+                key={cat.key}
+                onClick={() => goTo(firstIdx)}
+                className={`px-2 py-0.5 rounded transition-all cursor-pointer whitespace-nowrap text-[9px] sm:text-[10px] ${
+                  isCatActive
+                    ? 'bg-[#f3efe6]/15 text-[#f3efe6] font-bold border border-[#f3efe6]/30'
+                    : 'text-[#f3efe6]/40 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
+                }`}
+              >
+                {cat.label.split('/')[1]?.trim() || cat.label}
+              </button>
+            );
+          })}
         </div>
       </footer>
     </div>

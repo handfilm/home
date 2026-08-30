@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Radio, ExternalLink, RefreshCw, Film, ShieldAlert, MonitorPlay } from 'lucide-react';
+import { Sparkles, Radio, ExternalLink, RefreshCw, Film, ShieldAlert, MonitorPlay, MousePointer, Maximize2, Minimize2 } from 'lucide-react';
 
 interface LiveEmbedPortalProps {
   embedUrl: string;
@@ -24,6 +24,8 @@ export default function LiveEmbedPortal({
 }: LiveEmbedPortalProps) {
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'loaded' | 'fallback'>('idle');
   const [portalMode, setPortalMode] = useState<'live' | 'poster'>('live');
+  const [isInteractive, setIsInteractive] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
   const timerRef = useRef<number | null>(null);
 
@@ -66,7 +68,11 @@ export default function LiveEmbedPortal({
   };
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-[#0b0908]">
+    <div
+      className={`absolute inset-0 overflow-hidden bg-[#0b0908] transition-all duration-500 ${
+        isFullscreen ? 'fixed inset-0 z-[100]' : ''
+      }`}
+    >
       {/* 1. Underlying Texture / Base Layer */}
       <div className={`absolute inset-0 ${fallbackTexture} opacity-70`} />
 
@@ -83,9 +89,13 @@ export default function LiveEmbedPortal({
       {/* 3. Live Iframe Stream Layer */}
       {shouldMountIframe && (
         <div
-          className={`absolute -inset-[15%] w-[130%] h-[130%] transition-opacity duration-1000 pointer-events-none ${
-            loadState === 'loaded' ? 'opacity-85' : 'opacity-0'
-          } ${isActive ? 'animate-live-drift' : ''}`}
+          className={`absolute ${
+            isFullscreen ? 'inset-0 w-full h-full' : '-inset-[15%] w-[130%] h-[130%]'
+          } transition-opacity duration-1000 ${
+            isInteractive ? 'pointer-events-auto' : 'pointer-events-none'
+          } ${loadState === 'loaded' ? 'opacity-85' : 'opacity-0'} ${
+            isActive && !isFullscreen && !isInteractive ? 'animate-live-drift' : ''
+          }`}
         >
           <iframe
             key={retryKey}
@@ -94,22 +104,26 @@ export default function LiveEmbedPortal({
             loading="lazy"
             onLoad={handleIframeLoad}
             onError={handleIframeError}
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
             className="w-full h-full border-0 object-cover filter contrast-[1.04] brightness-[0.95]"
-            tabIndex={-1}
-            aria-hidden="true"
+            tabIndex={isInteractive ? 0 : -1}
+            aria-hidden={!isInteractive}
           />
         </div>
       )}
 
-      {/* 4. Cinematic Lighting Vignettes & Scrim */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0b] via-[#0e0d0b]/60 to-[#0e0d0b]/30 pointer-events-none z-10" />
-      <div className="absolute inset-0 bg-radial-to-c from-transparent via-[#0e0d0b]/30 to-[#0e0d0b]/80 pointer-events-none z-10" />
-      <div className="rx-scanlines z-10 opacity-35" />
+      {/* 4. Cinematic Lighting Vignettes & Scrim (reduced if interactive) */}
+      {!isInteractive && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0b] via-[#0e0d0b]/60 to-[#0e0d0b]/30 pointer-events-none z-10" />
+          <div className="absolute inset-0 bg-radial-to-c from-transparent via-[#0e0d0b]/30 to-[#0e0d0b]/80 pointer-events-none z-10" />
+          <div className="rx-scanlines z-10 opacity-35" />
+        </>
+      )}
 
       {/* 5. Live Stream Telemetry HUD Badge (Top Right) */}
       <div className="absolute top-6 right-6 sm:right-28 z-20 flex items-center gap-2 font-mono text-[10px] sm:text-[11px] tracking-wider uppercase">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161512]/80 border border-[#f3efe6]/15 backdrop-blur-md text-[#f3efe6]/80 shadow-md">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161512]/90 border border-[#f3efe6]/15 backdrop-blur-md text-[#f3efe6]/80 shadow-md">
           <span className="relative flex h-2 w-2">
             <span
               className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
@@ -141,14 +155,40 @@ export default function LiveEmbedPortal({
 
           <span className="text-[#f3efe6]/30">|</span>
 
-          <span className="text-[9px] text-[#f3efe6]/60 truncate max-w-[140px] sm:max-w-[200px]">
-            {embedUrl.replace(/^https?:\/\//, '')}
-          </span>
+          {/* Interactive Toggle */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsInteractive((prev) => !prev);
+            }}
+            title={isInteractive ? 'Switch to cinematic view mode' : 'Enable live scroll & click inside portal'}
+            className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-bold cursor-pointer transition-colors ${
+              isInteractive
+                ? 'bg-emerald-500 text-black'
+                : 'bg-[#f3efe6]/10 text-[#f3efe6]/70 hover:text-white'
+            }`}
+          >
+            <MousePointer className="w-2.5 h-2.5" />
+            <span>{isInteractive ? 'INTERACTIVE' : 'PREVIEW'}</span>
+          </button>
 
+          {/* Fullscreen Expansion */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsFullscreen((prev) => !prev);
+            }}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Expand Portal View'}
+            className="p-1 hover:text-white transition-colors cursor-pointer"
+          >
+            {isFullscreen ? <Minimize2 className="w-3 h-3 text-amber-400" /> : <Maximize2 className="w-3 h-3" />}
+          </button>
+
+          {/* Refresh Frame */}
           <button
             onClick={handleReload}
             title="Refresh Live Stream"
-            className="p-0.5 hover:text-white transition-colors cursor-pointer ml-1"
+            className="p-0.5 hover:text-white transition-colors cursor-pointer"
           >
             <RefreshCw className={`w-3 h-3 ${loadState === 'loading' ? 'animate-spin' : ''}`} />
           </button>
