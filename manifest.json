@@ -1,0 +1,64 @@
+{
+  "name": "HANDS & HEAD — Master OS",
+  "short_name": "H&H Master OS",
+  "description": "Unified Hands & Head and RAWx Master OS workspace ecosystem with modular showcases, cinematic media gallery, and multi-device task synchronization.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e0d0b",
+  "theme_color": "#0e0d0b",
+  "categories": ["design", "productivity", "lifestyle", "business"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "D2C Shop",
+      "short_name": "Shop",
+      "description": "Direct to consumer drops and catalog",
+      "url": "/#d2c",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Arutemika B2B",
+      "short_name": "B2B",
+      "description": "Corporate & wholesale ordering",
+      "url": "/#b2b",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Articles Editorial",
+      "short_name": "Articles",
+      "description": "Essays on design, tech and culture",
+      "url": "/#articles",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Hand Film Cinema",
+      "short_name": "Hand Film",
+      "description": "Live cinematic film portal",
+      "url": "/#handfilm",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    }
+  ]
+}
