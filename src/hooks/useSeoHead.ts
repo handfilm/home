@@ -19,69 +19,69 @@ interface SectionSeoOverride {
 
 const SECTION_SEO_OVERRIDES: Record<string, SectionSeoOverride> = {
   d2c: {
-    title: 'D2C Shop — Small-Batch Leather, Streetwear & Hardware | HANDS & HEAD',
+    title: 'D2C Shop — Small-Batch Leather, 240–300 GSM Streetwear & 316L Hardware | HANDS & HEAD',
     description:
-      'Direct-to-consumer vault by HANDS & HEAD. Small-batch genuine distressed leather goods, 240–300 GSM heavyweight streetwear, and 316L stainless steel hardware drops.',
+      'Direct-to-consumer vault by HANDS & HEAD. Small-batch genuine distressed leather goods, 240–300 GSM combed cotton heavyweight streetwear, and 316L/516SS stainless steel hardware drops.',
     themeColor: '#b14a26',
   },
   arutemika: {
-    title: 'Arutemika — Precision Craft & Industrial Design | HANDS & HEAD',
+    title: 'Arutemika — Direct-from-Source Dhaka Wholesale & Craft | HANDS & HEAD',
     description:
-      'Arutemika by HANDS & HEAD — precision-engineered apparel, hardware craft, and direct-from-source Dhaka production for modern global labels.',
+      'Arutemika by HANDS & HEAD — corporate, wholesale, and direct-from-source Dhaka apparel and leather production starting at 120 pcs/style MOQ.',
     themeColor: '#8a5a3a',
   },
   articles: {
-    title: 'Articles & Editorial Journal — Systems, Craft & Manufacturing | HANDS & HEAD',
+    title: 'Articles & Editorial Journal — WebGL2 Systems & Dhaka Manufacturing | HANDS & HEAD',
     description:
-      'Long-form technical essays, manufacturing field notes, and creative engineering dispatches from Rakib Himon and the HANDS & HEAD collective in Dhaka.',
+      'Long-form technical essays, Dhaka manufacturing field notes, and WebGL2 engineering dispatches from Rakib Himon and the HANDS & HEAD collective.',
     themeColor: '#c79a3d',
   },
   studio: {
-    title: 'HandFilm Studio & Storyboard — WebGL2 AI Video Editor & Host | HANDS & HEAD',
+    title: 'HandFilm Studio & Storyboard — WebGL2 GPU Shaders AI Video Editor | HANDS & HEAD',
     description:
-      'Browser-native WebGL2 AI video platform, non-linear editor (NLE), cinema player, and Cloudflare Stream video host built by HANDS & HEAD.',
+      'Browser-native WebGL2 GPU shader AI video editor, non-linear editor (NLE), cinema player, and Cloudflare Workers edge video host built by HANDS & HEAD.',
     themeColor: '#a97f3f',
   },
   aural: {
     title: 'Aural — Spatial Audio & Sonic Architecture | HANDS & HEAD',
     description:
-      'Aural by HANDS & HEAD — browser-native ambient soundscapes, audio engineering tools, and spatial acoustic design modules.',
+      'Aural by HANDS & HEAD — browser-native ambient soundscapes, Web Audio engineering tools, and spatial acoustic design modules.',
     themeColor: '#0A0B0D',
   },
   textile: {
-    title: 'Textile Sourcing & Custom Fabrics — Dhaka B2B Wing | HANDS & HEAD',
+    title: 'Textile Sourcing — 240–300 GSM Combed Cotton & Mills | HANDS & HEAD B2B',
     description:
-      'Direct-from-source Bangladesh textile sourcing, custom knitted fleece, heavyweight jersey mills (240–300 GSM), and technical fabrics with low MOQs.',
+      'Direct-from-source Bangladesh textile sourcing: 240–300 GSM combed cotton, heavyweight French terry, custom knitted fleece, and technical fabrics starting at 120 pcs/style MOQ.',
     themeColor: '#0A0B0D',
   },
   rmg: {
-    title: 'RMG & Heavyweight Streetwear Manufacturing — Dhaka B2B | HANDS & HEAD',
+    title: 'RMG & Heavyweight Streetwear Factory (120 pcs/style MOQ) | HANDS & HEAD B2B',
     description:
-      'Direct-from-source Dhaka RMG factory wing for 240–300 GSM heavyweight streetwear, cut-and-sew essentials, garment dyeing, and flexible startup MOQs.',
+      'Direct-from-source Dhaka RMG manufacturing wing: 120 pcs/style MOQ, 240–300 GSM combed cotton heavyweight streetwear, hoodies, cut-and-sew essentials, and garment dyeing.',
     themeColor: '#0A0B0D',
   },
   leather: {
-    title: 'Genuine Distressed Leather Manufacturing — Dhaka B2B | HANDS & HEAD',
+    title: 'Genuine Distressed Leather Manufacturing — Dhaka Tannery Wing | HANDS & HEAD B2B',
     description:
-      'Full-grain and distressed genuine leather sourcing and artisanal manufacturing in Dhaka — jackets, bags, belts, and small leather goods with low MOQs.',
+      'Audited Dhaka tannery sourcing and genuine distressed full-grain leather craftsmanship — jackets, bags, belts, and small leather goods with low MOQs.',
     themeColor: '#5c3a21',
   },
   jacket: {
     title: 'Custom Leather & Outerwear Jackets — Dhaka Factory Wing | HANDS & HEAD',
     description:
-      'Bespoke leather jackets, heavyweight bombers, waxed canvas workwear, and custom outerwear manufactured direct-from-source in Dhaka by HANDS & HEAD.',
+      'Bespoke distressed leather jackets, heavyweight bombers, waxed canvas workwear, and structured outerwear manufactured direct-from-source in Dhaka by HANDS & HEAD.',
     themeColor: '#3b2416',
   },
   jute: {
     title: 'Sustainable Jute & Natural Fiber Manufacturing — Bangladesh B2B | HANDS & HEAD',
     description:
-      'Export-grade Bangladesh golden jute textiles, eco-packaging, and structural natural fiber goods manufactured direct-from-source by HANDS & HEAD.',
+      'Export-grade Bangladesh golden jute textiles, zero-carbon eco-packaging, and structural natural fiber goods manufactured direct-from-source by HANDS & HEAD.',
     themeColor: '#4a3d24',
   },
   lingerie: {
     title: 'Intimates & Lingerie Manufacturing — Dhaka Precision B2B | HANDS & HEAD',
     description:
-      'Specialized intimates, technical loungewear, and precision-stitched lingerie production lines in Dhaka with strict QC and private-label support.',
+      'Specialized intimates, technical loungewear, and precision-stitched lingerie production lines in Dhaka with strict export QC and private-label support.',
     themeColor: '#2d1822',
   },
   bracelets: {

@@ -1,5 +1,6 @@
-# HANDS & HEAD (handsandhead.com) — Search Engine & AI Crawler Policy
-# One Core, Many Worlds.
+# HANDS & HEAD — Technical SEO & Generative Engine Optimization (GEO) Directives
+# Canonical Hub: https://handsandhead.com/
+# Generated: 2026-11-21
 
 User-agent: Googlebot
 Allow: /
@@ -33,10 +34,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /api/
 
 # Primary XML Sitemap
 Sitemap: https://handsandhead.com/sitemap.xml
 
-# AI / LLM Discovery Manifests (llms.txt standard)
-# https://handsandhead.com/llms.txt
-# https://handsandhead.com/llms-full.txt
+# AI / LLM Machine-Readable Knowledge Base
+# Summary: https://handsandhead.com/llms.txt
+# Complete Reference: https://handsandhead.com/llms-full.txt
