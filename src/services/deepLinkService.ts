@@ -1,60 +1,110 @@
-// Deep Linking and URL Synchronization Service
+import { ActiveTab } from '../types';
 
-export function getInitialPortalFromUrl(defaultPortalId: string): string {
-  if (typeof window === 'undefined') return defaultPortalId;
+// Deep Linking and URL Synchronization Service for 3-Tab Shell & 24 Ecosystem Portals
 
-  // 1. Check Hash: e.g. #b2b or #shop
-  const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
-  if (hash) {
-    if (hash === 'b2b' || hash === 'arutemika') return 'b2b';
-    if (hash === 'shop' || hash === 'd2c') return 'd2c';
-    if (hash === 'articles' || hash === 'art' || hash === 'editorial') return 'articles';
-    if (hash === 'handfilm' || hash === 'film') return 'handfilm';
-    return hash;
-  }
-
-  // 2. Check Query param: ?portal=b2b
-  const params = new URLSearchParams(window.location.search);
-  const portalParam = params.get('portal') || params.get('view') || params.get('sec');
-  if (portalParam) {
-    if (portalParam === 'b2b' || portalParam === 'arutemika') return 'b2b';
-    if (portalParam === 'shop' || portalParam === 'd2c') return 'd2c';
-    if (portalParam === 'articles') return 'articles';
-    if (portalParam === 'handfilm' || portalParam === 'film') return 'handfilm';
-    return portalParam;
-  }
-
-  return defaultPortalId;
+export interface ResolvedRoute {
+  tab: ActiveTab;
+  portalId: string | null;
 }
 
-export function updateUrlForPortal(portalId: string, portalTitle: string): void {
+const PORTAL_ALIASES: Record<string, string> = {
+  b2b: 'arutemika',
+  arutemika: 'arutemika',
+  shop: 'd2c',
+  d2c: 'd2c',
+  articles: 'articles',
+  art: 'articles',
+  editorial: 'articles',
+  handfilm: 'studio',
+  film: 'studio',
+};
+
+export function getInitialRouteFromUrl(validSectionIds: string[] = []): ResolvedRoute {
+  if (typeof window === 'undefined') {
+    return { tab: 'home', portalId: null };
+  }
+
+  const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
+  const params = new URLSearchParams(window.location.search);
+  const tabParam = (params.get('tab') || params.get('view') || '').toLowerCase().trim();
+  const portalParam = (params.get('portal') || params.get('sec') || '').toLowerCase().trim();
+
+  // 1. Explicit hash routing (#home, #apps, #sliders, #tasks, or #<portalId>)
+  if (hash) {
+    if (hash === 'home' || hash === 'hub-home' || hash === 'overview') {
+      return { tab: 'home', portalId: null };
+    }
+    if (hash === 'apps' || hash === 'stage' || hash === 'ecosystem' || hash === 'sections') {
+      return { tab: 'ecosystem', portalId: portalParam ? (PORTAL_ALIASES[portalParam] || portalParam) : null };
+    }
+    if (hash === 'sliders' || hash === 'rawx' || hash === 'showcase') {
+      return { tab: 'rawx-showcase', portalId: null };
+    }
+    if (hash === 'tasks' || hash === 'tasks-hub' || hash === 'sync') {
+      return { tab: 'tasks-hub', portalId: null };
+    }
+
+    const mappedPortal = PORTAL_ALIASES[hash] || hash;
+    if (validSectionIds.length === 0 || validSectionIds.includes(mappedPortal)) {
+      return { tab: 'ecosystem', portalId: mappedPortal };
+    }
+  }
+
+  // 2. Explicit query parameter routing (?tab=apps, ?view=sliders, ?portal=bloom)
+  if (portalParam) {
+    const mappedPortal = PORTAL_ALIASES[portalParam] || portalParam;
+    return { tab: 'ecosystem', portalId: mappedPortal };
+  }
+
+  if (tabParam) {
+    if (tabParam === 'home') return { tab: 'home', portalId: null };
+    if (tabParam === 'apps' || tabParam === 'stage' || tabParam === 'sections' || tabParam === 'ecosystem') {
+      return { tab: 'ecosystem', portalId: null };
+    }
+    if (tabParam === 'sliders' || tabParam === 'showcase' || tabParam === 'rawx') {
+      return { tab: 'rawx-showcase', portalId: null };
+    }
+    if (tabParam === 'tasks' || tabParam === 'tasks-hub') {
+      return { tab: 'tasks-hub', portalId: null };
+    }
+  }
+
+  // 3. Default first screen: HOME
+  return { tab: 'home', portalId: null };
+}
+
+export function getInitialPortalFromUrl(defaultPortalId: string): string {
+  const route = getInitialRouteFromUrl();
+  return route.portalId || defaultPortalId;
+}
+
+export function updateUrlForTab(tab: ActiveTab, portalId?: string): void {
   if (typeof window === 'undefined') return;
 
-  const targetHash = `#${portalId}`;
+  let targetHash = '#home';
+
+  if (tab === 'home') {
+    targetHash = '#home';
+  } else if (tab === 'ecosystem') {
+    targetHash = portalId ? `#${portalId}` : '#apps';
+  } else if (tab === 'rawx-showcase') {
+    targetHash = '#sliders';
+  } else if (tab === 'tasks-hub') {
+    targetHash = '#tasks';
+  }
+
   if (window.location.hash !== targetHash) {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${targetHash}`);
   }
+}
 
-  // Update dynamic document title
-  document.title = `HANDS & HEAD — ${portalTitle}`;
-
-  // Update theme-color meta tag if present
-  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-  if (metaThemeColor) {
-    const accentColors: Record<string, string> = {
-      d2c: '#b14a26',
-      b2b: '#4a6670',
-      articles: '#c79a3d',
-      handfilm: '#e05d26',
-    };
-    metaThemeColor.setAttribute('content', accentColors[portalId] || '#0e0d0b');
-  }
+export function updateUrlForPortal(portalId: string): void {
+  updateUrlForTab('ecosystem', portalId);
 }
 
 export async function copyPortalShareLink(portalId: string): Promise<boolean> {
   const shareUrl = `${window.location.origin}${window.location.pathname}#${portalId}`;
 
-  // If navigator.clipboard is supported
   if (navigator.clipboard && window.isSecureContext) {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -64,7 +114,6 @@ export async function copyPortalShareLink(portalId: string): Promise<boolean> {
     }
   }
 
-  // Fallback copy using textarea
   try {
     const textArea = document.createElement('textarea');
     textArea.value = shareUrl;

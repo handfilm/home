@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { SectionItem, ActiveTab, ColorGrade } from '../types';
-import { Search, ArrowRight, CornerDownLeft, Sparkles, CheckSquare, Layers, Volume2, Globe, Download, Smartphone, SlidersHorizontal } from 'lucide-react';
+import { Search, CornerDownLeft, Sparkles, CheckSquare, Layers, Volume2, Globe, Download, Smartphone, SlidersHorizontal, Home, Film, Factory } from 'lucide-react';
 import { Language, TranslationDictionary } from '../i18n/translations';
 import { trackEvent } from '../services/analytics';
 
@@ -98,15 +98,29 @@ export default function CommandPalette({
       });
     });
 
-    // 2. View Switches
+    // 2. View Switches (3-Tab Top-Level Shell + Tasks Hub)
+    list.push({
+      id: 'view-home',
+      category: 'views',
+      title: 'Home — Enterprise Overview',
+      subtitle: 'HANDS & HEAD Main Hub, 3 Core Pillars & Live Telemetry',
+      shortcut: 'Key 1',
+      icon: <Home className="w-3.5 h-3.5 text-[#E50914]" />,
+      keywords: ['home', 'main', 'hub', 'overview', 'landing', 'pillars'],
+      action: () => {
+        setActiveTab('home');
+        onClose();
+      },
+    });
+
     list.push({
       id: 'view-stage',
       category: 'views',
-      title: 'Stage Ecosystem Slider',
-      subtitle: 'Primary full-screen portal showcase',
-      shortcut: 'Key 1',
+      title: 'Apps — 24-Section Stage Slider',
+      subtitle: 'Primary full-screen 24-module ecosystem showcase',
+      shortcut: 'Key 2',
       icon: <Layers className="w-3.5 h-3.5 text-[#c8b89a]" />,
-      keywords: ['stage', 'slider', 'ecosystem', 'main', 'home', 'portal'],
+      keywords: ['apps', 'stage', 'slider', 'ecosystem', '24', 'portal'],
       action: () => {
         setActiveTab('ecosystem');
         onClose();
@@ -116,9 +130,9 @@ export default function CommandPalette({
     list.push({
       id: 'view-rawx',
       category: 'views',
-      title: 'RAWx 16 Sliders Ultra System',
+      title: 'Sliders — RAWx 16 Ultra System',
       subtitle: 'Architectural showcase of all 16 slider variants',
-      shortcut: 'Key 2',
+      shortcut: 'Key 3',
       icon: <Sparkles className="w-3.5 h-3.5 text-amber-400" />,
       keywords: ['rawx', 'sliders', '16', 'ultra', 'gallery', 'showcase'],
       action: () => {
@@ -132,11 +146,39 @@ export default function CommandPalette({
       category: 'views',
       title: 'Multi-Device Task Sync Hub',
       subtitle: 'Bidirectional encrypted project task management',
-      shortcut: 'Key 3',
+      shortcut: 'Key 4',
       icon: <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />,
       keywords: ['tasks', 'todo', 'sync', 'devices', 'project', 'hub'],
       action: () => {
         setActiveTab('tasks-hub');
+        onClose();
+      },
+    });
+
+    list.push({
+      id: 'ext-storyboard',
+      category: 'portals',
+      title: 'Handfilm & Storyboard (WebGL2 AI Video)',
+      subtitle: 'storyboard.handsandhead.com — NLE Editor, Player & Cloudflare Host',
+      shortcut: 'External ↗',
+      icon: <Film className="w-3.5 h-3.5 text-[#E50914]" />,
+      keywords: ['handfilm', 'storyboard', 'webgl2', 'video', 'nle', 'cinema', 'ai'],
+      action: () => {
+        window.open('https://storyboard.handsandhead.com/', '_blank', 'noopener,noreferrer');
+        onClose();
+      },
+    });
+
+    list.push({
+      id: 'ext-b2b-wings',
+      category: 'portals',
+      title: 'B2B & Industrial Wings',
+      subtitle: 'b2b.handsandhead.com — RMG, Streetwear, Leather, Jackets & 316L/516SS',
+      shortcut: 'External ↗',
+      icon: <Factory className="w-3.5 h-3.5 text-[#C8A96A]" />,
+      keywords: ['b2b', 'industrial', 'rmg', 'streetwear', 'leather', 'jackets', '316l', '516ss', 'hardware'],
+      action: () => {
+        window.open('https://b2b.handsandhead.com/', '_blank', 'noopener,noreferrer');
         onClose();
       },
     });

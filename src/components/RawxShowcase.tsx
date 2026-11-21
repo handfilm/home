@@ -29,9 +29,15 @@ interface RawxShowcaseProps {
   onOpenLightbox: (items: LightboxItem[], startIndex: number) => void;
   speed: number;
   onBackToEcosystem?: () => void;
+  isActiveTab?: boolean;
 }
 
-export default function RawxShowcase({ onOpenLightbox, speed, onBackToEcosystem }: RawxShowcaseProps) {
+export default function RawxShowcase({
+  onOpenLightbox,
+  speed,
+  onBackToEcosystem,
+  isActiveTab = true,
+}: RawxShowcaseProps) {
   // Dynamic Sliders Media State with localStorage persistence
   const [slidersData, setSlidersData] = useState<AllSlidersData>(() => getStoredSlidersData());
 
@@ -155,9 +161,9 @@ export default function RawxShowcase({ onOpenLightbox, speed, onBackToEcosystem 
     setIsPhotoManagerOpen(true);
   };
 
-  // Autoplay intervals
+  // Autoplay intervals (paused automatically when Sliders tab is hidden)
   useEffect(() => {
-    if (!isAutoplayActive) return;
+    if (!isAutoplayActive || !isActiveTab) return;
 
     // §01 Hero Auto (5s)
     const intS1 = setInterval(() => {
@@ -258,6 +264,7 @@ export default function RawxShowcase({ onOpenLightbox, speed, onBackToEcosystem 
     };
   }, [
     isAutoplayActive,
+    isActiveTab,
     slidersData.s1.length,
     slidersData.s3.length,
     slidersData.s6.length,
@@ -392,12 +399,16 @@ export default function RawxShowcase({ onOpenLightbox, speed, onBackToEcosystem 
           {/* Left Actions: Return button, Photo Studio, Autoplay, Lightbox Trigger */}
           <div className="flex items-center gap-2 flex-wrap">
             {onBackToEcosystem && (
-              <button
-                onClick={onBackToEcosystem}
+              <a
+                href="#apps"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onBackToEcosystem();
+                }}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#1f1e1a] border border-[#f3efe6]/25 hover:border-[#f3efe6]/60 text-xs text-[#f3efe6] tracking-wider uppercase transition-all cursor-pointer font-bold"
               >
-                <span>← Ecosystem Stage</span>
-              </button>
+                <span>← Ecosystem Apps</span>
+              </a>
             )}
 
             <button
@@ -1880,6 +1891,35 @@ export default function RawxShowcase({ onOpenLightbox, speed, onBackToEcosystem 
           <div className="absolute bottom-0 left-0 h-[2px] bg-[#c8b89a] z-30" style={{ width: `${wipeProgress}%` }} />
         </div>
       </section>
+
+      {/* Semantic Ecosystem Subdomain Index Footer */}
+      <footer className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 border-t border-[#1c1c1c] flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.18em] uppercase text-[#888888]">
+        <span>HANDS &amp; HEAD · RAWx 16 ULTRA SLIDERS ENGINE</span>
+        <nav aria-label="Hands and Head Ecosystem Links" className="flex flex-wrap items-center gap-4">
+          <a href="#home" className="hover:text-[#f4f0e8] transition-colors">
+            Home Hub
+          </a>
+          <a href="#apps" className="hover:text-[#f4f0e8] transition-colors">
+            24 Ecosystem Apps
+          </a>
+          <a
+            href="https://storyboard.handsandhead.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#E50914] transition-colors"
+          >
+            storyboard.handsandhead.com ↗
+          </a>
+          <a
+            href="https://b2b.handsandhead.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#c8b89a] transition-colors"
+          >
+            b2b.handsandhead.com ↗
+          </a>
+        </nav>
+      </footer>
 
       {/* Dynamic Photo Manager Modal */}
       <DynamicPhotoManagerModal

@@ -27,6 +27,7 @@ interface StageSliderProps {
   onOpenTasksForSection: (sectionId: string) => void;
   sectionTasksCount: Record<string, number>;
   onOpenSliders?: () => void;
+  isActiveTab?: boolean;
   language: Language;
   t: TranslationDictionary;
 }
@@ -40,6 +41,7 @@ export default function StageSlider({
   onOpenTasksForSection,
   sectionTasksCount,
   onOpenSliders,
+  isActiveTab = true,
   language,
   t,
 }: StageSliderProps) {
@@ -47,6 +49,7 @@ export default function StageSlider({
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [copiedSectionId, setCopiedSectionId] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   const total = sections.length;
@@ -77,6 +80,8 @@ export default function StageSlider({
 
   // Keyboard navigation
   useEffect(() => {
+    if (!isActiveTab) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) {
         return;
@@ -98,10 +103,12 @@ export default function StageSlider({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSectionIndex, goTo, total, currentSection]);
+  }, [isActiveTab, currentSectionIndex, goTo, total, currentSection]);
 
   // Mouse wheel navigation
   useEffect(() => {
+    if (!isActiveTab) return;
+
     let wheelLock = false;
     const handleWheel = (e: WheelEvent) => {
       if (window.innerWidth <= 780) return;
@@ -121,7 +128,7 @@ export default function StageSlider({
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [currentSectionIndex, goTo]);
+  }, [isActiveTab, currentSectionIndex, goTo]);
 
   const handleActivate = (s: SectionItem) => {
     trackEvent('MASTER_SECTION_CLICK', { sectionId: s.id, url: s.dest });
@@ -304,23 +311,50 @@ export default function StageSlider({
                 />
               ) : (
                 <>
-                  {section.imageUrl ? (
-                    <div
-                      className={`absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
-                        isActive ? 'scale-100 opacity-80' : 'scale-105 opacity-40'
+                  {/* Permanent Dark-Obsidian Architectural Fallback Backdrop */}
+                  <div
+                    className={`absolute inset-0 bg-[#0A0B0D] transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
+                      section.tex || 'tex-manuf'
+                    } ${isActive ? 'scale-100 opacity-100' : 'scale-105 opacity-70'}`}
+                    style={{
+                      transform: isActive
+                        ? `scale(1) translate(${mouseOffset.x * 0.25}px, ${mouseOffset.y * 0.25}px)`
+                        : 'scale(1.05)',
+                    }}
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none opacity-[0.08]"
+                    style={{
+                      backgroundImage:
+                        'linear-gradient(rgba(243,239,230,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(243,239,230,0.45) 1px, transparent 1px)',
+                      backgroundSize: '64px 64px',
+                    }}
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(ellipse 65% 55% at 72% 30%, ${section.accent || '#C8A96A'}33, transparent 70%)`,
+                    }}
+                  />
+
+                  {/* High-Res Photo Layer (gracefully hides on network/CORS error to reveal obsidian backdrop) */}
+                  {section.imageUrl && !failedImages[section.id] && (
+                    <img
+                      src={section.imageUrl}
+                      alt={`${display.title} — ${display.sub}`}
+                      referrerPolicy="no-referrer"
+                      loading={Math.abs(idx - currentSectionIndex) <= 2 ? 'eager' : 'lazy'}
+                      onError={() =>
+                        setFailedImages((prev) => ({
+                          ...prev,
+                          [section.id]: true,
+                        }))
+                      }
+                      className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
+                        isActive ? 'scale-100 opacity-75' : 'scale-105 opacity-35'
                       }`}
-                      style={{
-                        backgroundImage: `url('${section.imageUrl}')`,
-                        transform: isActive
-                          ? `scale(1) translate(${mouseOffset.x * 0.4}px, ${mouseOffset.y * 0.4}px)`
-                          : 'scale(1.05)',
-                      }}
-                    />
-                  ) : (
-                    <div
-                      className={`absolute inset-0 transition-transform duration-1000 ease-[cubic-bezier(.16,.84,.32,1)] ${
-                        section.tex || 'tex-d2c'
-                      } ${isActive ? 'scale-100 opacity-100' : 'scale-105 opacity-60'}`}
                       style={{
                         transform: isActive
                           ? `scale(1) translate(${mouseOffset.x * 0.4}px, ${mouseOffset.y * 0.4}px)`
@@ -330,7 +364,7 @@ export default function StageSlider({
                   )}
 
                   {/* Scrim Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0b] via-[#0e0d0b]/60 to-[#0e0d0b]/40 pointer-events-none z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B0D] via-[#0A0B0D]/62 to-[#0A0B0D]/38 pointer-events-none z-10" />
                   <div className="rx-scanlines z-10 opacity-30" />
                 </>
               )}
@@ -397,22 +431,27 @@ export default function StageSlider({
                   {/* If RAWx section, offer primary 16 sliders launcher */}
                   {(section.id === 'articles' || section.title.toLowerCase().includes('rawx')) &&
                   onOpenSliders ? (
-                    <button
+                    <a
+                      href="#sliders"
                       onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         onOpenSliders();
                       }}
                       className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer bg-amber-400 text-[#0e0d0b] shadow-xl shadow-amber-400/25 group hover:scale-[1.03] hover:bg-amber-300"
                     >
                       <Sparkles className="w-4 h-4 text-[#0e0d0b] animate-spin" />
                       <span>OPEN 16 ULTRA SLIDERS</span>
-                    </button>
+                    </a>
                   ) : (
-                    /* Standard Enter destination link */
-                    <button
+                    /* Standard Enter destination semantic anchor link */
+                    <a
+                      href={section.dest}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleActivate(section);
+                        trackEvent('MASTER_SECTION_CLICK', { sectionId: section.id, url: section.dest });
                       }}
                       className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer shadow-lg group hover:scale-[1.02]"
                       style={{
@@ -422,7 +461,7 @@ export default function StageSlider({
                     >
                       <span>{display.cta}</span>
                       <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
-                    </button>
+                    </a>
                   )}
 
                   {/* Share / Copy Deep Link Button */}
@@ -456,9 +495,15 @@ export default function StageSlider({
                     )}
                   </button>
 
-                  <span className="hidden sm:inline-block text-[11px] text-[#f3efe6]/40 border-b border-[#f3efe6]/15 pb-0.5">
+                  <a
+                    href={section.dest}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="hidden sm:inline-block text-[11px] text-[#f3efe6]/55 hover:text-[#f3efe6] border-b border-[#f3efe6]/20 hover:border-[#f3efe6]/60 pb-0.5 transition-colors"
+                  >
                     {section.url}
-                  </span>
+                  </a>
                 </div>
               </div>
             </div>

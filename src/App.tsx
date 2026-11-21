@@ -4,14 +4,16 @@ import { INITIAL_SECTIONS, INITIAL_TASKS, GRADES } from './data/initialData';
 import { MultiDeviceSyncEngine, getStoredRoomId, getDeviceName } from './services/syncService';
 import { TRANSLATIONS, Language } from './i18n/translations';
 import { audioEngine } from './services/audioEngine';
-import { getInitialPortalFromUrl, updateUrlForPortal } from './services/deepLinkService';
+import { getInitialRouteFromUrl, updateUrlForTab } from './services/deepLinkService';
 import { initPwa, subscribeToInstallPrompt, promptPwaInstall } from './services/pwaService';
 import { getStoredVisitorState, recordPortalVisit } from './services/visitorState';
 import { trackEvent } from './services/analytics';
+import { useSeoHead } from './hooks/useSeoHead';
 
 import GrainCanvas from './components/GrainCanvas';
 import CustomCursor from './components/CustomCursor';
 import MasterHeader from './components/MasterHeader';
+import HomeLanding from './components/HomeLanding';
 import StageSlider from './components/StageSlider';
 import RawxShowcase from './components/RawxShowcase';
 import TaskSyncHub from './components/TaskSyncHub';
@@ -30,8 +32,35 @@ const LANGUAGE_STORAGE_KEY = 'hh_master_language';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('ecosystem');
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+
+  // Sections & Tasks State
+  const [sections, setSections] = useState<SectionItem[]>(INITIAL_SECTIONS);
+  const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_TASKS);
+
+  // Resolve initial 3-tab route from URL (#home | #apps | #sliders | #tasks | #<portalId>)
+  // Defaults cleanly to 'home' on first visit
+  const initialRoute = useMemo(
+    () => getInitialRouteFromUrl(INITIAL_SECTIONS.map((s) => s.id)),
+    []
+  );
+
+  const [activeTab, setActiveTabState] = useState<ActiveTab>(initialRoute.tab);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(() => {
+    if (initialRoute.portalId) {
+      const idx = INITIAL_SECTIONS.findIndex(
+        (s) => s.id.toLowerCase() === initialRoute.portalId!.toLowerCase()
+      );
+      if (idx !== -1) return idx;
+    }
+    return 0;
+  });
+
+  const setActiveTab = useCallback((nextTab: ActiveTab) => {
+    setActiveTabState(nextTab);
+    if (typeof window !== 'undefined' && (nextTab === 'home' || nextTab === 'rawx-showcase' || nextTab === 'tasks-hub')) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, []);
 
   // Language State (EN | BN)
   const [language, setLanguage] = useState<Language>(() => {
@@ -60,10 +89,6 @@ export default function App() {
     const state = getStoredVisitorState();
     return state.visitedPortals;
   });
-
-  // Sections & Tasks State
-  const [sections, setSections] = useState<SectionItem[]>(INITIAL_SECTIONS);
-  const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_TASKS);
 
   // Sync Engine State
   const initialRoom = useMemo(() => getStoredRoomId(), []);
@@ -102,7 +127,7 @@ export default function App() {
   });
 
   // Cursor Label State
-  const [cursorLabel, setCursorLabel] = useState('ENTER →');
+  const [cursorLabel, setCursorLabel] = useState('EXPLORE →');
 
   // Filter tasks for a specific section when jumped from Stage
   const [filterSectionId, setFilterSectionId] = useState<string | null>(null);
@@ -116,26 +141,45 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 2. Initialize Deep Linking & initial section selection
+  // 2. Listen for browser hashchange / deep-link navigation (#home, #apps, #sliders, #<portalId>)
   useEffect(() => {
-    const initialPortalId = getInitialPortalFromUrl(sections[0]?.id || 'd2c');
-    const matchedIdx = sections.findIndex((s) => s.id.toLowerCase() === initialPortalId.toLowerCase());
-    if (matchedIdx !== -1) {
-      setCurrentSectionIndex(matchedIdx);
-    }
+    const handleHashChange = () => {
+      const resolved = getInitialRouteFromUrl(sections.map((s) => s.id));
+      setActiveTabState(resolved.tab);
+      if (resolved.portalId) {
+        const idx = sections.findIndex(
+          (s) => s.id.toLowerCase() === resolved.portalId!.toLowerCase()
+        );
+        if (idx !== -1) {
+          setCurrentSectionIndex(idx);
+        }
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, [sections]);
 
-  // 3. Update URL & Audio on section change
+  // 3. Synchronize document head SEO tags dynamically across tabs & all 24 slides
+  useSeoHead({
+    activeTab,
+    currentSection: sections[currentSectionIndex],
+    sectionsCount: sections.length,
+  });
+
+  // 4. Synchronize URL hash, ambient audio, and visited portals
   useEffect(() => {
     const cur = sections[currentSectionIndex];
-    if (cur) {
-      updateUrlForPortal(cur.id, cur.title);
+    if (activeTab === 'ecosystem' && cur) {
+      updateUrlForTab('ecosystem', cur.id);
       audioEngine.setPortal(cur.id);
 
       const updated = recordPortalVisit(cur.id);
       setVisitedPortals(updated.visitedPortals);
+    } else {
+      updateUrlForTab(activeTab);
     }
-  }, [currentSectionIndex, sections]);
+  }, [activeTab, currentSectionIndex, sections]);
 
   // 4. Initialize Sync Engine
   useEffect(() => {
@@ -146,7 +190,9 @@ export default function App() {
           setTasks(remoteTasks);
         }
         if (Array.isArray(remoteSections) && remoteSections.length > 0) {
-          setSections(remoteSections);
+          const coreIds = new Set(INITIAL_SECTIONS.map((s) => s.id));
+          const customRemote = remoteSections.filter((s) => s.isCustom && !coreIds.has(s.id));
+          setSections([...INITIAL_SECTIONS, ...customRemote]);
         }
         setSyncState((prev) => ({
           ...prev,
@@ -176,7 +222,7 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 450);
+    }, 350);
     return () => clearTimeout(timer);
   }, []);
 
@@ -213,6 +259,18 @@ export default function App() {
     trackEvent('MASTER_COLOR_GRADE_CHANGE', { grade: nextGrade });
   }, [currentGrade]);
 
+  // Direct jump to any of the 24 sections from Home or overlays
+  const handleJumpToSectionId = useCallback(
+    (sectionId: string) => {
+      const idx = sections.findIndex((s) => s.id.toLowerCase() === sectionId.toLowerCase());
+      if (idx !== -1) {
+        setCurrentSectionIndex(idx);
+      }
+      setActiveTab('ecosystem');
+    },
+    [sections, setActiveTab]
+  );
+
   // Global Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -236,14 +294,15 @@ export default function App() {
       if (e.key === 'g' || e.key === 'G') {
         cycleGrade();
       }
-      if (e.key === '1') setActiveTab('ecosystem');
-      if (e.key === '2') setActiveTab('rawx-showcase');
-      if (e.key === '3') setActiveTab('tasks-hub');
+      if (e.key === '1') setActiveTab('home');
+      if (e.key === '2') setActiveTab('ecosystem');
+      if (e.key === '3') setActiveTab('rawx-showcase');
+      if (e.key === '4') setActiveTab('tasks-hub');
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cycleGrade]);
+  }, [cycleGrade, setActiveTab]);
 
   const handleJoinRoom = (newRoomId: string) => {
     if (syncEngineRef.current) {
@@ -282,15 +341,15 @@ export default function App() {
   };
 
   const handleUpdateTask = (id: string, updates: Partial<TaskItem>) => {
-    const updatedTasks = tasks.map((t) =>
-      t.id === id
+    const updatedTasks = tasks.map((tItem) =>
+      tItem.id === id
         ? {
-            ...t,
+            ...tItem,
             ...updates,
             updatedAt: new Date().toISOString(),
             deviceOrigin: getDeviceName(),
           }
-        : t
+        : tItem
     );
     setTasks(updatedTasks);
 
@@ -300,7 +359,7 @@ export default function App() {
   };
 
   const handleDeleteTask = (id: string) => {
-    const updatedTasks = tasks.filter((t) => t.id !== id);
+    const updatedTasks = tasks.filter((tItem) => tItem.id !== id);
     setTasks(updatedTasks);
 
     if (syncEngineRef.current) {
@@ -340,20 +399,30 @@ export default function App() {
   // Section tasks counts
   const sectionTasksCount = useMemo(() => {
     const counts: Record<string, number> = {};
-    tasks.forEach((t) => {
-      if (t.status !== 'done') {
-        counts[t.sectionId] = (counts[t.sectionId] || 0) + 1;
+    tasks.forEach((tItem) => {
+      if (tItem.status !== 'done') {
+        counts[tItem.sectionId] = (counts[tItem.sectionId] || 0) + 1;
       }
     });
     return counts;
   }, [tasks]);
 
+  const tasksSummary = useMemo(
+    () => ({
+      total: tasks.length,
+      pending: tasks.filter((tItem) => tItem.status !== 'done').length,
+      done: tasks.filter((tItem) => tItem.status === 'done').length,
+    }),
+    [tasks]
+  );
+
   const activeGradeObj = GRADES.find((g) => g.id === currentGrade);
   const currentSection = sections[currentSectionIndex] || sections[0];
+  const activeAccentColor = activeTab === 'home' ? '#E50914' : (currentSection?.accent || '#b14a26');
 
   return (
     <div
-      className={`min-h-screen bg-[#0e0d0b] text-[#f3efe6] relative selection:bg-[#b14a26] selection:text-[#0e0d0b] ${
+      className={`min-h-screen bg-[#0A0B0D] text-[#f3efe6] relative selection:bg-[#E50914] selection:text-white ${
         activeGradeObj?.cls || ''
       }`}
     >
@@ -362,8 +431,8 @@ export default function App() {
 
       {/* GPU Ambient Shader Canvas */}
       <AmbientShaderCanvas
-        accentColor={currentSection?.accent || '#b14a26'}
-        portalId={currentSection?.id || 'd2c'}
+        accentColor={activeAccentColor}
+        portalId={activeTab === 'home' ? 'home' : (currentSection?.id || 'd2c')}
       />
 
       {/* Custom Crosshair Desktop Cursor */}
@@ -372,7 +441,7 @@ export default function App() {
       {/* Initial Page Loader */}
       <div
         id="loader"
-        className={`fixed inset-0 z-[200] bg-[#0e0d0b] flex flex-col items-center justify-center gap-4 transition-opacity duration-700 ${
+        className={`fixed inset-0 z-[200] bg-[#0A0B0D] flex flex-col items-center justify-center gap-4 transition-opacity duration-500 ${
           loading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -380,15 +449,15 @@ export default function App() {
           <b>{t.brand.name}</b> — {t.brand.tagline}
         </div>
         <div className="w-48 h-[1px] bg-[#f3efe6]/20 relative overflow-hidden">
-          <div className="absolute left-0 top-0 h-full w-full bg-[#f3efe6] animate-[load_0.8s_ease_forwards]" />
+          <div className="absolute left-0 top-0 h-full w-full bg-[#E50914] animate-[load_0.8s_ease_forwards]" />
         </div>
       </div>
 
-      {/* Top Universal Master Header */}
+      {/* Top Universal Master Header (3-Tab Hardware Switcher: HOME | APPS | SLIDERS) */}
       <MasterHeader
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        accentColor={currentSection?.accent || '#b14a26'}
+        accentColor={activeAccentColor}
         syncState={syncState}
         onOpenSyncModal={() => setIsSyncModalOpen(true)}
         onOpenIndex={() => setIsIndexOpen(true)}
@@ -397,11 +466,7 @@ export default function App() {
         onCycleGrade={cycleGrade}
         onToggleConsole={() => setIsConsoleOpen((prev) => !prev)}
         isConsoleOpen={isConsoleOpen}
-        tasksCount={{
-          total: tasks.length,
-          pending: tasks.filter((t) => t.status !== 'done').length,
-          done: tasks.filter((t) => t.status === 'done').length,
-        }}
+        tasksCount={tasksSummary}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         isSoundEnabled={isSoundEnabled}
         onToggleSound={handleToggleSound}
@@ -412,9 +477,33 @@ export default function App() {
         t={t}
       />
 
-      {/* Main Tab Content */}
+      {/* Non-Destructive Zero-Latency 3-Tab Shell (Keep-Alive Mounted Views) */}
       <main className="relative z-10">
-        {activeTab === 'ecosystem' && (
+        {/* TAB 1: HOME — Tech-First Enterprise Landing (Default First Screen) */}
+        <div
+          id="panel-home"
+          className={activeTab === 'home' ? 'block' : 'hidden'}
+          aria-hidden={activeTab !== 'home'}
+        >
+          <HomeLanding
+            sections={sections}
+            syncState={syncState}
+            tasksCount={tasksSummary}
+            onNavigateTab={setActiveTab}
+            onJumpToSection={handleJumpToSectionId}
+            onOpenSyncModal={() => setIsSyncModalOpen(true)}
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            onSetCursorLabel={setCursorLabel}
+            t={t}
+          />
+        </div>
+
+        {/* TAB 2: APPS — Existing 24-Section Ultra-Fast Stage Slider Engine (100% Preserved) */}
+        <div
+          id="panel-apps"
+          className={activeTab === 'ecosystem' ? 'block' : 'hidden'}
+          aria-hidden={activeTab !== 'ecosystem'}
+        >
           <StageSlider
             sections={sections}
             currentSectionIndex={currentSectionIndex}
@@ -424,15 +513,22 @@ export default function App() {
             onOpenTasksForSection={handleOpenTasksForSection}
             sectionTasksCount={sectionTasksCount}
             onOpenSliders={() => setActiveTab('rawx-showcase')}
+            isActiveTab={activeTab === 'ecosystem'}
             language={language}
             t={t}
           />
-        )}
+        </div>
 
-        {activeTab === 'rawx-showcase' && (
+        {/* TAB 3: SLIDERS — Existing 16 Ultra Sliders Visual Engine (100% Preserved) */}
+        <div
+          id="panel-sliders"
+          className={activeTab === 'rawx-showcase' ? 'block' : 'hidden'}
+          aria-hidden={activeTab !== 'rawx-showcase'}
+        >
           <RawxShowcase
             speed={speed}
             onBackToEcosystem={() => setActiveTab('ecosystem')}
+            isActiveTab={activeTab === 'rawx-showcase'}
             onOpenLightbox={(items, startIndex) => {
               setLightboxState({
                 isOpen: true,
@@ -441,8 +537,9 @@ export default function App() {
               });
             }}
           />
-        )}
+        </div>
 
+        {/* UTILITY VIEW: Multi-Device Task Sync Hub */}
         {activeTab === 'tasks-hub' && (
           <TaskSyncHub
             tasks={tasks}
@@ -460,7 +557,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Ecosystem Status Ticker (bottom ambient bar) */}
+      {/* Ecosystem Status Ticker (bottom ambient HUD bar) */}
       <StatusTicker
         sections={sections}
         onSelectSection={(idx) => {

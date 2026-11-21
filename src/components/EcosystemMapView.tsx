@@ -53,11 +53,11 @@ export default function EcosystemMapView({
   // Category Theme Colors and Center Anchors in 1000x640 Canvas
   const categoryConfig: Record<string, { label: string; color: string; cx: number; cy: number; angle: number }> = {
     commerce: { label: 'COMMERCE', color: '#b14a26', cx: 240, cy: 190, angle: -150 },
-    media: { label: 'MEDIA / CONTENT', color: '#c79a3d', cx: 500, cy: 120, angle: -90 },
+    content: { label: 'CONTENT', color: '#c79a3d', cx: 500, cy: 120, angle: -90 },
     manuf: { label: 'MANUFACTURING', color: '#52697a', cx: 770, cy: 190, angle: -30 },
-    craft: { label: 'CRAFT / LIFESTYLE', color: '#5c7a5c', cx: 780, cy: 450, angle: 30 },
-    agro: { label: 'AGRICULTURE / FOOD', color: '#6f8c4e', cx: 500, cy: 520, angle: 90 },
-    tools: { label: 'TOOLS / APPS', color: '#3f8a8f', cx: 230, cy: 450, angle: 150 },
+    lifestyle: { label: 'LIFESTYLE', color: '#5c7a5c', cx: 780, cy: 450, angle: 30 },
+    food: { label: 'FOOD', color: '#6f8c4e', cx: 500, cy: 520, angle: 90 },
+    apps: { label: 'APPS', color: '#3f8a8f', cx: 230, cy: 450, angle: 150 },
   };
 
   // Build the complete interactive Graph Model
@@ -187,7 +187,7 @@ export default function EcosystemMapView({
     };
     graphNodes.push(engineNode);
 
-    // Link engine to core hub and media
+    // Link engine to core hub and content
     graphLinks.push({
       from: 'core-hub',
       to: 'rawx-engine',
@@ -195,7 +195,7 @@ export default function EcosystemMapView({
       speed: 2.8,
     });
     graphLinks.push({
-      from: 'cat-media',
+      from: 'cat-content',
       to: 'rawx-engine',
       accent: '#f59e0b',
       dash: '2,2',
@@ -211,15 +211,15 @@ export default function EcosystemMapView({
       speed: 6.0,
     });
     graphLinks.push({
-      from: 'cat-craft',
-      to: 'cat-agro',
+      from: 'cat-lifestyle',
+      to: 'cat-food',
       accent: '#6b8265',
       dash: '4,4',
       speed: 6.5,
     });
     graphLinks.push({
-      from: 'cat-tools',
-      to: 'cat-media',
+      from: 'cat-apps',
+      to: 'cat-content',
       accent: '#7a7a99',
       dash: '4,4',
       speed: 7.0,

@@ -15,7 +15,12 @@ export type MasterEventType =
   | 'MASTER_INSTALL_ACCEPTED'
   | 'MASTER_NEWSLETTER_SIGNUP'
   | 'MASTER_COLOR_GRADE_CHANGE'
-  | 'MASTER_DEVICE_SYNC_CONNECTED';
+  | 'MASTER_DEVICE_SYNC_CONNECTED'
+  | 'HOME_NAV_TAB'
+  | 'HOME_QUICK_JUMP_SECTION'
+  | 'HOME_WHATSAPP_CTA'
+  | 'HOME_PILLAR_CLICK'
+  | 'HOME_PILLAR_CTA';
 
 export interface TelemetryPayload {
   [key: string]: string | number | boolean | null | undefined | object;
