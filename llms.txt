@@ -1,0 +1,61 @@
+# HANDS & HEAD
+
+> One Core, Many Worlds. Enterprise venture operating system, browser-native WebGL2 AI video platform, and direct-from-source Dhaka industrial manufacturing house founded by Rakib Himon (Shaikh Rakibuzzaman Himon).
+
+- Canonical Hub: https://handsandhead.com/
+- Founder & Systems Architect: Rakib Himon (Shaikh Rakibuzzaman Himon) — https://rakib.handsandhead.com/
+- Headquarters: Dhaka, Bangladesh
+- Full AI Knowledge Base: https://handsandhead.com/llms-full.txt
+- XML Sitemap: https://handsandhead.com/sitemap.xml
+
+## Flagship Technology Engine
+
+- [HandFilm Studio & Storyboard](https://storyboard.handsandhead.com/): Browser-native WebGL2 AI video editor, non-linear editing (NLE) suite, cinema player, and Cloudflare video hosting infrastructure engineered for zero-install production pipelines.
+- [HANDS & HEAD Master OS](https://handsandhead.com/): Zero-latency 3-tab operating system (`#home`, `#apps`, `#sliders`) uniting 24 modular venture portals, the RAWx 16 Ultra Sliders engine, and real-time multi-device task synchronization.
+
+## Industrial & B2B Backbone (Dhaka Direct-from-Source)
+
+- [HANDS & HEAD B2B Portal](https://b2b.handsandhead.com/): Direct-from-source manufacturing wings in Dhaka, Bangladesh offering low MOQs, export-grade QA, and vertical sourcing across apparel, leather, and steel hardware.
+- [RMG & Heavyweight Streetwear](https://b2b.handsandhead.com/#rmg): Ready-made garments and 240–300 GSM heavyweight combed cotton streetwear, hoodies, tees, and cut-and-sew production.
+- [Genuine Distressed Leather](https://b2b.handsandhead.com/#leather): Audited Dhaka tannery sourcing, distressed full-grain hides, leather goods, and finished export craftsmanship.
+- [Custom Jackets & Outerwear](https://jacket.handsandhead.com/): Technical jackets, distressed leather outerwear, and structured coat production (also accessible via https://b2b.handsandhead.com/#jacket).
+- [316L / 516SS Precision Hardware & RAWx](https://rawx.handsandhead.com/): Surgical-grade 316L and 516SS stainless-steel hardware, bracelets, and custom metal fittings (also accessible via https://b2b.handsandhead.com/#bracelets).
+- [Arutemika Wholesale](https://arutemika.handsandhead.com/): Corporate, wholesale, and enterprise B2B procurement desk.
+
+## 24-Module Ecosystem Directory
+
+### Commerce
+- [01. D2C Shop](https://d2c.handsandhead.com/): Consumer commerce, limited drops, leather vault goods, and WhatsApp-first ordering.
+- [02. Arutemika](https://arutemika.handsandhead.com/): Corporate, wholesale, and bulk procurement commerce.
+
+### Content & Cinema
+- [03. Articles](https://articles.handsandhead.com/): Long-form essays on industrial realism, software architecture, AI, and design.
+- [04. Studio (HandFilm & Storyboard)](https://storyboard.handsandhead.com/): WebGL2 AI video platform, NLE editor, cinema player, and Cloudflare video host.
+- [05. Aural](https://aural.handsandhead.com/): Acoustic research, procedural ambient soundscapes, and music division.
+
+### Manufacturing Wings
+- [06. Textile](https://b2b.handsandhead.com/#textile): Woven and knit fabric development and mill sourcing.
+- [07. RMG](https://b2b.handsandhead.com/#rmg): Ready-made garments and 240–300 GSM heavyweight streetwear manufacturing.
+- [08. Leather](https://b2b.handsandhead.com/#leather): Genuine distressed leather goods and tannery sourcing.
+- [09. Jacket](https://jacket.handsandhead.com/): Custom outerwear and leather/technical jacket manufacturing.
+- [10. Jute](https://b2b.handsandhead.com/#jute): Natural fibre jute processing and zero-carbon industrial packaging.
+- [11. Lingerie](https://b2b.handsandhead.com/#lingerie): Seamless intimate apparel engineering and precision assembly.
+- [12. Bracelets / RAWx Hardware](https://rawx.handsandhead.com/): 316L/516SS stainless-steel hardware and handcrafted accessories.
+
+### Lifestyle
+- [13. Bloom](https://bloom.handsandhead.com/): Floral and botanical design division.
+- [14. Gym](https://gym.handsandhead.com/): Athletic performance gear, training apparel, and wellness protocols.
+
+### Agriculture & Food
+- [15. Agro](https://agro.handsandhead.com/): Direct agricultural sourcing and agro-processing operations.
+- [16. Food](https://food.handsandhead.com/): Packaged food production, quality assurance, and distribution.
+
+### Software & Apps
+- [17. Bloom App](https://bloomapp.handsandhead.com/): Digital botanical concierge and rapid floral dispatch app.
+- [18. Apps](https://apps.handsandhead.com/): Internal software utilities, APIs, and venture tooling (including ecosystem ventures such as Skyhara).
+- [19. Note](https://note.handsandhead.com/): Encrypted Markdown writing and structured team knowledge workspace.
+- [20. Picseed](https://picseed.handsandhead.com/): Automated image CDN and high-fidelity visual asset pipeline.
+- [21. Hub](https://hub.handsandhead.com/): Central ecosystem control spine and telemetry backbone.
+- [22. Deeper](https://deeper.handsandhead.com/): Frontier R&D, experimental WebGL interfaces, and systems incubation.
+- [23. Hiya](https://hiya.handsandhead.com/): Low-latency peer-to-peer team messaging mesh.
+- [24. Me (Rakib Himon)](https://rakib.handsandhead.com/): Founder profile, architecture notes, and single sign-on identity enclave.

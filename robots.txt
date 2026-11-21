@@ -1,3 +1,42 @@
+# HANDS & HEAD (handsandhead.com) — Search Engine & AI Crawler Policy
+# One Core, Many Worlds.
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
 User-agent: *
 Allow: /
+
+# Primary XML Sitemap
 Sitemap: https://handsandhead.com/sitemap.xml
+
+# AI / LLM Discovery Manifests (llms.txt standard)
+# https://handsandhead.com/llms.txt
+# https://handsandhead.com/llms-full.txt
