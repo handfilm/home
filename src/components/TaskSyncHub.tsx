@@ -170,7 +170,7 @@ export default function TaskSyncHub({
 
   return (
     <div
-      className="w-full min-h-[calc(100vh-118px)] md:min-h-[calc(100vh-70px)] mt-[118px] md:mt-[70px] px-4 sm:px-8 py-8 pb-28 hh-theme-transition"
+      className="w-full min-h-[calc(100vh-130px)] md:min-h-[calc(100vh-80px)] mt-[130px] md:mt-[80px] px-4 sm:px-8 py-8 pb-28 hh-theme-transition"
       style={{
         backgroundColor: 'var(--hh-bg)',
         color: 'var(--hh-text)',

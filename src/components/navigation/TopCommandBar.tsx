@@ -9,7 +9,9 @@ import {
   Moon,
   Download,
   LayoutGrid,
+  MoreVertical,
   Check,
+  ChevronRight,
 } from 'lucide-react';
 import {
   Language,
@@ -40,6 +42,18 @@ export interface TopCommandBarProps {
   t: TranslationDictionary;
 }
 
+interface UtilityTileMeta {
+  id: string;
+  title: string;
+  badge: string;
+  description: string;
+  accent: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  hasChevron?: boolean;
+  active?: boolean;
+}
+
 export default function TopCommandBar({
   activeTab,
   setActiveTab,
@@ -55,9 +69,11 @@ export default function TopCommandBar({
   t,
 }: TopCommandBarProps) {
   const { colorMode, toggleColorMode, themeTabKey, palette, isDark } = useTheme();
-  const [isLangOpen, setIsLangOpen] = useState(false);
+  const [isUtilityMenuOpen, setIsUtilityMenuOpen] = useState(false);
+  const [isLangPickerExpanded, setIsLangPickerExpanded] = useState(false);
+  const [hoveredUtilId, setHoveredUtilId] = useState<string>('search');
   const [installFeedback, setInstallFeedback] = useState(false);
-  const langMenuRef = useRef<HTMLDivElement | null>(null);
+  const utilityMenuRef = useRef<HTMLDivElement | null>(null);
 
   const isBangla = language === 'bn';
 
@@ -69,13 +85,15 @@ export default function TopCommandBar({
 
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
-      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
-        setIsLangOpen(false);
+      if (utilityMenuRef.current && !utilityMenuRef.current.contains(e.target as Node)) {
+        setIsUtilityMenuOpen(false);
+        setIsLangPickerExpanded(false);
       }
     };
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsLangOpen(false);
+        setIsUtilityMenuOpen(false);
+        setIsLangPickerExpanded(false);
       }
     };
     document.addEventListener('mousedown', handleOutside);
@@ -95,8 +113,8 @@ export default function TopCommandBar({
         borderColor: palette.accent,
         color: '#ffffff',
         boxShadow: isDark
-          ? '0 0 20px rgba(225, 29, 72, 0.42)'
-          : '0 6px 18px rgba(190, 18, 60, 0.28)',
+          ? '0 0 26px rgba(225, 29, 72, 0.48)'
+          : '0 8px 22px rgba(190, 18, 60, 0.30)',
       };
     }
     if (tabKey === 'handfilm' && activeTab === 'handfilm') {
@@ -105,8 +123,8 @@ export default function TopCommandBar({
         borderColor: palette.accent,
         color: isDark ? '#041218' : '#ffffff',
         boxShadow: isDark
-          ? '0 0 20px rgba(6, 182, 212, 0.38)'
-          : '0 6px 18px rgba(2, 132, 199, 0.26)',
+          ? '0 0 26px rgba(6, 182, 212, 0.44)'
+          : '0 8px 22px rgba(2, 132, 199, 0.28)',
       };
     }
     if (tabKey === 'rawx' && activeTab === 'rawx-showcase') {
@@ -115,8 +133,8 @@ export default function TopCommandBar({
         borderColor: palette.accent,
         color: isDark ? '#0c0b0a' : '#ffffff',
         boxShadow: isDark
-          ? '0 0 20px rgba(217, 119, 6, 0.4)'
-          : '0 6px 18px rgba(180, 83, 9, 0.28)',
+          ? '0 0 26px rgba(217, 119, 6, 0.46)'
+          : '0 8px 22px rgba(180, 83, 9, 0.30)',
       };
     }
     if (tabKey === 'apps' && activeTab === 'ecosystem') {
@@ -125,8 +143,8 @@ export default function TopCommandBar({
         borderColor: isDark ? '#f3efe6' : '#0f172a',
         color: isDark ? '#09090b' : '#ffffff',
         boxShadow: isDark
-          ? '0 0 18px rgba(16, 185, 129, 0.28)'
-          : '0 6px 18px rgba(15, 23, 42, 0.24)',
+          ? '0 0 22px rgba(16, 185, 129, 0.34)'
+          : '0 8px 22px rgba(15, 23, 42, 0.26)',
       };
     }
     return undefined;
@@ -142,6 +160,100 @@ export default function TopCommandBar({
 
   const currentLangOption = LANGUAGE_OPTIONS.find((opt) => opt.code === language);
 
+  const utilityTiles: UtilityTileMeta[] = [
+    {
+      id: 'search',
+      title: 'Quick Jump',
+      badge: '⌘K',
+      description: 'Instant search across all 24 portals, tools & shortcuts',
+      accent: palette.accent,
+      icon: <Search className="w-5 h-5" style={{ color: palette.accent }} />,
+      onClick: () => {
+        setIsUtilityMenuOpen(false);
+        onOpenCommandPalette();
+      },
+    },
+    {
+      id: 'sync',
+      title: 'Mesh Sync',
+      badge: syncState.isConnected ? 'LIVE' : syncState.roomId,
+      description: `Room ${syncState.roomId} · ${syncState.deviceCount} ${
+        syncState.deviceCount === 1 ? 'Device' : 'Devices'
+      } Connected`,
+      accent: '#10b981',
+      icon: <Radio className="w-5 h-5 text-emerald-500" />,
+      onClick: () => {
+        setIsUtilityMenuOpen(false);
+        onOpenSyncModal();
+      },
+    },
+    {
+      id: 'tasks',
+      title: t.nav.tasks,
+      badge: `${tasksCount.pending} OPEN`,
+      description: `${tasksCount.pending} Open / ${tasksCount.total} Total Operational Dispatches`,
+      accent: '#10b981',
+      active: activeTab === 'tasks-hub',
+      icon: <CheckSquare className="w-5 h-5 text-emerald-500" />,
+      onClick: () => {
+        setIsUtilityMenuOpen(false);
+        setActiveTab('tasks-hub');
+      },
+    },
+    {
+      id: 'language',
+      title: 'Language',
+      badge: currentLangOption?.shortLabel || language.toUpperCase(),
+      description: `Active: ${currentLangOption?.nativeLabel || 'English'} · 8 Languages`,
+      accent: palette.accent,
+      hasChevron: true,
+      active: isLangPickerExpanded,
+      icon: <Globe className="w-5 h-5" />,
+      onClick: () => setIsLangPickerExpanded((prev) => !prev),
+    },
+    {
+      id: 'theme',
+      title: 'Theme Canvas',
+      badge: colorMode === 'dark' ? 'DARK' : 'LIGHT',
+      description: isDark ? 'Switch to Crisp Light Mode' : 'Switch to Obsidian Dark Mode',
+      accent: palette.secondaryAccent,
+      icon: isDark ? (
+        <Sun className="w-5 h-5" style={{ color: palette.secondaryAccent }} />
+      ) : (
+        <Moon className="w-5 h-5" style={{ color: palette.secondaryAccent }} />
+      ),
+      onClick: () => toggleColorMode(),
+    },
+    {
+      id: 'install',
+      title: 'Install PWA',
+      badge: canInstallPwa ? 'READY' : installFeedback ? 'MENU' : 'APP',
+      description: installFeedback
+        ? 'Use browser menu → Install App for offline PWA mode'
+        : 'Install Desktop & Mobile Offline Progressive App',
+      accent: palette.secondaryAccent,
+      icon: <Download className="w-5 h-5" />,
+      onClick: () => {
+        void handleInstallClick();
+      },
+    },
+    {
+      id: 'index',
+      title: 'Portal Index',
+      badge: '01–24',
+      description: 'Jump directly to any Ecosystem Wing (01–24)',
+      accent: palette.accent,
+      icon: <LayoutGrid className="w-5 h-5" />,
+      onClick: () => {
+        setIsUtilityMenuOpen(false);
+        onOpenIndex();
+      },
+    },
+  ];
+
+  const activeHoveredTile =
+    utilityTiles.find((item) => item.id === hoveredUtilId) || utilityTiles[0];
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-2xl hh-theme-transition"
@@ -152,7 +264,7 @@ export default function TopCommandBar({
       }}
     >
       <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-8 py-2 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-4 gap-y-2">
-        {/* ZONE 1: Left Brand Lockup (Bigger Logo + Stacked Tagline) */}
+        {/* ZONE 1: Left Brand Lockup (Logo + SUPER BOLD Tagline Beneath) */}
         <a
           href="#home"
           onClick={(e) => handleTabNav(e, 'home')}
@@ -160,14 +272,14 @@ export default function TopCommandBar({
           style={{ color: 'var(--hh-text)' }}
           aria-label="HANDS & HEAD — One Core, Many Worlds."
         >
-          <span className="flex items-center gap-2.5">
+          <span className="flex items-center gap-2">
             <span
               className="w-2.5 h-2.5 rounded-full transition-transform duration-300 group-hover:scale-125 shrink-0"
               style={{ backgroundColor: palette.accent }}
               aria-hidden="true"
             />
             <span
-              className={`text-xl sm:text-2xl font-extrabold uppercase leading-none whitespace-nowrap ${
+              className={`text-lg sm:text-xl font-extrabold uppercase leading-none whitespace-nowrap ${
                 isBangla ? 'bangla-text tracking-normal' : 'tracking-[0.14em]'
               }`}
               style={isBangla ? { letterSpacing: 0 } : undefined}
@@ -176,11 +288,11 @@ export default function TopCommandBar({
             </span>
           </span>
           <span
-            className={`text-[11px] sm:text-xs font-serif italic opacity-80 tracking-normal mt-0.5 leading-tight pl-5 whitespace-nowrap ${
-              isBangla ? 'bangla-text not-italic' : ''
+            className={`text-xs sm:text-[13.5px] font-black tracking-tight mt-1 leading-none pl-[18px] whitespace-nowrap ${
+              isBangla ? 'bangla-text' : ''
             }`}
             style={{
-              color: 'var(--hh-muted)',
+              color: palette.secondaryAccent,
               ...(isBangla ? { letterSpacing: 0 } : undefined),
             }}
           >
@@ -188,20 +300,20 @@ export default function TopCommandBar({
           </span>
         </a>
 
-        {/* ZONE 2: Center Primary Module Dock (4 Large Icon-Only Buttons, 46x46px) */}
+        {/* ZONE 2: Center Primary Module Dock (MUCH BIGGER HOME, HANDFILM, RAWx, APPS) */}
         <nav
           aria-label="Primary Operating System Views"
           data-active-theme-tab={themeTabKey}
           className="order-3 md:order-2 w-full md:w-auto flex items-center justify-center shrink-0"
         >
           <div
-            className="inline-flex items-center gap-1.5 sm:gap-2 p-1 rounded-2xl border hh-theme-transition"
+            className="inline-flex items-center gap-2 sm:gap-2.5 p-1.5 rounded-2xl border hh-theme-transition"
             style={{
               backgroundColor: 'var(--hh-surface)',
               borderColor: 'var(--hh-border)',
               boxShadow: isDark
-                ? 'inset 0 1px 0 rgba(255,255,255,0.04)'
-                : '0 4px 14px rgba(15,23,42,0.05)',
+                ? 'inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 32px rgba(0,0,0,0.4)'
+                : '0 6px 20px rgba(15,23,42,0.06)',
             }}
           >
             <IconHoverCard
@@ -211,12 +323,13 @@ export default function TopCommandBar({
               ariaCurrent={activeTab === 'home' ? 'page' : undefined}
               isActive={activeTab === 'home'}
               activeStyle={getTabActiveStyle('home')}
-              buttonSize="lg"
-              buttonShape="rounded-xl"
+              buttonSize="xl"
+              buttonShape="rounded-2xl"
               buttonStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
               title={t.nav.home}
               badge="CORE"
-              description="Enterprise Command Core · 3 Operating Pillars & Live Routing Matrix"
+              urlLabel="handsandhead.com"
+              description="Enterprise Command Core · Operating Pillars & Routing Matrix"
               align="center"
               position="bottom"
               isBangla={isBangla}
@@ -231,11 +344,12 @@ export default function TopCommandBar({
               ariaCurrent={activeTab === 'handfilm' ? 'page' : undefined}
               isActive={activeTab === 'handfilm'}
               activeStyle={getTabActiveStyle('handfilm')}
-              buttonSize="lg"
-              buttonShape="rounded-xl"
+              buttonSize="xl"
+              buttonShape="rounded-2xl"
               buttonStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
               title={t.nav.handfilm}
               badge="STUDIO"
+              urlLabel="storyboard.handsandhead.com"
               description="AI Cinema & Video Studio · Launch Easy, Beast, CapCut & AD Modes"
               align="center"
               position="bottom"
@@ -251,12 +365,13 @@ export default function TopCommandBar({
               ariaCurrent={activeTab === 'rawx-showcase' ? 'page' : undefined}
               isActive={activeTab === 'rawx-showcase'}
               activeStyle={getTabActiveStyle('rawx')}
-              buttonSize="lg"
-              buttonShape="rounded-xl"
+              buttonSize="xl"
+              buttonShape="rounded-2xl"
               buttonStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
               title="RAWx"
               badge="19 ENGINES"
               badgeTone="amber"
+              urlLabel="rawx.handsandhead.com"
               description="Flagship Brand & Visual Lab · 19 Interactive Slider Engines & Drops"
               align="center"
               position="bottom"
@@ -272,12 +387,13 @@ export default function TopCommandBar({
               ariaCurrent={activeTab === 'ecosystem' ? 'page' : undefined}
               isActive={activeTab === 'ecosystem'}
               activeStyle={getTabActiveStyle('apps')}
-              buttonSize="lg"
-              buttonShape="rounded-xl"
+              buttonSize="xl"
+              buttonShape="rounded-2xl"
               buttonStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
               title={t.nav.apps}
               badge="24 PORTALS"
               badgeTone="emerald"
+              urlLabel="apps.handsandhead.com"
               description="Ecosystem Directory · Browse & Launch All 24 Portals"
               align="center"
               position="bottom"
@@ -288,253 +404,206 @@ export default function TopCommandBar({
           </div>
         </nav>
 
-        {/* ZONE 3: Right Utility Dock (7 Tactile Icon-Only Buttons, 42x42px) */}
-        <div className="order-2 md:order-3 flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* 1. Command Search (⌘K) */}
+        {/* ZONE 3: Very Low Priority Utility Menu (Quiet 3-Dots Smart Dropdown) */}
+        <div ref={utilityMenuRef} className="order-2 md:order-3 relative flex items-center shrink-0">
           <IconHoverCard
-            onClick={onOpenCommandPalette}
-            ariaLabel="Quick Jump Command Palette (Cmd+K)"
-            buttonSize="md"
+            onClick={() => setIsUtilityMenuOpen((prev) => !prev)}
+            ariaLabel="System Utilities & Settings Menu"
+            ariaExpanded={isUtilityMenuOpen}
+            ariaHaspopup="menu"
+            isActive={isUtilityMenuOpen}
+            suppressCard={isUtilityMenuOpen}
+            buttonSize="sm"
             buttonShape="rounded-xl"
-            title="Quick Jump"
-            badge="⌘K"
-            description="Quick Jump (⌘K) · Instant search across 24 portals & tools"
+            buttonClassName="opacity-70 hover:opacity-100"
+            buttonStyle={{
+              backgroundColor: isUtilityMenuOpen ? 'var(--hh-surface-2)' : 'transparent',
+              borderColor: isUtilityMenuOpen ? 'var(--hh-border)' : 'transparent',
+            }}
+            title="System Utilities"
+            badge="7 TOOLS"
+            description="Quick Jump ⌘K · Sync · Tasks · 8 Languages · Theme · PWA · Index"
             align="right"
             position="bottom"
             isBangla={isBangla}
-            icon={<Search className="w-5 h-5" style={{ color: palette.accent }} />}
-          />
-
-          {/* 2. Sync Mesh (Live green indicator dot) */}
-          <IconHoverCard
-            onClick={onOpenSyncModal}
-            ariaLabel="Multi-Device Mesh Sync"
-            buttonSize="md"
-            buttonShape="rounded-xl"
-            title="Mesh Sync"
-            badge={syncState.isConnected ? 'LIVE' : 'MESH'}
-            badgeTone={syncState.isConnected ? 'emerald' : 'amber'}
-            description={`Mesh Sync Active · ${syncState.roomId} · ${syncState.deviceCount} ${
-              syncState.deviceCount === 1 ? 'Device' : 'Devices'
-            } Connected`}
-            align="right"
-            position="bottom"
-            isBangla={isBangla}
-            accentColor="#10b981"
-            cornerBadge={
-              <span className="absolute top-1.5 right-1.5 flex h-2 w-2" aria-hidden="true">
-                {syncState.isConnected && (
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                )}
-                <span
-                  className={`relative inline-flex rounded-full h-2 w-2 ${
-                    syncState.isConnected ? 'bg-emerald-500' : 'bg-amber-500'
-                  }`}
-                />
-              </span>
-            }
-            icon={<Radio className="w-5 h-5" />}
-          />
-
-          {/* 3. Tasks (Compact corner count dot) */}
-          <IconHoverCard
-            href="#tasks"
-            onClick={(e) => handleTabNav(e, 'tasks-hub')}
-            ariaLabel={`Active Tasks (${tasksCount.pending} Open)`}
-            ariaCurrent={activeTab === 'tasks-hub' ? 'page' : undefined}
-            isActive={activeTab === 'tasks-hub'}
-            activeStyle={
-              activeTab === 'tasks-hub'
-                ? {
-                    backgroundColor: 'rgba(16, 185, 129, 0.16)',
-                    borderColor: '#10b981',
-                    color: '#10b981',
-                  }
-                : undefined
-            }
-            buttonSize="md"
-            buttonShape="rounded-xl"
-            title={t.nav.tasks}
-            badge={`${tasksCount.pending} OPEN`}
-            badgeTone="emerald"
-            description={`Active Tasks · ${tasksCount.pending} Open / ${tasksCount.total} Total Operational Dispatches`}
-            align="right"
-            position="bottom"
-            isBangla={isBangla}
-            accentColor="#10b981"
             cornerBadge={
               tasksCount.pending > 0 ? (
                 <span
                   aria-hidden="true"
-                  className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-rose-600 text-white font-mono text-[9px] font-bold flex items-center justify-center tabular-nums shadow-sm border"
-                  style={{ borderColor: 'var(--hh-bg)' }}
-                >
-                  {tasksCount.pending}
-                </span>
+                  className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500"
+                />
               ) : undefined
             }
-            icon={<CheckSquare className="w-5 h-5 text-emerald-500" />}
+            icon={<MoreVertical className="w-[18px] h-[18px]" style={{ color: 'var(--hh-muted)' }} />}
           />
 
-          {/* 4. Language Selector (Globe Icon Only + 8-Language Dropdown) */}
-          <div ref={langMenuRef} className="relative shrink-0">
-            <IconHoverCard
-              onClick={() => setIsLangOpen((prev) => !prev)}
-              ariaLabel={`${t.theme.selectLanguage}: ${currentLangOption?.nativeLabel || language}`}
-              ariaExpanded={isLangOpen}
-              ariaHaspopup="listbox"
-              isActive={isLangOpen}
-              activeStyle={
-                isLangOpen
-                  ? {
-                      backgroundColor: palette.accent,
-                      borderColor: palette.accent,
-                      color:
-                        isDark && (themeTabKey === 'handfilm' || themeTabKey === 'rawx')
-                          ? '#09090b'
-                          : '#ffffff',
-                    }
-                  : undefined
-              }
-              suppressCard={isLangOpen}
-              buttonSize="md"
-              buttonShape="rounded-xl"
-              title="Language"
-              badge={currentLangOption?.shortLabel || language.toUpperCase()}
-              description={`Language · Switch Interface Locale (${
-                currentLangOption?.nativeLabel || 'English'
-              })`}
-              align="right"
-              position="bottom"
-              isBangla={isBangla}
-              icon={<Globe className="w-5 h-5" />}
-            />
-
-            {isLangOpen && (
-              <div
-                role="listbox"
-                aria-label={t.theme.selectLanguage}
-                className="absolute right-0 top-full mt-3 w-52 rounded-2xl border backdrop-blur-2xl p-1.5 shadow-2xl z-50"
-                style={{
-                  backgroundColor: 'var(--hh-glass-bg)',
-                  borderColor: 'var(--hh-border)',
-                  color: 'var(--hh-text)',
-                  boxShadow: 'var(--hh-card-shadow)',
-                }}
-              >
-                {LANGUAGE_OPTIONS.map((opt) => {
-                  const isSelected = language === opt.code;
-                  const optIsBn = opt.code === 'bn';
+          {/* Smart 3-Dots Dropdown with Super Smart Icons + Animated Hover Preview Card */}
+          {isUtilityMenuOpen && (
+            <div
+              role="menu"
+              aria-label="Workspace Utilities"
+              className="absolute right-0 top-full mt-3 w-[320px] sm:w-[344px] max-w-[calc(100vw-1.5rem)] rounded-2xl border backdrop-blur-2xl p-3.5 shadow-2xl z-50 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              style={{
+                backgroundColor: 'var(--hh-glass-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+                boxShadow: isDark
+                  ? '0 28px 60px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255,255,255,0.06)'
+                  : '0 24px 52px rgba(15, 23, 42, 0.16)',
+              }}
+            >
+              {/* Smart 4-Column Square Icon Matrix */}
+              <div className="grid grid-cols-4 gap-2">
+                {utilityTiles.map((tile) => {
+                  const isFocused = hoveredUtilId === tile.id;
                   return (
                     <button
-                      key={opt.code}
+                      key={tile.id}
                       type="button"
-                      role="option"
-                      aria-selected={isSelected}
-                      onClick={() => {
-                        onSelectLanguage(opt.code);
-                        setIsLangOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 ${
-                        optIsBn ? 'bangla-text' : 'font-sans'
+                      role="menuitem"
+                      aria-label={tile.title}
+                      onMouseEnter={() => setHoveredUtilId(tile.id)}
+                      onFocus={() => setHoveredUtilId(tile.id)}
+                      onClick={tile.onClick}
+                      className={`group relative aspect-square rounded-xl border flex flex-col items-center justify-center gap-1 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer hover:scale-105 hover:-translate-y-0.5 active:scale-95 ${
+                        tile.active ? 'ring-1' : ''
                       }`}
-                      style={
-                        isSelected
-                          ? {
-                              backgroundColor: palette.accent,
-                              color:
-                                isDark && themeTabKey === 'handfilm'
-                                  ? '#041218'
-                                  : isDark && themeTabKey === 'rawx'
-                                  ? '#0c0b0a'
-                                  : '#ffffff',
-                              fontWeight: 700,
-                              ...(optIsBn ? { letterSpacing: 0 } : undefined),
-                            }
-                          : {
-                              color: 'var(--hh-text)',
-                              ...(optIsBn ? { letterSpacing: 0 } : undefined),
-                            }
-                      }
+                      style={{
+                        backgroundColor:
+                          isFocused || tile.active ? 'var(--hh-surface-2)' : 'var(--hh-surface)',
+                        borderColor:
+                          isFocused || tile.active ? tile.accent : 'var(--hh-border)',
+                        color: 'var(--hh-text)',
+                      }}
                     >
-                      <span className="flex items-center gap-2.5 min-w-0">
-                        <span className="font-mono text-[10px] uppercase tracking-wider opacity-75 w-5 shrink-0">
-                          {opt.shortLabel}
+                      <div className="transition-transform duration-200 group-hover:scale-110">
+                        {tile.icon}
+                      </div>
+
+                      {tile.id === 'tasks' && tasksCount.pending > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-rose-600 text-white font-mono text-[9px] font-bold flex items-center justify-center tabular-nums"
+                        >
+                          {tasksCount.pending}
                         </span>
-                        <span className="truncate">{opt.nativeLabel}</span>
-                      </span>
-                      {isSelected && <Check className="w-3.5 h-3.5 shrink-0" />}
+                      )}
+
+                      {tile.id === 'sync' && syncState.isConnected && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500"
+                        />
+                      )}
+
+                      {tile.hasChevron && (
+                        <ChevronRight
+                          className={`w-3 h-3 absolute bottom-1 right-1 opacity-60 transition-transform ${
+                            isLangPickerExpanded ? 'rotate-90' : ''
+                          }`}
+                        />
+                      )}
                     </button>
                   );
                 })}
               </div>
-            )}
-          </div>
 
-          {/* 5. Light / Dark Mode Toggle */}
-          <IconHoverCard
-            onClick={toggleColorMode}
-            ariaLabel={isDark ? t.theme.switchToLight : t.theme.switchToDark}
-            buttonSize="md"
-            buttonShape="rounded-xl"
-            title="Theme Mode"
-            badge={colorMode === 'dark' ? 'DARK' : 'LIGHT'}
-            description="Theme Mode · Switch Light & Dark Canvas"
-            align="right"
-            position="bottom"
-            isBangla={isBangla}
-            accentColor={palette.secondaryAccent}
-            icon={
-              isDark ? (
-                <Sun
-                  className="w-5 h-5 transition-transform duration-200 group-hover:rotate-45"
-                  style={{ color: palette.secondaryAccent }}
+              {/* Dynamic Animated Hover Detail Card inside the 3-Dots Menu */}
+              <div
+                key={activeHoveredTile.id}
+                className="mt-3 rounded-xl border p-3 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                }}
+              >
+                <div
+                  className="h-[2.5px] w-10 rounded-full mb-2 transition-all duration-200"
+                  style={{ backgroundColor: activeHoveredTile.accent }}
                 />
-              ) : (
-                <Moon
-                  className="w-5 h-5 transition-transform duration-200 group-hover:-rotate-12"
-                  style={{ color: palette.secondaryAccent }}
-                />
-              )
-            }
-          />
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-[14px] font-extrabold tracking-tight" style={{ color: 'var(--hh-text)' }}>
+                    {activeHoveredTile.title}
+                  </span>
+                  <span
+                    className="px-2 py-0.5 rounded-md border font-mono text-[10px] font-bold uppercase tracking-wider tabular-nums"
+                    style={{
+                      backgroundColor: 'var(--hh-surface-2)',
+                      borderColor: 'var(--hh-border)',
+                      color: activeHoveredTile.accent,
+                    }}
+                  >
+                    {activeHoveredTile.badge}
+                  </span>
+                </div>
+                <p
+                  className={`text-[12.5px] leading-snug ${isBangla ? 'bangla-text' : ''}`}
+                  style={{
+                    color: 'var(--hh-muted)',
+                    ...(isBangla ? { letterSpacing: 0 } : undefined),
+                  }}
+                >
+                  {activeHoveredTile.description}
+                </p>
+              </div>
 
-          {/* 6. Install App (PWA) */}
-          <IconHoverCard
-            onClick={handleInstallClick}
-            ariaLabel="Install Desktop & Mobile Offline PWA"
-            buttonSize="md"
-            buttonShape="rounded-xl"
-            title="Install App"
-            badge={canInstallPwa ? 'READY' : installFeedback ? 'BROWSER MENU' : 'PWA'}
-            badgeTone={canInstallPwa ? 'emerald' : 'neutral'}
-            description={
-              installFeedback
-                ? 'Use browser menu → Install App for offline PWA access'
-                : 'Install App · Desktop & Mobile Offline PWA'
-            }
-            hint={installFeedback ? 'PWA manifest active ✓' : 'Click to install →'}
-            align="right"
-            position="bottom"
-            isBangla={isBangla}
-            accentColor={palette.secondaryAccent}
-            icon={<Download className="w-5 h-5" />}
-          />
-
-          {/* 7. Master Index */}
-          <IconHoverCard
-            onClick={onOpenIndex}
-            ariaLabel="Portal Index — Jump to Any Wing (01–24)"
-            buttonSize="md"
-            buttonShape="rounded-xl"
-            title="Portal Index"
-            badge="01–24"
-            description="Portal Index · Jump to Any Wing (01–24)"
-            align="right"
-            position="bottom"
-            isBangla={isBangla}
-            icon={<LayoutGrid className="w-5 h-5" />}
-          />
+              {/* Inline Expandable 8-Language Selector */}
+              {isLangPickerExpanded && (
+                <div
+                  role="listbox"
+                  aria-label={t.theme.selectLanguage}
+                  className="mt-2.5 pt-2.5 border-t grid grid-cols-2 gap-1.5"
+                  style={{ borderColor: 'var(--hh-border)' }}
+                >
+                  {LANGUAGE_OPTIONS.map((opt) => {
+                    const isSelected = language === opt.code;
+                    const optIsBn = opt.code === 'bn';
+                    return (
+                      <button
+                        key={opt.code}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        onClick={() => {
+                          onSelectLanguage(opt.code);
+                          setIsLangPickerExpanded(false);
+                          setIsUtilityMenuOpen(false);
+                        }}
+                        className={`flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 ${
+                          optIsBn ? 'bangla-text' : 'font-sans'
+                        }`}
+                        style={
+                          isSelected
+                            ? {
+                                backgroundColor: palette.accent,
+                                color:
+                                  isDark && themeTabKey === 'handfilm'
+                                    ? '#041218'
+                                    : isDark && themeTabKey === 'rawx'
+                                    ? '#0c0b0a'
+                                    : '#ffffff',
+                                fontWeight: 700,
+                                ...(optIsBn ? { letterSpacing: 0 } : undefined),
+                              }
+                            : {
+                                color: 'var(--hh-text)',
+                                ...(optIsBn ? { letterSpacing: 0 } : undefined),
+                              }
+                        }
+                      >
+                        <span className="truncate">{opt.nativeLabel}</span>
+                        {isSelected ? (
+                          <Check className="w-3 h-3 shrink-0" />
+                        ) : (
+                          <span className="font-mono text-[9.5px] opacity-60">{opt.shortLabel}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -173,12 +173,20 @@ export default function StageSlider({
   return (
     <div
       onMouseMove={handleMouseMove}
-      className={`relative w-full h-[calc(100vh-118px)] md:h-[calc(100vh-70px)] mt-[118px] md:mt-[70px] overflow-hidden hh-theme-transition ${isBn ? 'bangla-text' : ''}`}
+      className={`relative w-full h-[calc(100vh-130px)] md:h-[calc(100vh-80px)] mt-[130px] md:mt-[80px] overflow-hidden hh-theme-transition ${isBn ? 'bangla-text' : ''}`}
       style={{
         backgroundColor: 'var(--hh-bg)',
         color: 'var(--hh-text)',
       }}
     >
+      {/* Subtle stage-reactive bottom ambient glow */}
+      <div
+        className="pointer-events-none fixed inset-x-0 bottom-0 h-32 z-10 transition-all duration-700"
+        style={{
+          background: `radial-gradient(ellipse 60% 90% at 50% 100%, ${currentSection?.accent || '#c8b89a'}26, transparent 75%)`,
+        }}
+        aria-hidden="true"
+      />
       {/* Side Navigation Rail */}
       <nav
         className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-1 sm:gap-1.5 items-end font-mono text-[9.5px] sm:text-[10px] tracking-[0.14em] uppercase max-h-[80vh] overflow-y-auto no-scrollbar py-2.5 px-3 rounded-2xl border backdrop-blur-md shadow-xl hh-theme-transition"
@@ -418,7 +426,7 @@ export default function StageSlider({
                 )}
               </div>
 
-              {/* Main Content Area at Bottom */}
+              {/* Main Content Area at Bottom — Low Text, Super Bold Tagline, Bigger Buttons & Animated Hover Card */}
               <div
                 className="relative z-20 h-full flex flex-col justify-end px-6 sm:px-16 pb-24 sm:pb-28 max-w-4xl transition-transform duration-300"
                 style={{
@@ -429,35 +437,44 @@ export default function StageSlider({
               >
                 {/* Eyebrow */}
                 <div
-                  className={`font-mono text-[11px] tracking-[0.2em] text-[#f3efe6]/60 uppercase mb-3 sm:mb-4 flex items-center gap-3 transition-all duration-500 ${
+                  className={`font-mono text-xs tracking-[0.2em] text-[#f3efe6]/70 uppercase mb-2.5 flex items-center gap-3 transition-all duration-500 ${
                     isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
                   }`}
                 >
-                  <span style={{ color: section.accent }} className="font-bold">
+                  <span style={{ color: section.accent }} className="font-black">
                     {String(idx + 1).padStart(2, '0')}
                   </span>
                   <span>/ {String(sections.length).padStart(2, '0')}</span>
-                  <span>— {t.brand.name}</span>
+                  <span className="opacity-50">·</span>
+                  <span className="text-[#f3efe6]/85">{section.url}</span>
                 </div>
 
                 {/* Big Display Title */}
-                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight text-[#f3efe6] leading-[0.9] mb-4">
+                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight text-[#f3efe6] leading-[0.9] mb-3">
                   {display.title}
                 </h1>
 
-                {/* Subtitle in elegant serif font */}
-                <p className="serif-display italic text-lg sm:text-2xl text-[#f3efe6]/90 mb-3 max-w-2xl font-light">
-                  {display.sub}
-                </p>
+                {/* Super Bold Tagline / Subtitle with Animated Hover Card for Full Description */}
+                <div className="group/stagebrief relative max-w-2xl mb-6">
+                  <p className="text-lg sm:text-2xl text-[#f3efe6] font-extrabold tracking-tight leading-snug">
+                    {display.sub}
+                  </p>
+                  {display.desc && (
+                    <div
+                      className="pointer-events-none absolute left-0 bottom-full mb-3 w-[320px] sm:w-[400px] max-w-[calc(100vw-3rem)] rounded-2xl border p-4 backdrop-blur-2xl shadow-2xl opacity-0 translate-y-2 scale-95 group-hover/stagebrief:opacity-100 group-hover/stagebrief:translate-y-0 group-hover/stagebrief:scale-100 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] z-30"
+                      style={{
+                        backgroundColor: 'rgba(12, 12, 16, 0.90)',
+                        borderColor: section.accent || 'rgba(255,255,255,0.2)',
+                      }}
+                    >
+                      <div className="text-sm font-black text-white mb-1">{display.title}</div>
+                      <p className="text-sm text-zinc-200 leading-snug font-medium">{display.desc}</p>
+                    </div>
+                  )}
+                </div>
 
-                {/* Description */}
-                <p className="text-sm sm:text-base text-[#f3efe6]/70 max-w-xl mb-6 leading-relaxed">
-                  {display.desc}
-                </p>
-
-                {/* Action Buttons Row */}
-                <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono text-[11px] sm:text-[12px] tracking-wider uppercase">
-                  {/* If RAWx section, offer primary 16 sliders launcher */}
+                {/* Bigger, Cleaner Action Buttons Row */}
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono text-xs sm:text-sm tracking-wider uppercase">
                   {(section.id === 'articles' || section.title.toLowerCase().includes('rawx')) &&
                   onOpenSliders ? (
                     <a
@@ -467,13 +484,12 @@ export default function StageSlider({
                         e.preventDefault();
                         onOpenSliders();
                       }}
-                      className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer bg-amber-400 text-[#0e0d0b] shadow-xl shadow-amber-400/25 group hover:scale-[1.03] hover:bg-amber-300"
+                      className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-extrabold transition-all duration-200 cursor-pointer bg-amber-400 text-[#0e0d0b] shadow-xl shadow-amber-400/25 group hover:scale-[1.03] hover:bg-amber-300"
                     >
-                      <Sparkles className="w-4 h-4 text-[#0e0d0b] animate-spin" />
-                      <span>OPEN 16 ULTRA SLIDERS</span>
+                      <Sparkles className="w-5 h-5 text-[#0e0d0b]" />
+                      <span>RAWx 19 SLIDERS</span>
                     </a>
                   ) : (
-                    /* Standard Enter destination semantic anchor link */
                     <a
                       href={section.dest}
                       target="_blank"
@@ -482,57 +498,48 @@ export default function StageSlider({
                         e.stopPropagation();
                         trackEvent('MASTER_SECTION_CLICK', { sectionId: section.id, url: section.dest });
                       }}
-                      className="flex items-center gap-2.5 px-5 py-3 rounded-lg font-bold transition-all duration-300 cursor-pointer shadow-lg group hover:scale-[1.02]"
+                      className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-extrabold transition-all duration-200 cursor-pointer shadow-lg group hover:scale-[1.03]"
                       style={{
                         backgroundColor: section.accent || '#f3efe6',
                         color: '#f3efe6',
                       }}
                     >
                       <span>{display.cta}</span>
-                      <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
+                      <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
                   )}
 
-                  {/* Share / Copy Deep Link Button */}
+                  {/* Share Icon Button */}
                   <button
                     onClick={(e) => handleShare(e, section)}
-                    title="Copy direct deep link to this ecosystem portal"
-                    className={`flex items-center gap-2 px-3.5 py-3 rounded-lg border transition-all cursor-pointer ${
+                    aria-label="Copy Portal Link"
+                    title="Copy Portal Link"
+                    className={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all cursor-pointer hover:scale-105 ${
                       isCopied
                         ? 'bg-emerald-500 text-black border-emerald-400 font-bold'
-                        : 'bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6]/80 hover:text-[#f3efe6] border-[#f3efe6]/20'
+                        : 'bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6] border-[#f3efe6]/20'
                     }`}
                   >
-                    {isCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5 text-[#c8b89a]" />}
-                    <span>{isCopied ? t.actions.linkCopied : t.actions.copyLink}</span>
+                    {isCopied ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5 text-[#c8b89a]" />}
                   </button>
 
-                  {/* Open Section Tasks */}
+                  {/* Section Tasks Icon Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onOpenTasksForSection(section.id);
                     }}
-                    className="flex items-center gap-2 px-4 py-3 bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6] border border-[#f3efe6]/20 hover:border-[#f3efe6]/50 rounded-lg transition-all cursor-pointer"
+                    aria-label={`${t.nav.tasks} (${pendingTasks})`}
+                    title={t.nav.tasks}
+                    className="relative w-12 h-12 bg-[#161512]/90 hover:bg-[#201e1a] text-[#f3efe6] border border-[#f3efe6]/20 hover:border-[#f3efe6]/50 rounded-2xl flex items-center justify-center transition-all cursor-pointer hover:scale-105"
                   >
-                    <CheckSquare className="w-4 h-4 text-emerald-400" />
-                    <span>{t.nav.tasks}</span>
+                    <CheckSquare className="w-5 h-5 text-emerald-400" />
                     {pendingTasks > 0 && (
-                      <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] bg-[#b14a26] text-white font-bold">
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#b14a26] text-white text-[10px] font-bold flex items-center justify-center tabular-nums">
                         {pendingTasks}
                       </span>
                     )}
                   </button>
-
-                  <a
-                    href={section.dest}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="hidden sm:inline-block text-[11px] text-[#f3efe6]/55 hover:text-[#f3efe6] border-b border-[#f3efe6]/20 hover:border-[#f3efe6]/60 pb-0.5 transition-colors"
-                  >
-                    {section.url}
-                  </a>
                 </div>
               </div>
             </div>

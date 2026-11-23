@@ -778,7 +778,7 @@ export default function RawxShowcase({
       ref={rootRef}
       className={`w-full font-mono pb-32 space-y-12 overflow-y-auto hh-theme-transition ${
         language === 'bn' ? 'bangla-text' : ''
-      } ${isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-4' : 'mt-[118px] md:mt-[70px]'}`}
+      } ${isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-4' : 'mt-[130px] md:mt-[80px]'}`}
       style={{
         backgroundColor: 'var(--hh-bg)',
         color: 'var(--hh-text)',
@@ -808,7 +808,7 @@ export default function RawxShowcase({
         </div>
       </div>
 
-      {/* A. RAWx Brand Command Header */}
+      {/* A. RAWx Brand Command Header — Low Text, Minimal Right URL, Bigger Buttons */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-2">
         <div
           className="rounded-2xl border p-5 sm:p-7 flex flex-col xl:flex-row xl:items-center justify-between gap-6 hh-theme-transition"
@@ -818,25 +818,17 @@ export default function RawxShowcase({
             boxShadow: 'var(--hh-card-shadow)',
           }}
         >
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2.5 text-[10px] font-space-mono uppercase tracking-[0.2em]">
-              <span
-                className="px-2.5 py-0.5 rounded border font-bold"
-                style={{
-                  backgroundColor: 'var(--hh-bg)',
-                  borderColor: 'var(--hh-accent)',
-                  color: 'var(--hh-accent)',
-                }}
-              >
-                {t.rawx.studioBadge}
+          <div className="space-y-2 max-w-xl">
+            <div className="flex flex-wrap items-center gap-2.5 text-[10.5px] font-space-mono uppercase tracking-[0.18em]">
+              <span className="font-bold" style={{ color: 'var(--hh-accent)' }}>
+                19 SLIDER LABS
               </span>
-              <span style={{ color: 'var(--hh-accent)' }}>19 Interactive Sliders</span>
               <span style={{ color: 'var(--hh-border)' }}>·</span>
-              <span style={{ color: 'var(--hh-muted)' }}>{t.rawx.hoverHint}</span>
+              <span style={{ color: 'var(--hh-muted)' }}>rawx.handsandhead.com</span>
             </div>
 
             <h1
-              className="font-bebas text-3xl sm:text-5xl tracking-wide leading-none"
+              className="font-bebas text-4xl sm:text-5xl tracking-wide leading-none"
               style={{ color: 'var(--hh-text)' }}
             >
               <span className="normal-case" style={{ color: 'var(--hh-accent)' }}>
@@ -844,14 +836,10 @@ export default function RawxShowcase({
               </span>{' '}
               — {t.rawx.heroTitle.replace(/^RAWx\s*—\s*/i, '')}
             </h1>
-
-            <p className="font-inter text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
-              {t.rawx.heroSubtitle}
-            </p>
           </div>
 
-          {/* Right Global Command Controls */}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {/* Right Bigger Icon-Forward Command Controls */}
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             {onBackToEcosystem && (
               <a
                 href="#apps"
@@ -859,7 +847,7 @@ export default function RawxShowcase({
                   e.preventDefault();
                   onBackToEcosystem();
                 }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider uppercase transition-all cursor-pointer font-bold whitespace-nowrap"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-space-mono tracking-wider uppercase transition-all cursor-pointer font-bold whitespace-nowrap hover:scale-[1.02]"
                 style={{
                   backgroundColor: 'var(--hh-bg)',
                   borderColor: 'var(--hh-border)',
@@ -873,72 +861,75 @@ export default function RawxShowcase({
             <button
               type="button"
               onClick={() => setIsSavedTrayOpen((prev) => !prev)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap font-semibold"
+              aria-label={t.rawx.savedLookbook}
+              title={t.rawx.savedLookbook}
+              className="flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap font-bold hover:scale-[1.02]"
               style={{
                 backgroundColor: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-surface-2)' : 'var(--hh-bg)',
                 borderColor: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-accent)' : 'var(--hh-border)',
                 color: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-accent)' : 'var(--hh-text)',
               }}
             >
-              <BookmarkCheck className="w-3.5 h-3.5" />
-              <span>
-                {t.rawx.savedLookbook} ({savedDropIds.length})
-              </span>
+              <BookmarkCheck className="w-4 h-4" />
+              <span className="tabular-nums">{savedDropIds.length}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsAutoplayActive((prev) => !prev)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider transition-all cursor-pointer whitespace-nowrap font-semibold"
+              aria-label={isAutoplayActive ? t.rawx.autoplayOn : t.rawx.autoplayPaused}
+              title={isAutoplayActive ? t.rawx.autoplayOn : t.rawx.autoplayPaused}
+              className="w-11 h-11 rounded-xl border flex items-center justify-center transition-all cursor-pointer hover:scale-105"
               style={{
                 backgroundColor: 'var(--hh-bg)',
                 borderColor: isAutoplayActive ? '#10b981' : 'var(--hh-accent)',
                 color: isAutoplayActive ? '#10b981' : 'var(--hh-accent)',
               }}
             >
-              {isAutoplayActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span>{isAutoplayActive ? t.rawx.autoplayOn : t.rawx.autoplayPaused}</span>
+              {isAutoplayActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </button>
 
             <button
               type="button"
               onClick={handleToggleTheaterMode}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap"
+              aria-label={isTheaterMode ? t.rawx.theaterExit : t.rawx.theaterEnter}
+              title={isTheaterMode ? t.rawx.theaterExit : t.rawx.theaterEnter}
+              className="w-11 h-11 rounded-xl border flex items-center justify-center cursor-pointer transition-all hover:scale-105"
               style={{
                 backgroundColor: isTheaterMode ? 'var(--hh-accent)' : 'var(--hh-bg)',
                 borderColor: isTheaterMode ? 'var(--hh-accent)' : 'var(--hh-border)',
                 color: isTheaterMode ? 'var(--hh-accent-ink)' : 'var(--hh-text)',
               }}
             >
-              {isTheaterMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Tv className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />}
-              <span>{isTheaterMode ? t.rawx.theaterExit : t.rawx.theaterEnter}</span>
+              {isTheaterMode ? <Minimize2 className="w-4 h-4" /> : <Tv className="w-4 h-4" style={{ color: 'var(--hh-accent)' }} />}
             </button>
 
             <button
               type="button"
               onClick={() => openPhotoManagerFor('s1')}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-space-mono font-bold text-[11px] tracking-wider uppercase transition-all cursor-pointer shadow-md whitespace-nowrap"
+              className="flex items-center gap-2 px-4 py-3 rounded-xl font-space-mono font-extrabold text-xs tracking-wider uppercase transition-all cursor-pointer shadow-md whitespace-nowrap hover:scale-[1.02]"
               style={{
                 backgroundColor: 'var(--hh-accent)',
                 color: 'var(--hh-accent-ink)',
               }}
             >
-              <Camera className="w-3.5 h-3.5" />
+              <Camera className="w-4 h-4" />
               <span>{t.rawx.customizePhotos}</span>
             </button>
 
             <button
               type="button"
               onClick={() => onOpenLightbox(allCurrentLightboxItems, 0)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono uppercase cursor-pointer whitespace-nowrap"
+              aria-label={t.rawx.lightbox}
+              title={t.rawx.lightbox}
+              className="w-11 h-11 rounded-xl border flex items-center justify-center cursor-pointer transition-all hover:scale-105"
               style={{
                 backgroundColor: 'var(--hh-bg)',
                 borderColor: 'var(--hh-border)',
                 color: 'var(--hh-text)',
               }}
             >
-              <Maximize2 className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
-              <span className="hidden sm:inline">{t.rawx.lightbox}</span>
+              <Maximize2 className="w-4 h-4" style={{ color: 'var(--hh-accent)' }} />
             </button>
           </div>
         </div>

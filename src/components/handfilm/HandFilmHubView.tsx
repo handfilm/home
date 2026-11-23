@@ -719,7 +719,7 @@ export default function HandFilmHubView({
 
   return (
     <div
-      className={`relative min-h-screen w-full pt-[118px] md:pt-[70px] pb-40 font-inter hh-theme-transition ${
+      className={`relative min-h-screen w-full pt-[130px] md:pt-[80px] pb-40 font-inter hh-theme-transition ${
         language === 'bn' ? 'bangla-text' : ''
       }`}
       style={{
@@ -745,7 +745,7 @@ export default function HandFilmHubView({
       <div
         ref={navContainerRef}
         onMouseLeave={handleScheduleCloseMenu}
-        className="sticky top-[117px] md:top-[69px] z-40 border-b backdrop-blur-xl hh-theme-transition"
+        className="sticky top-[129px] md:top-[79px] z-40 border-b backdrop-blur-xl hh-theme-transition"
         style={{
           borderColor: 'var(--hh-border)',
           backgroundColor: 'var(--hh-header-bg)',
@@ -1194,44 +1194,34 @@ export default function HandFilmHubView({
                   {/* Hover / Tap Glassmorphic Detail Reveal Drawer */}
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className={`absolute inset-x-2.5 bottom-2.5 z-20 rounded-2xl p-4 backdrop-blur-xl bg-black/78 border border-white/20 text-white transition-all duration-300 ease-out space-y-2.5 ${
+                    className={`absolute inset-x-2.5 bottom-2.5 z-20 rounded-2xl p-4 backdrop-blur-2xl bg-black/82 border border-white/25 text-white transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] space-y-3 ${
                       isExpanded
-                        ? 'opacity-100 translate-y-0 pointer-events-auto'
-                        : 'opacity-0 translate-y-8 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto'
+                        ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                        : 'opacity-0 translate-y-6 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-base font-bold text-white leading-tight">{card.title}</span>
-                      <span className="font-space-mono text-[9.5px] text-[#06b6d4]">{card.duration}</span>
+                      <span className="text-lg font-black text-white leading-tight">{card.title}</span>
+                      <span className="font-space-mono text-[10px] font-bold text-[#06b6d4]">{card.duration}</span>
                     </div>
 
-                    <p className="text-[11.5px] text-zinc-200 leading-snug line-clamp-2">
+                    <p className="text-[13px] text-zinc-100 leading-snug line-clamp-2 font-medium">
                       {card.description}
                     </p>
-
-                    <div className="flex flex-wrap gap-1">
-                      {card.chips.map((chip) => (
-                        <span
-                          key={chip}
-                          className="px-2 py-0.5 rounded bg-white/10 font-space-mono text-[9px] text-zinc-200"
-                        >
-                          {chip}
-                        </span>
-                      ))}
-                    </div>
 
                     <a
                       href={card.href}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => trackStoryboardLaunch(`vertical_card_${card.id}`, card.href)}
-                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-extrabold transition-transform hover:scale-[1.02]"
                       style={{
                         backgroundColor: 'var(--hh-accent)',
                         color: 'var(--hh-accent-ink)',
                       }}
                     >
                       <span>{t.handfilm.launchStoryboard}</span>
+                      <ArrowUpRight className="w-4 h-4" />
                     </a>
                   </div>
                 </div>
@@ -1372,10 +1362,10 @@ export default function HandFilmHubView({
                   {/* Smooth Hover-Reveal Glassmorphic Detail Panel */}
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className={`absolute inset-x-3 bottom-3 z-20 rounded-2xl p-5 backdrop-blur-xl border transition-all duration-300 ease-out space-y-3 ${
+                    className={`absolute inset-x-3 bottom-3 z-20 rounded-2xl p-5 backdrop-blur-xl border shadow-2xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] space-y-3.5 ${
                       isExpanded
-                        ? 'opacity-100 translate-y-0 pointer-events-auto'
-                        : 'opacity-0 translate-y-8 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto'
+                        ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                        : 'opacity-0 translate-y-6 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto'
                     }`}
                     style={{
                       backgroundColor: 'var(--hh-glass-bg)',
@@ -1383,18 +1373,18 @@ export default function HandFilmHubView({
                     }}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-lg font-bold" style={{ color: 'var(--hh-text)' }}>
+                      <h3 className="text-xl font-extrabold tracking-tight" style={{ color: 'var(--hh-text)' }}>
                         {model.name}
                       </h3>
                       <span
-                        className="font-space-mono text-[10px]"
-                        style={{ color: 'var(--hh-muted)' }}
+                        className="font-space-mono text-[11px] font-bold"
+                        style={{ color: 'var(--hh-accent-2)' }}
                       >
                         {model.query}
                       </span>
                     </div>
 
-                    <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--hh-muted)' }}>
+                    <p className="text-sm font-medium leading-relaxed line-clamp-2" style={{ color: 'var(--hh-muted)' }}>
                       {model.description}
                     </p>
 
@@ -1402,7 +1392,7 @@ export default function HandFilmHubView({
                       {model.highlights.map((item) => (
                         <span
                           key={item}
-                          className="px-2 py-0.5 rounded-lg border font-space-mono text-[10px]"
+                          className="px-2.5 py-1 rounded-lg border font-space-mono text-[10.5px] font-semibold"
                           style={{
                             backgroundColor: 'var(--hh-bg)',
                             borderColor: 'var(--hh-border)',
@@ -1419,7 +1409,7 @@ export default function HandFilmHubView({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => trackStoryboardLaunch(`model_grid_${model.id}`, model.href)}
-                      className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-transform hover:scale-[1.01]"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-extrabold transition-transform hover:scale-[1.02] shadow-lg"
                       style={{
                         backgroundColor: 'var(--hh-accent)',
                         color: 'var(--hh-accent-ink)',
@@ -2094,20 +2084,20 @@ export default function HandFilmHubView({
       </div>
 
       {/* FLOATING BOTTOM PILL BAR */}
-      <div className="fixed bottom-20 sm:bottom-22 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1.5rem)] max-w-xl pointer-events-auto">
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1.5rem)] max-w-xl pointer-events-auto">
         <div
-          className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-full backdrop-blur-xl border shadow-2xl"
+          className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl backdrop-blur-xl border shadow-2xl"
           style={{
             backgroundColor: 'var(--hh-glass-bg)',
             borderColor: 'var(--hh-border)',
           }}
         >
           <div className="flex items-center gap-2.5 min-w-0 pl-1">
-            <span className="font-space-mono text-[11px] font-bold tracking-wider shrink-0" style={{ color: 'var(--hh-text)' }}>
+            <span className="font-space-mono text-xs font-bold tracking-wider shrink-0" style={{ color: 'var(--hh-text)' }}>
               HANDFILM
             </span>
             <span aria-hidden="true" className="hidden sm:inline" style={{ color: 'var(--hh-muted)' }}>—</span>
-            <span className="text-xs truncate hidden sm:inline" style={{ color: 'var(--hh-muted)' }}>
+            <span className="text-xs font-medium truncate hidden sm:inline" style={{ color: 'var(--hh-muted)' }}>
               {t.handfilm.stickySlogan}
             </span>
           </div>
@@ -2117,14 +2107,14 @@ export default function HandFilmHubView({
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackStoryboardLaunch('floating_bottom_pill', buildStoryboardUrl(''))}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
             style={{
               backgroundColor: 'var(--hh-accent)',
               color: 'var(--hh-accent-ink)',
             }}
           >
             <span>{t.handfilm.tryOnline}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <ArrowUpRight className="w-4 h-4" />
           </a>
         </div>
       </div>

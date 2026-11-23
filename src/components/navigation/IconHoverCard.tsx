@@ -10,6 +10,7 @@ export interface IconHoverCardProps {
   description: string;
   badge?: string;
   badgeTone?: HoverCardBadgeTone;
+  urlLabel?: string;
   hint?: string;
   align?: HoverCardAlign;
   position?: HoverCardPosition;
@@ -18,8 +19,8 @@ export interface IconHoverCardProps {
   href?: string;
   isActive?: boolean;
   activeStyle?: React.CSSProperties;
-  buttonSize?: 'md' | 'lg';
-  buttonShape?: 'rounded-xl' | 'rounded-full';
+  buttonSize?: 'sm' | 'md' | 'lg' | 'xl';
+  buttonShape?: 'rounded-xl' | 'rounded-2xl' | 'rounded-full';
   buttonClassName?: string;
   buttonStyle?: React.CSSProperties;
   ariaCurrent?: 'page' | undefined;
@@ -44,6 +45,7 @@ export default function IconHoverCard({
   description,
   badge,
   badgeTone = 'accent',
+  urlLabel,
   hint = 'Click to open →',
   align = 'center',
   position = 'bottom',
@@ -53,7 +55,7 @@ export default function IconHoverCard({
   isActive = false,
   activeStyle,
   buttonSize = 'md',
-  buttonShape = 'rounded-xl',
+  buttonShape = 'rounded-2xl',
   buttonClassName = '',
   buttonStyle,
   ariaCurrent,
@@ -69,10 +71,12 @@ export default function IconHoverCard({
   const { palette, isDark } = useTheme();
   const resolvedAccent = accentColor || palette.accent;
 
-  const sizeClasses =
-    buttonSize === 'lg'
-      ? 'w-[42px] h-[42px] sm:w-[46px] sm:h-[46px]'
-      : 'w-[38px] h-[38px] sm:w-[42px] sm:h-[42px]';
+  const sizeMap: Record<'sm' | 'md' | 'lg' | 'xl', string> = {
+    sm: 'w-9 h-9',
+    md: 'w-[42px] h-[42px] sm:w-[44px] sm:h-[44px]',
+    lg: 'w-[46px] h-[46px] sm:w-[48px] sm:h-[48px]',
+    xl: 'w-[50px] h-[50px] sm:w-[56px] sm:h-[56px]',
+  };
 
   const alignClasses: Record<HoverCardAlign, string> = {
     left: 'left-0',
@@ -116,8 +120,8 @@ export default function IconHoverCard({
   const descUsesBangla = isBangla || hasBanglaText(description);
   const hintUsesBangla = isBangla || hasBanglaText(hint);
 
-  const sharedTriggerClasses = `group relative inline-flex items-center justify-center ${sizeClasses} ${buttonShape} border transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer shrink-0 select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ${
-    isActive ? 'scale-[1.03]' : 'hover:scale-105 active:scale-95'
+  const sharedTriggerClasses = `group relative inline-flex items-center justify-center ${sizeMap[buttonSize]} ${buttonShape} border transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer shrink-0 select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ${
+    isActive ? 'scale-[1.04]' : 'hover:scale-105 hover:-translate-y-0.5 active:scale-95'
   } ${buttonClassName}`;
 
   const mergedTriggerStyle: React.CSSProperties = {
@@ -163,30 +167,30 @@ export default function IconHoverCard({
       {!suppressCard && (
         <div
           role="tooltip"
-          className={`absolute ${positionWrapperClasses} ${alignClasses[align]} z-50 w-[260px] max-w-[calc(100vw-1.5rem)] pointer-events-none group-hover/hovercard:pointer-events-auto group-has-[:focus-visible]/hovercard:pointer-events-auto`}
+          className={`absolute ${positionWrapperClasses} ${alignClasses[align]} z-50 w-[290px] sm:w-[310px] max-w-[calc(100vw-1.5rem)] pointer-events-none group-hover/hovercard:pointer-events-auto group-has-[:focus-visible]/hovercard:pointer-events-auto`}
         >
           <div
-            className="w-full rounded-2xl border p-3.5 backdrop-blur-2xl shadow-2xl opacity-0 translate-y-2 scale-95 group-hover/hovercard:opacity-100 group-hover/hovercard:translate-y-0 group-hover/hovercard:scale-100 group-has-[:focus-visible]/hovercard:opacity-100 group-has-[:focus-visible]/hovercard:translate-y-0 group-has-[:focus-visible]/hovercard:scale-100 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none motion-reduce:transform-none text-left"
+            className="w-full rounded-2xl border p-4 backdrop-blur-2xl shadow-2xl opacity-0 translate-y-3 scale-[0.92] group-hover/hovercard:opacity-100 group-hover/hovercard:translate-y-0 group-hover/hovercard:scale-100 group-has-[:focus-visible]/hovercard:opacity-100 group-has-[:focus-visible]/hovercard:translate-y-0 group-has-[:focus-visible]/hovercard:scale-100 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none motion-reduce:transform-none text-left overflow-hidden"
             style={{
               backgroundColor: 'var(--hh-glass-bg)',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(15, 23, 42, 0.12)',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(15, 23, 42, 0.14)',
               color: 'var(--hh-text)',
               boxShadow: isDark
-                ? '0 22px 48px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.06)'
-                : '0 20px 44px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                ? '0 26px 56px rgba(0, 0, 0, 0.68), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+                : '0 24px 50px rgba(15, 23, 42, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
             }}
           >
-            {/* Subtle Top Accent Hairline */}
+            {/* Animated Accent Sweep Bar */}
             <div
               aria-hidden="true"
-              className="h-[2px] w-10 rounded-full mb-2.5"
+              className="h-[3px] w-10 group-hover/hovercard:w-20 transition-all duration-300 ease-out rounded-full mb-3"
               style={{ backgroundColor: resolvedAccent }}
             />
 
-            {/* Header Row: Bold Title + Status/Shortcut Pill */}
-            <div className="flex items-center justify-between gap-2 mb-1.5">
+            {/* Header Row: Bigger Bold Title + Status/Shortcut Pill */}
+            <div className="flex items-center justify-between gap-2.5 mb-2">
               <span
-                className={`text-xs font-bold tracking-wide truncate ${
+                className={`text-[15px] font-extrabold tracking-tight truncate ${
                   titleUsesBangla ? 'bangla-text' : ''
                 }`}
                 style={{
@@ -199,7 +203,7 @@ export default function IconHoverCard({
 
               {badge && (
                 <span
-                  className={`px-2 py-0.5 rounded-md border font-mono text-[9.5px] font-bold uppercase tracking-wider shrink-0 tabular-nums ${
+                  className={`px-2 py-0.5 rounded-md border font-mono text-[10px] font-bold uppercase tracking-wider shrink-0 tabular-nums ${
                     isBangla || hasBanglaText(badge) ? 'bangla-text' : ''
                   }`}
                   style={{
@@ -212,9 +216,9 @@ export default function IconHoverCard({
               )}
             </div>
 
-            {/* 1-2 Line Concise Description */}
+            {/* Bigger, Crisp 1-2 Line Description */}
             <p
-              className={`text-[11.5px] leading-relaxed line-clamp-2 ${
+              className={`text-[13px] leading-snug font-medium line-clamp-2 ${
                 descUsesBangla ? 'bangla-text' : ''
               }`}
               style={{
@@ -225,20 +229,20 @@ export default function IconHoverCard({
               {description}
             </p>
 
-            {/* Optional Interactive Footer Action (e.g., inline Play/Pause toggle) */}
+            {/* Optional Interactive Footer Action */}
             {footerAction && (
               <div
-                className="mt-2.5 pt-2 border-t flex items-center justify-between gap-2"
+                className="mt-3 pt-2.5 border-t flex items-center justify-between gap-2"
                 style={{ borderColor: 'var(--hh-border)' }}
               >
                 {footerAction}
               </div>
             )}
 
-            {/* Subtle Bottom Action Hint */}
-            {hint && !footerAction && (
+            {/* Subtle Bottom Action Hint & Minimal Right URL */}
+            {(hint || urlLabel) && !footerAction && (
               <div
-                className={`mt-2.5 pt-2 border-t flex items-center justify-between font-mono text-[10px] tracking-wider ${
+                className={`mt-3 pt-2.5 border-t flex items-center justify-between gap-2 font-mono text-[10.5px] tracking-wider ${
                   hintUsesBangla ? 'bangla-text' : ''
                 }`}
                 style={{
@@ -247,7 +251,15 @@ export default function IconHoverCard({
                   ...(hintUsesBangla ? { letterSpacing: 0 } : undefined),
                 }}
               >
-                <span className="font-semibold">{hint}</span>
+                <span className="font-bold">{hint}</span>
+                {urlLabel && (
+                  <span
+                    className="truncate text-[10px] font-normal opacity-75"
+                    style={{ color: 'var(--hh-muted)' }}
+                  >
+                    {urlLabel}
+                  </span>
+                )}
               </div>
             )}
           </div>

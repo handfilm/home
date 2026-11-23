@@ -15,7 +15,7 @@ export function HomeCoreIcon({ isActive, className = '' }: BrandTabIconProps) {
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
-      className={`w-[22px] h-[22px] shrink-0 overflow-visible ${className}`}
+      className={`w-[26px] h-[26px] sm:w-[28px] sm:h-[28px] shrink-0 overflow-visible ${className}`}
     >
       {/* Heavy Octagonal Shield Frame */}
       <polygon
@@ -62,7 +62,7 @@ export function HandfilmCinemaIcon({ isActive, className = '' }: BrandTabIconPro
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
-      className={`w-[22px] h-[22px] shrink-0 overflow-visible ${className}`}
+      className={`w-[26px] h-[26px] sm:w-[28px] sm:h-[28px] shrink-0 overflow-visible ${className}`}
     >
       {/* Thick Cinema Frame Housing */}
       <rect
@@ -109,7 +109,7 @@ export function RawxForgedIcon({ isActive, className = '' }: BrandTabIconProps) 
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
-      className={`w-[22px] h-[22px] shrink-0 overflow-visible hh-icon-rawx-wrap ${
+      className={`w-[26px] h-[26px] sm:w-[28px] sm:h-[28px] shrink-0 overflow-visible hh-icon-rawx-wrap ${
         isActive ? 'hh-icon-rawx-active' : ''
       } ${className}`}
     >
@@ -163,7 +163,7 @@ export function AppsMatrixIcon({ isActive, className = '' }: BrandTabIconProps) 
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
-      className={`w-[22px] h-[22px] shrink-0 overflow-visible ${className}`}
+      className={`w-[26px] h-[26px] sm:w-[28px] sm:h-[28px] shrink-0 overflow-visible ${className}`}
     >
       <rect
         x="2.6"

@@ -136,6 +136,8 @@ export default function BottomCommandDock({
   const totalSections = sections.length || 1;
   const safeIndex = ((currentSectionIndex % totalSections) + totalSections) % totalSections;
   const currentSection = sections[safeIndex] || sections[0];
+  const stageAccent = currentSection?.accent || palette.accent;
+  const progressPercent = ((safeIndex + 1) / totalSections) * 100;
 
   const filteredIndices = useMemo(() => {
     if (activeCategory === 'all') {
@@ -210,17 +212,44 @@ export default function BottomCommandDock({
   return (
     <aside
       aria-label="Ecosystem Floating Command Dock"
-      className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-1rem)] pointer-events-auto"
+      className="fixed bottom-3.5 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-1rem)] pointer-events-auto"
     >
+      {/* Subtle Stage-Reactive Ambient Halo Behind Dock */}
       <div
-        className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-2xl border backdrop-blur-2xl shadow-2xl hh-theme-transition"
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-x-6 -inset-y-3 rounded-full blur-2xl opacity-35 transition-colors duration-700"
+        style={{
+          background: `radial-gradient(ellipse at center, ${stageAccent}44, transparent 70%)`,
+        }}
+      />
+
+      <div
+        className="relative flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-2 rounded-2xl border backdrop-blur-2xl shadow-2xl hh-theme-transition"
         style={{
           backgroundColor: 'var(--hh-glass-bg)',
-          borderColor: 'var(--hh-border)',
+          borderColor: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(15,23,42,0.12)',
           color: 'var(--hh-text)',
-          boxShadow: 'var(--hh-card-shadow)',
+          boxShadow: isDark
+            ? `0 20px 50px rgba(0,0,0,0.65), 0 0 0 1px ${stageAccent}22`
+            : `0 18px 42px rgba(15,23,42,0.14), 0 0 0 1px ${stageAccent}18`,
         }}
       >
+        {/* Subtle Stage Progress Hairline Along Bottom Edge */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-3 right-3 bottom-0 h-[2px] rounded-full overflow-hidden opacity-75"
+          style={{ backgroundColor: 'var(--hh-border)' }}
+        >
+          <div
+            className="h-full rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            style={{
+              width: `${progressPercent}%`,
+              backgroundColor: stageAccent,
+              boxShadow: `0 0 10px ${stageAccent}`,
+            }}
+          />
+        </div>
+
         {/* LEFT CLUSTER: Wing Position Compass + Telemetry Pulse */}
         <div className="flex items-center gap-1 sm:gap-1.5">
           <IconHoverCard
@@ -238,17 +267,17 @@ export default function BottomCommandDock({
             badge={`${String(safeIndex + 1).padStart(2, '0')} / ${String(
               totalSections
             ).padStart(2, '0')}`}
-            description={`${currentInfo.sub}${currentSection?.url ? ` · ${currentSection.url}` : ''}`}
+            description={currentInfo.sub}
             align="left"
             position="top"
             isBangla={isBangla}
-            accentColor={currentSection?.accent || palette.accent}
+            accentColor={stageAccent}
             cornerBadge={
               <span
                 aria-hidden="true"
                 className="absolute -top-1 -right-1 px-1 rounded-full font-mono text-[7.5px] font-bold leading-[13px] tabular-nums border shadow-sm"
                 style={{
-                  backgroundColor: currentSection?.accent || palette.accent,
+                  backgroundColor: stageAccent,
                   borderColor: 'var(--hh-bg)',
                   color: '#ffffff',
                 }}
@@ -260,7 +289,7 @@ export default function BottomCommandDock({
               currentSection ? (
                 <div className="flex items-center justify-between w-full gap-2">
                   <span
-                    className="font-mono text-[10px] truncate opacity-80"
+                    className="font-mono text-[10.5px] truncate opacity-85"
                     style={{ color: 'var(--hh-muted)' }}
                   >
                     {currentSection.url}
@@ -269,16 +298,16 @@ export default function BottomCommandDock({
                     href={currentSection.dest}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-mono text-[10px] font-bold shrink-0 hover:underline"
-                    style={{ color: currentSection.accent || palette.accent }}
+                    className="inline-flex items-center gap-1 font-mono text-[11px] font-bold shrink-0 hover:underline"
+                    style={{ color: stageAccent }}
                   >
-                    <span>Visit</span>
+                    <span>Open</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
               ) : undefined
             }
-            icon={<Compass className="w-5 h-5" style={{ color: currentSection?.accent || palette.accent }} />}
+            icon={<Compass className="w-5 h-5" style={{ color: stageAccent }} />}
           />
 
           <IconHoverCard
@@ -289,8 +318,9 @@ export default function BottomCommandDock({
             title="Ecosystem Status"
             badge="ONLINE"
             badgeTone="emerald"
-            description="Ecosystem Status · Control Spine & Telemetry Stack Online"
-            hint="Click to inspect Hub →"
+            urlLabel="hub.handsandhead.com"
+            description="Control Spine & Telemetry Stack Online across all 24 nodes"
+            hint="Inspect Hub →"
             align="left"
             position="top"
             isBangla={isBangla}
@@ -321,6 +351,7 @@ export default function BottomCommandDock({
             buttonShape="rounded-xl"
             title={prevInfo.title}
             badge="← Prev Wing"
+            urlLabel={prevSection?.url}
             description={prevInfo.sub || 'Jump to previous ecosystem wing'}
             hint="Click to jump ←"
             align="center"
@@ -337,6 +368,7 @@ export default function BottomCommandDock({
             buttonShape="rounded-xl"
             title={nextInfo.title}
             badge="Next Wing →"
+            urlLabel={nextSection?.url}
             description={nextInfo.sub || 'Jump to next ecosystem wing'}
             hint="Click to jump →"
             align="center"
@@ -364,12 +396,13 @@ export default function BottomCommandDock({
             title="RAWx 19 Ultra Sliders"
             badge="19 LABS"
             badgeTone="amber"
-            description="RAWx 19 Ultra Sliders · Interactive Lookbook & LUT Lab"
+            urlLabel="rawx.handsandhead.com"
+            description="Interactive Lookbook & 19 Cinematic Slider Engines"
             align="center"
             position="top"
             isBangla={isBangla}
             accentColor={isDark ? '#d97706' : '#b45309'}
-            icon={<RawxForgedIcon isActive={activeTab === 'rawx-showcase'} className="w-5 h-5" />}
+            icon={<RawxForgedIcon isActive={activeTab === 'rawx-showcase'} className="!w-5 !h-5" />}
           />
 
           {/* Wing Category Filter Popover */}
@@ -395,9 +428,9 @@ export default function BottomCommandDock({
               suppressCard={isFilterOpen}
               buttonSize="md"
               buttonShape="rounded-xl"
-              title="Wing Category Filter"
+              title="Wing Filter"
               badge={activeCategory === 'all' ? 'ALL 24' : activeCategoryLabel.toUpperCase()}
-              description={`Active filter: ${activeCategoryLabel} · Click to filter ecosystem wings`}
+              description={`Active filter: ${activeCategoryLabel} · Focus stage navigation by division`}
               align="center"
               position="top"
               isBangla={isBangla}
@@ -502,7 +535,7 @@ export default function BottomCommandDock({
             title="Aural Acoustic Lab"
             badge={isSoundEnabled ? 'PLAYING' : 'PAUSED'}
             badgeTone={isSoundEnabled ? 'emerald' : 'neutral'}
-            description="Aural Acoustic Lab · Atmospheric Frequency Stream"
+            description="Atmospheric Frequency Stream · Procedural Ambient Audio"
             align="right"
             position="top"
             isBangla={isBangla}
@@ -514,7 +547,7 @@ export default function BottomCommandDock({
                   e.stopPropagation();
                   onToggleSound();
                 }}
-                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 style={{
                   backgroundColor: isSoundEnabled
                     ? isDark
@@ -548,8 +581,9 @@ export default function BottomCommandDock({
             title="24 Ecosystem Apps"
             badge={`${sections.length} APPS`}
             badgeTone="emerald"
-            description="24 Ecosystem Apps · Open Full Launcher"
-            hint="Click to open →"
+            urlLabel="apps.handsandhead.com"
+            description="Open the Master Directory & Interactive Ecosystem Map"
+            hint="Open Launcher →"
             align="right"
             position="top"
             isBangla={isBangla}
