@@ -1,6 +1,6 @@
 # HANDS & HEAD — Technical SEO & Generative Engine Optimization (GEO) Directives
 # Canonical Hub: https://handsandhead.com/
-# Generated: 2026-11-21
+# Generated: 2026-11-23
 
 User-agent: Googlebot
 Allow: /

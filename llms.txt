@@ -8,7 +8,7 @@
 - Flagship WebGL2 AI Video & Storyboard Platform: https://storyboard.handsandhead.com/
 - Founder & Systems Architect: Rakib Himon (Shaikh Rakibuzzaman Himon) — https://rakib.handsandhead.com/
 - Headquarters: Dhaka, Bangladesh
-- Last Updated: 2026-11-21
+- Last Updated: 2026-11-23
 - Complete Fact-Sheet: https://handsandhead.com/llms-full.txt
 - XML Sitemap: https://handsandhead.com/sitemap.xml
 
