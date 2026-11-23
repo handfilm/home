@@ -373,6 +373,31 @@ export const DEFAULT_SLIDERS_DATA: AllSlidersData = {
     { id: 'sF-4', url: 'https://cdn.shopify.com/s/files/1/0678/5957/8923/files/Alia-01_1.jpg?v=1779859520', tag: 'Wipe 04', title: 'Lateral Cut', sub: 'Diagonal Clip Wipe' },
     { id: 'sF-5', url: 'https://cdn.shopify.com/s/files/1/0678/5957/8923/files/RAWx-Hypnotic-Pendulum-18-01_7.jpg?v=1779859511', tag: 'Wipe 05', title: 'Sovereign Reveal', sub: 'Master Optical Sweep' },
   ],
+
+  // §G · S19 HIDE & 316L STEEL ARCHIVE 16:9
+  sG: [
+    {
+      id: 'sG-1',
+      url: 'https://cdn.shopify.com/s/files/1/0678/5957/8923/files/Picsart_26-05-25_06-16-40-096.jpg?v=1779844301',
+      tag: 'Hide & Steel 19',
+      title: '316L Bayonet Shackle & Veg-Tan Hide',
+      sub: 'CNC-Milled Surgical Steel · 8-Strand Dhaka Bridle Cord',
+    },
+    {
+      id: 'sG-2',
+      url: 'https://cdn.shopify.com/s/files/1/0678/5957/8923/files/Picsart_26-05-24_01-54-03-799.jpg?v=1779844300',
+      tag: 'Hardware Spec 02',
+      title: 'Brushed 516SS Anchor Clasp',
+      sub: 'Beeswax-Burnished Cowhide · Serialized Alloy Plate',
+    },
+    {
+      id: 'sG-3',
+      url: 'https://cdn.shopify.com/s/files/1/0678/5957/8923/files/Picsart_26-05-24_02-11-50-131.jpg?v=1779844299',
+      tag: 'Forge Archive 03',
+      title: 'Twin-Wrap Cuff & Solid Pin',
+      sub: 'Made-to-Order · 7–10 Days JIT Production',
+    },
+  ],
 };
 
 const STORAGE_KEY = 'rawx_master_sliders_data_v3';
@@ -381,8 +406,12 @@ export function getStoredSlidersData(): AllSlidersData {
   try {
     const raw = safeStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_SLIDERS_DATA;
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_SLIDERS_DATA, ...parsed };
+    const parsed = JSON.parse(raw) as Partial<AllSlidersData>;
+    return {
+      ...DEFAULT_SLIDERS_DATA,
+      ...parsed,
+      sG: Array.isArray(parsed.sG) && parsed.sG.length > 0 ? parsed.sG : DEFAULT_SLIDERS_DATA.sG,
+    };
   } catch (e) {
     console.error('Failed to load sliders data from storage:', e);
     return DEFAULT_SLIDERS_DATA;

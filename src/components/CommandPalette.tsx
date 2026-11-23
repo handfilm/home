@@ -144,11 +144,11 @@ export default function CommandPalette({
     list.push({
       id: 'view-rawx',
       category: 'views',
-      title: 'Sliders — RAWx 16 Ultra System',
-      subtitle: 'Architectural showcase of all 16 slider variants',
+      title: 'RAWx — Flagship Brand & 19-Drop Lookbook Studio',
+      subtitle: 'Hide, 316L Steel & Heavyweight Apparel Storefront + 19 Slider Engines',
       shortcut: 'Key 3',
       icon: <Sparkles className="w-3.5 h-3.5 text-amber-400" />,
-      keywords: ['rawx', 'sliders', '16', 'ultra', 'gallery', 'showcase'],
+      keywords: ['rawx', 'hide', 'steel', '316l', 'apparel', 'sliders', '19', 'lookbook', 'drops', 'showcase'],
       action: () => {
         setActiveTab('rawx-showcase');
         onClose();

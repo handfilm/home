@@ -46,6 +46,7 @@ export default function App() {
   );
 
   const [activeTab, setActiveTabState] = useState<ActiveTab>(initialRoute.tab);
+  const [targetRawxDropId, setTargetRawxDropId] = useState<string | null>(initialRoute.rawxDropId);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(() => {
     if (initialRoute.portalId) {
       const idx = INITIAL_SECTIONS.findIndex(
@@ -58,6 +59,9 @@ export default function App() {
 
   const setActiveTab = useCallback((nextTab: ActiveTab) => {
     setActiveTabState(nextTab);
+    if (nextTab !== 'rawx-showcase') {
+      setTargetRawxDropId(null);
+    }
     if (
       typeof window !== 'undefined' &&
       (nextTab === 'home' || nextTab === 'handfilm' || nextTab === 'rawx-showcase' || nextTab === 'tasks-hub')
@@ -145,11 +149,12 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 2. Listen for browser hashchange / deep-link navigation (#home, #apps, #sliders, #<portalId>)
+  // 2. Listen for browser hashchange / deep-link navigation (#home, #handfilm, #rawx, #rawx-s01..19, #apps, #sliders legacy, #<portalId>)
   useEffect(() => {
     const handleHashChange = () => {
       const resolved = getInitialRouteFromUrl(sections.map((s) => s.id));
       setActiveTabState(resolved.tab);
+      setTargetRawxDropId(resolved.rawxDropId);
       if (resolved.portalId) {
         const idx = sections.findIndex(
           (s) => s.id.toLowerCase() === resolved.portalId!.toLowerCase()
@@ -544,7 +549,7 @@ export default function App() {
           />
         </div>
 
-        {/* TAB 3: SLIDERS — Existing 16 Ultra Sliders Visual Engine (100% Preserved) */}
+        {/* TAB 3: RAWx — Flagship Brand Storefront & 19-Drop Lookbook Studio (All 19 Slider Engines Preserved) */}
         <div
           id="panel-sliders"
           className={activeTab === 'rawx-showcase' ? 'block' : 'hidden'}
@@ -552,6 +557,8 @@ export default function App() {
         >
           <RawxShowcase
             speed={speed}
+            currentGrade={currentGrade}
+            targetDropId={targetRawxDropId}
             onBackToEcosystem={() => setActiveTab('ecosystem')}
             isActiveTab={activeTab === 'rawx-showcase'}
             onOpenLightbox={(items, startIndex) => {

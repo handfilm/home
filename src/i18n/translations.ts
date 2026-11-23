@@ -9,6 +9,7 @@ export interface TranslationDictionary {
   nav: {
     home: string;
     handfilm: string;
+    rawx: string;
     apps: string;
     sliders: string;
     stage: string;
@@ -118,6 +119,7 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     nav: {
       home: 'Home',
       handfilm: 'HandFilm',
+      rawx: 'RAWx',
       apps: 'Apps',
       sliders: 'Sliders',
       stage: 'Stage',
@@ -409,6 +411,7 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     nav: {
       home: 'হোম',
       handfilm: 'হ্যান্ডফিল্ম',
+      rawx: 'RAWx',
       apps: 'অ্যাপস',
       sliders: 'স্লাইডার্স',
       stage: 'স্টেজ',

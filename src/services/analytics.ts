@@ -22,7 +22,13 @@ export type MasterEventType =
   | 'HOME_PILLAR_CLICK'
   | 'HOME_PILLAR_CTA'
   | 'HANDFILM_STORYBOARD_LAUNCH'
-  | 'HANDFILM_OPEN_DOWNLOAD_MODAL';
+  | 'HANDFILM_OPEN_DOWNLOAD_MODAL'
+  | 'RAWX_INSPECT_DROP'
+  | 'RAWX_COPY_DROP_LINK'
+  | 'RAWX_STORYBOARD_REMIX'
+  | 'RAWX_WHATSAPP_PREORDER'
+  | 'RAWX_TOGGLE_SAVED_LOOKBOOK'
+  | 'RAWX_THEATER_MODE';
 
 export interface TelemetryPayload {
   [key: string]: string | number | boolean | null | undefined | object;

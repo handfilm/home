@@ -227,11 +227,11 @@ function buildSeoConfig(
 
   if (activeTab === 'rawx-showcase') {
     return {
-      title: `RAWx 16 Ultra Sliders — Interactive Web Architecture | ${BRAND_NAME}`,
+      title: `RAWx — Hide, Steel & Heavyweight Apparel | Brand & Lookbook Studio | ${BRAND_NAME}`,
       description:
-        'Explore the RAWx 16 Ultra Sliders kinetic interface lab by HANDS & HEAD — high-velocity WebGL, typography, and motion systems engineered for instant responsiveness.',
-      canonical: `${SITE_ORIGIN}/#sliders`,
-      themeColor: '#050505',
+        'RAWx Flagship Brand Storefront & 19-Drop Lookbook Studio by HANDS & HEAD — full-grain cowhide, 316L surgical steel hardware, 320 GSM heavyweight apparel, and real-time LUT lookbook engines.',
+      canonical: `${SITE_ORIGIN}/#rawx`,
+      themeColor: '#09090b',
     };
   }
 

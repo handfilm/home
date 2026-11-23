@@ -1,5 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { AllSlidersData, SlideData } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  AllSlidersData,
+  DropMetadata,
+  RawxCollectionCategory,
+  RawxDropKey,
+  SlideData,
+} from '../types';
+import { DEFAULT_RAWX_DROPS, RAWX_COLLECTION_FILTERS } from '../data/rawxDrops';
 import {
   X,
   Upload,
@@ -11,9 +18,8 @@ import {
   Sparkles,
   Plus,
   Trash2,
-  Sliders,
   Eye,
-  Layers,
+  Tag,
 } from 'lucide-react';
 
 interface DynamicPhotoManagerModalProps {
@@ -53,7 +59,8 @@ type SectionKey =
   | 'sC'
   | 'sD'
   | 'sE'
-  | 'sF';
+  | 'sF'
+  | 'sG';
 
 const SECTION_OPTIONS: { key: SectionKey; label: string; ratio: string }[] = [
   { key: 's1', label: '§01 · Master Hero', ratio: '21:9' },
@@ -78,13 +85,46 @@ const SECTION_OPTIONS: { key: SectionKey; label: string; ratio: string }[] = [
   { key: 's10', label: '§10 · Footer Banner', ratio: '8:1' },
   { key: 's11', label: '§11 · Before / After', ratio: '21:9' },
   { key: 's12', label: '§12 · Video Slide', ratio: '21:9' },
-  { key: 'sA', label: '§A · Zoom-Burst', ratio: '21:9' },
-  { key: 'sB', label: '§B · Stagger Grid 3×2', ratio: '16:7' },
-  { key: 'sC', label: '§C · Countdown Ring', ratio: '16:9' },
-  { key: 'sD', label: '§D · Split Panel Dual-Axis', ratio: '16:9' },
-  { key: 'sE', label: '§E · Inertia Filmstrip', ratio: '21:6' },
-  { key: 'sF', label: '§F · Wipe Transition', ratio: '21:9' },
+  { key: 'sA', label: '§13 · Zoom-Burst', ratio: '21:9' },
+  { key: 'sB', label: '§14 · Stagger Grid 3×2', ratio: '16:7' },
+  { key: 'sC', label: '§15 · Hide & 316L Ring', ratio: '16:9' },
+  { key: 'sD', label: '§16 · Cuff Split-Panel', ratio: '16:9' },
+  { key: 'sE', label: '§17 · Inertia Filmstrip', ratio: '21:6' },
+  { key: 'sF', label: '§18 · Wipe Transition', ratio: '21:9' },
+  { key: 'sG', label: '§19 · RAWx Forge 316L', ratio: '16:9' },
 ];
+
+const DROP_KEY_MAP: Record<SectionKey, RawxDropKey> = {
+  s1: 's1',
+  s2a: 's2a',
+  s2b: 's2a',
+  s2c: 's2a',
+  s2d: 's2a',
+  s3: 's3',
+  s4a: 's4a',
+  s4b: 's4a',
+  s5a: 's5a',
+  s5b: 's5a',
+  s5c: 's5a',
+  s6: 's6',
+  s7a: 's7a',
+  s7b: 's7a',
+  s7c: 's7a',
+  s7d: 's7a',
+  s8a: 's8a',
+  s8b: 's8a',
+  s9: 's9',
+  s10: 's10',
+  s11: 's11',
+  s12: 's12',
+  sA: 'sA',
+  sB: 'sB',
+  sC: 'sC',
+  sD: 'sD',
+  sE: 'sE',
+  sF: 'sF',
+  sG: 'sG',
+};
 
 const CURATED_IMAGE_PRESETS = [
   {
@@ -129,6 +169,10 @@ const CURATED_IMAGE_PRESETS = [
   },
 ];
 
+const COLLECTION_OPTIONS = RAWX_COLLECTION_FILTERS.filter(
+  (item): item is RawxCollectionCategory => item !== 'ALL'
+);
+
 export default function DynamicPhotoManagerModal({
   isOpen,
   onClose,
@@ -142,16 +186,72 @@ export default function DynamicPhotoManagerModal({
   );
   const [selectedSlideIndex, setSelectedSlideIndex] = useState<number>(0);
   const [saveToast, setSaveToast] = useState<string | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const jsonFileInputRef = useRef<HTMLInputElement | null>(null);
 
+  useEffect(() => {
+    if (isOpen && defaultSectionKey) {
+      const exists = SECTION_OPTIONS.some((s) => s.key === defaultSectionKey);
+      if (exists) {
+        setSelectedSection(defaultSectionKey as SectionKey);
+        setSelectedSlideIndex(0);
+      }
+      setConfirmReset(false);
+    }
+  }, [isOpen, defaultSectionKey]);
+
   if (!isOpen) return null;
 
-  const currentSectionData = slidersData[selectedSection];
+  const activeDropKey = DROP_KEY_MAP[selectedSection] || 's1';
+  const defaultDropMeta = DEFAULT_RAWX_DROPS[activeDropKey];
+  const currentDropMeta: DropMetadata = {
+    ...defaultDropMeta,
+    ...(slidersData.dropMetadata?.[activeDropKey] || {}),
+    craftsmanshipSpecs: {
+      ...defaultDropMeta.craftsmanshipSpecs,
+      ...(slidersData.dropMetadata?.[activeDropKey]?.craftsmanshipSpecs || {}),
+    },
+  };
 
   const triggerToast = (msg: string) => {
     setSaveToast(msg);
     setTimeout(() => setSaveToast(null), 2500);
+  };
+
+  const handleUpdateDropMeta = <K extends keyof DropMetadata>(
+    field: K,
+    value: DropMetadata[K]
+  ) => {
+    const existingMap = slidersData.dropMetadata || {};
+    const updatedDrop: DropMetadata = {
+      ...currentDropMeta,
+      [field]: value,
+    };
+    onUpdateSlidersData({
+      ...slidersData,
+      dropMetadata: {
+        ...existingMap,
+        [activeDropKey]: updatedDrop,
+      },
+    });
+  };
+
+  const handleResetSingleDropMeta = () => {
+    const existingMap = { ...(slidersData.dropMetadata || {}) };
+    delete existingMap[activeDropKey];
+    onUpdateSlidersData({
+      ...slidersData,
+      dropMetadata: existingMap,
+    });
+    triggerToast(`Restored ${defaultDropMeta.dropCode} metadata.`);
+  };
+
+  const getArraySlidesForKey = (key: SectionKey): SlideData[] | null => {
+    if (key === 's11' || key === 'sB' || key === 'sD') return null;
+    if (key === 'sG') return slidersData.sG || [];
+    const val = slidersData[key];
+    return Array.isArray(val) ? val : null;
   };
 
   // Upload local image file
@@ -181,31 +281,34 @@ export default function DynamicPhotoManagerModal({
     }
 
     if (selectedSection === 'sB') {
-      const sB = { ...slidersData.sB };
+      const cells = slidersData.sB.cells.map((cell) => ({
+        ...cell,
+        sets: [...cell.sets],
+      }));
       const cellIdx = Math.floor(selectedSlideIndex / 2);
       const setIdx = selectedSlideIndex % 2;
-      if (sB.cells[cellIdx]) {
-        sB.cells[cellIdx].sets[setIdx] = url;
-        onUpdateSlidersData({ ...slidersData, sB });
+      if (cells[cellIdx]) {
+        cells[cellIdx].sets[setIdx] = url;
+        onUpdateSlidersData({ ...slidersData, sB: { cells } });
       }
       return;
     }
 
     if (selectedSection === 'sD') {
-      const sD = { ...slidersData.sD };
-      if (selectedSlideIndex < sD.left.length) {
-        sD.left[selectedSlideIndex].url = url;
+      const left = slidersData.sD.left.map((item) => ({ ...item }));
+      const right = slidersData.sD.right.map((item) => ({ ...item }));
+      if (selectedSlideIndex < left.length) {
+        left[selectedSlideIndex].url = url;
       } else {
-        const rightIdx = selectedSlideIndex - sD.left.length;
-        if (sD.right[rightIdx]) sD.right[rightIdx].url = url;
+        const rightIdx = selectedSlideIndex - left.length;
+        if (right[rightIdx]) right[rightIdx].url = url;
       }
-      onUpdateSlidersData({ ...slidersData, sD });
+      onUpdateSlidersData({ ...slidersData, sD: { left, right } });
       return;
     }
 
-    // Standard array sections
-    const array = slidersData[selectedSection] as SlideData[];
-    if (Array.isArray(array)) {
+    const array = getArraySlidesForKey(selectedSection);
+    if (array) {
       const updated = array.map((item, idx) =>
         idx === selectedSlideIndex ? { ...item, url } : item
       );
@@ -224,19 +327,20 @@ export default function DynamicPhotoManagerModal({
     }
 
     if (selectedSection === 'sD') {
-      const sD = { ...slidersData.sD };
-      if (selectedSlideIndex < sD.left.length) {
-        sD.left[selectedSlideIndex][field] = value;
+      const left = slidersData.sD.left.map((item) => ({ ...item }));
+      const right = slidersData.sD.right.map((item) => ({ ...item }));
+      if (selectedSlideIndex < left.length) {
+        left[selectedSlideIndex][field] = value;
       } else {
-        const rightIdx = selectedSlideIndex - sD.left.length;
-        if (sD.right[rightIdx]) sD.right[rightIdx][field] = value;
+        const rightIdx = selectedSlideIndex - left.length;
+        if (right[rightIdx]) right[rightIdx][field] = value;
       }
-      onUpdateSlidersData({ ...slidersData, sD });
+      onUpdateSlidersData({ ...slidersData, sD: { left, right } });
       return;
     }
 
-    const array = slidersData[selectedSection] as SlideData[];
-    if (Array.isArray(array)) {
+    const array = getArraySlidesForKey(selectedSection);
+    if (array) {
       const updated = array.map((item, idx) =>
         idx === selectedSlideIndex ? { ...item, [field]: value } : item
       );
@@ -246,14 +350,14 @@ export default function DynamicPhotoManagerModal({
 
   // Add new slide
   const handleAddSlide = () => {
-    const array = slidersData[selectedSection] as SlideData[];
-    if (Array.isArray(array)) {
+    const array = getArraySlidesForKey(selectedSection);
+    if (array) {
       const newSlide: SlideData = {
         id: `${selectedSection}-${Date.now()}`,
         url: CURATED_IMAGE_PRESETS[Math.floor(Math.random() * CURATED_IMAGE_PRESETS.length)].url,
         tag: 'Custom Frame',
         title: 'New Slide Frame',
-        sub: 'Dynamic Master OS Pipeline',
+        sub: 'Dynamic RAWx Pipeline',
       };
       const updated = [...array, newSlide];
       onUpdateSlidersData({ ...slidersData, [selectedSection]: updated });
@@ -264,8 +368,8 @@ export default function DynamicPhotoManagerModal({
 
   // Delete slide
   const handleDeleteSlide = (idxToDelete: number) => {
-    const array = slidersData[selectedSection] as SlideData[];
-    if (Array.isArray(array) && array.length > 1) {
+    const array = getArraySlidesForKey(selectedSection);
+    if (array && array.length > 1) {
       const updated = array.filter((_, idx) => idx !== idxToDelete);
       onUpdateSlidersData({ ...slidersData, [selectedSection]: updated });
       setSelectedSlideIndex(Math.max(0, idxToDelete - 1));
@@ -275,10 +379,11 @@ export default function DynamicPhotoManagerModal({
 
   // Export JSON configuration
   const handleExportConfig = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(slidersData, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(slidersData, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `rawx_slider_config_${Date.now()}.json`);
+    downloadAnchor.setAttribute('download', `rawx_drops_config_${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -293,13 +398,18 @@ export default function DynamicPhotoManagerModal({
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const parsed = JSON.parse(event.target?.result as string);
-        if (parsed && typeof parsed === 'object') {
-          onUpdateSlidersData(parsed);
-          triggerToast('Imported custom slider configuration!');
+        const parsed = JSON.parse(event.target?.result as string) as Partial<AllSlidersData>;
+        if (parsed && typeof parsed === 'object' && Array.isArray(parsed.s1)) {
+          onUpdateSlidersData({
+            ...slidersData,
+            ...parsed,
+          });
+          triggerToast('Imported custom RAWx & drop configuration!');
+        } else {
+          triggerToast('Invalid RAWx configuration JSON.');
         }
-      } catch (err) {
-        alert('Invalid JSON file format.');
+      } catch {
+        triggerToast('Invalid JSON file format.');
       }
     };
     reader.readAsText(file);
@@ -349,8 +459,8 @@ export default function DynamicPhotoManagerModal({
       }
     }
 
-    const array = slidersData[selectedSection] as SlideData[];
-    const item = array?.[selectedSlideIndex] || array?.[0] || { url: '', title: '', tag: '', sub: '' };
+    const array = getArraySlidesForKey(selectedSection) || [];
+    const item = array[selectedSlideIndex] || array[0] || { url: '', title: '', tag: '', sub: '' };
     return {
       url: item.url || '',
       title: item.title || '',
@@ -398,8 +508,8 @@ export default function DynamicPhotoManagerModal({
       return [...left, ...right];
     }
 
-    const array = slidersData[selectedSection] as SlideData[];
-    if (Array.isArray(array)) {
+    const array = getArraySlidesForKey(selectedSection);
+    if (array) {
       return array.map((s, i) => ({
         id: s.id || `${selectedSection}-${i}`,
         url: s.url,
@@ -410,6 +520,7 @@ export default function DynamicPhotoManagerModal({
   };
 
   const slideList = getSlideList();
+  const isCurrentArraySection = getArraySlidesForKey(selectedSection) !== null;
 
   return (
     <div
@@ -426,21 +537,23 @@ export default function DynamicPhotoManagerModal({
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-bold tracking-wider uppercase text-white flex items-center gap-2">
-                <span>DYNAMIC PHOTO &amp; MEDIA STUDIO</span>
+                <span className="normal-case text-[#e11d48]">RAWx</span>
+                <span>PHOTO &amp; DROP STUDIO MANAGER</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-[#c8b89a]/20 text-[#c8b89a] font-normal">
-                  MASTER OS
+                  19 DROPS
                 </span>
               </h2>
               <p className="text-[10px] text-[#f3efe6]/50">
-                Change photos, upload your own images, edit titles &amp; configure all 16 slider systems
+                Edit drop product specs, swap lookbook photos, upload local frames, or import/export JSON across all 19 drops
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={handleExportConfig}
-              title="Export all custom slider photos & content as JSON"
+              title="Export all custom RAWx photos & drop metadata as JSON"
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#1a1916] border border-[#f3efe6]/10 text-[10px] text-[#f3efe6]/70 hover:text-white cursor-pointer transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
@@ -448,8 +561,9 @@ export default function DynamicPhotoManagerModal({
             </button>
 
             <button
+              type="button"
               onClick={() => jsonFileInputRef.current?.click()}
-              title="Import JSON slider preset configuration"
+              title="Import JSON drop configuration"
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#1a1916] border border-[#f3efe6]/10 text-[10px] text-[#f3efe6]/70 hover:text-white cursor-pointer transition-colors"
             >
               <FileCode className="w-3.5 h-3.5" />
@@ -463,21 +577,41 @@ export default function DynamicPhotoManagerModal({
               className="hidden"
             />
 
-            <button
-              onClick={() => {
-                if (confirm('Reset all slider photos and texts to default Master OS state?')) {
-                  onResetToDefaults();
-                  triggerToast('Restored Default Photos.');
-                }
-              }}
-              title="Reset to factory photography"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-950/40 border border-red-500/20 text-[10px] text-red-400 hover:text-red-300 cursor-pointer transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset</span>
-            </button>
+            {confirmReset ? (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onResetToDefaults();
+                    setConfirmReset(false);
+                    triggerToast('Restored Factory RAWx Drops & Photos.');
+                  }}
+                  className="px-2.5 py-1.5 rounded bg-red-600 text-white text-[10px] font-bold uppercase cursor-pointer"
+                >
+                  Confirm
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmReset(false)}
+                  className="px-2 py-1.5 rounded bg-[#1f1e1a] text-[#f3efe6]/70 text-[10px] cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmReset(true)}
+                title="Reset to factory photography and drops"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-950/40 border border-red-500/20 text-[10px] text-red-400 hover:text-red-300 cursor-pointer transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset</span>
+              </button>
+            )}
 
             <button
+              type="button"
               onClick={onClose}
               className="p-1.5 rounded bg-[#1f1e1a] hover:bg-[#2d2c26] text-[#f3efe6]/60 hover:text-white cursor-pointer transition-colors ml-2"
               aria-label="Close modal"
@@ -489,23 +623,24 @@ export default function DynamicPhotoManagerModal({
 
         {/* Toast alert */}
         {saveToast && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded bg-[#c8b89a] text-black font-bold text-xs tracking-wider flex items-center gap-2 shadow-xl animate-fade-in">
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded bg-[#c8b89a] text-black font-bold text-xs tracking-wider flex items-center gap-2 shadow-xl">
             <Check className="w-4 h-4 text-black" />
             <span>{saveToast}</span>
           </div>
         )}
 
-        {/* Main Body: Section selector + Slide list + Editor */}
+        {/* Main Body: Section selector + Slide list + Editor + Drop Metadata */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {/* Section Picker Pills */}
           <div>
             <label className="text-[10px] tracking-[0.2em] uppercase text-[#888888] block mb-2 font-semibold">
-              1. CHOOSE SLIDER SECTION TO CUSTOMIZE:
+              1. CHOOSE SLIDER / DROP SECTION TO CUSTOMIZE:
             </label>
             <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-thin">
               {SECTION_OPTIONS.map((sec) => (
                 <button
                   key={sec.key}
+                  type="button"
                   onClick={() => {
                     setSelectedSection(sec.key);
                     setSelectedSlideIndex(0);
@@ -536,8 +671,9 @@ export default function DynamicPhotoManagerModal({
                 2. SELECT SLIDE / FRAME ({slideList.length} Slides Available):
               </label>
 
-              {Array.isArray(slidersData[selectedSection]) && (
+              {isCurrentArraySection && (
                 <button
+                  type="button"
                   onClick={handleAddSlide}
                   className="flex items-center gap-1 text-[10px] text-[#c8b89a] hover:underline cursor-pointer"
                 >
@@ -551,6 +687,7 @@ export default function DynamicPhotoManagerModal({
               {slideList.map((slide, idx) => (
                 <button
                   key={slide.id}
+                  type="button"
                   onClick={() => setSelectedSlideIndex(idx)}
                   className={`relative aspect-[4/3] rounded overflow-hidden border-2 transition-all cursor-pointer group bg-[#161512] ${
                     selectedSlideIndex === idx
@@ -622,6 +759,7 @@ export default function DynamicPhotoManagerModal({
                   className="hidden"
                 />
                 <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="w-full py-2.5 px-4 rounded bg-[#1e1d19] hover:bg-[#2a2924] border border-[#f3efe6]/15 hover:border-[#c8b89a] text-xs text-[#c8b89a] flex items-center justify-center gap-2 cursor-pointer transition-all font-bold"
                 >
@@ -647,6 +785,7 @@ export default function DynamicPhotoManagerModal({
                     className="flex-1 bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-2 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
                   />
                   <button
+                    type="button"
                     onClick={() => triggerToast('Image URL Applied!')}
                     className="px-3 py-2 bg-[#c8b89a] text-black font-bold text-xs rounded hover:bg-white cursor-pointer transition-colors"
                   >
@@ -707,6 +846,7 @@ export default function DynamicPhotoManagerModal({
                   {CURATED_IMAGE_PRESETS.map((preset, pIdx) => (
                     <button
                       key={pIdx}
+                      type="button"
                       onClick={() => {
                         applyImageUrl(preset.url);
                         triggerToast(`Applied "${preset.name}"`);
@@ -726,18 +866,132 @@ export default function DynamicPhotoManagerModal({
               </div>
 
               {/* Delete slide action if array */}
-              {Array.isArray(slidersData[selectedSection]) &&
-                (slidersData[selectedSection] as SlideData[]).length > 1 && (
-                  <div className="pt-2 flex justify-end">
-                    <button
-                      onClick={() => handleDeleteSlide(selectedSlideIndex)}
-                      className="text-[10px] text-red-400 hover:text-red-300 flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Remove This Slide from Section</span>
-                    </button>
-                  </div>
-                )}
+              {isCurrentArraySection && (getArraySlidesForKey(selectedSection)?.length || 0) > 1 && (
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSlide(selectedSlideIndex)}
+                    className="text-[10px] text-red-400 hover:text-red-300 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove This Slide from Section</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 3. RAWx Drop & Brand Product Metadata Editor */}
+          <div className="bg-[#141310] border border-[#f3efe6]/10 p-5 rounded-lg space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f3efe6]/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Tag className="w-4 h-4 text-[#e11d48]" />
+                <span className="text-[11px] tracking-[0.18em] uppercase font-bold text-white">
+                  3. <span className="normal-case text-[#e11d48]">RAWx</span> DROP &amp; PRODUCT METADATA (
+                  {currentDropMeta.dropId.toUpperCase()})
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleResetSingleDropMeta}
+                className="text-[10px] text-[#c8b89a] hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset Drop Meta</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  Drop Code
+                </label>
+                <input
+                  type="text"
+                  value={currentDropMeta.dropCode}
+                  onChange={(e) => handleUpdateDropMeta('dropCode', e.target.value)}
+                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  Collection Category
+                </label>
+                <select
+                  value={currentDropMeta.collection}
+                  onChange={(e) =>
+                    handleUpdateDropMeta('collection', e.target.value as RawxCollectionCategory)
+                  }
+                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                >
+                  {COLLECTION_OPTIONS.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  Product / Campaign Title
+                </label>
+                <input
+                  type="text"
+                  value={currentDropMeta.title}
+                  onChange={(e) => handleUpdateDropMeta('title', e.target.value)}
+                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  Material Spec Pill
+                </label>
+                <input
+                  type="text"
+                  value={currentDropMeta.materialSpec}
+                  onChange={(e) => handleUpdateDropMeta('materialSpec', e.target.value)}
+                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  Price Estimate
+                </label>
+                <input
+                  type="text"
+                  value={currentDropMeta.priceDisplay}
+                  onChange={(e) => handleUpdateDropMeta('priceDisplay', e.target.value)}
+                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  JIT Pre-Order Window
+                </label>
+                <input
+                  type="text"
+                  value={currentDropMeta.preorderWindow}
+                  onChange={(e) => handleUpdateDropMeta('preorderWindow', e.target.value)}
+                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                Editorial Story Caption
+              </label>
+              <textarea
+                rows={2}
+                value={currentDropMeta.storyCaption}
+                onChange={(e) => handleUpdateDropMeta('storyCaption', e.target.value)}
+                className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-2 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none resize-none"
+              />
             </div>
           </div>
         </div>
@@ -745,13 +999,14 @@ export default function DynamicPhotoManagerModal({
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-3 border-t border-[#f3efe6]/10 bg-[#141310] text-[11px]">
           <span className="text-[#888888] hidden sm:inline">
-            Changes are saved in real-time to your browser's persistent storage.
+            Changes are saved in real-time to your browser&apos;s persistent storage.
           </span>
           <button
+            type="button"
             onClick={onClose}
             className="w-full sm:w-auto px-6 py-2 rounded bg-[#c8b89a] text-black font-bold tracking-wider uppercase hover:bg-white transition-colors cursor-pointer"
           >
-            Done &amp; Return to Sliders
+            Done &amp; Return to <span className="normal-case">RAWx</span>
           </button>
         </div>
       </div>

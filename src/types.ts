@@ -71,6 +71,57 @@ export interface SlideData {
   videoUrl?: string;
 }
 
+export type RawxDropKey =
+  | 's1'
+  | 's2a'
+  | 's3'
+  | 's4a'
+  | 's5a'
+  | 's6'
+  | 's7a'
+  | 's8a'
+  | 's9'
+  | 's10'
+  | 's11'
+  | 's12'
+  | 'sA'
+  | 'sB'
+  | 'sC'
+  | 'sD'
+  | 'sE'
+  | 'sF'
+  | 'sG';
+
+export type RawxCollectionCategory =
+  | 'STREETWEAR & HEAVY TEES'
+  | 'HIDE & 316L STEEL'
+  | 'OUTERWEAR & FOOTWEAR'
+  | 'EDITORIAL & LUT LAB';
+
+export type RawxSizingType = 'apparel' | 'wrist' | 'footwear';
+
+export interface DropMetadata {
+  sectionKey: RawxDropKey;
+  dropId: string;
+  domId: string;
+  dropCode: string;
+  collection: RawxCollectionCategory;
+  title: string;
+  materialSpec: string;
+  priceDisplay: string;
+  preorderWindow: string;
+  storyCaption: string;
+  banglaTagline?: string;
+  sizingType: RawxSizingType;
+  craftsmanshipSpecs: {
+    materialGrade: string;
+    hardwareOrTrim: string;
+    weightOrGauge: string;
+    construction: string;
+  };
+  lutPreset: string;
+}
+
 export interface AllSlidersData {
   s1: SlideData[];
   s2a: SlideData[];
@@ -114,6 +165,8 @@ export interface AllSlidersData {
   };
   sE: SlideData[];
   sF: SlideData[];
+  sG?: SlideData[];
+  dropMetadata?: Record<string, DropMetadata>;
 }
 
 export interface GradeOption {

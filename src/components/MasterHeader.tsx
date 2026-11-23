@@ -133,7 +133,7 @@ export default function MasterHeader({
         </button>
       </div>
 
-      {/* Center: Hardware-Style 4-Tab Top-Level Switcher (HOME | HANDFILM | APPS | SLIDERS) */}
+      {/* Center: Hardware-Style 4-Tab Top-Level Switcher (HOME | HANDFILM | RAWx | APPS) */}
       <nav
         aria-label="Primary Operating System Views"
         className="flex items-center gap-0.5 sm:gap-1 bg-[#14161A] p-1 rounded-lg border border-[#f3efe6]/15 font-mono text-[10.5px] sm:text-[11px] tracking-[0.14em] uppercase shadow-inner shrink-0"
@@ -168,6 +168,21 @@ export default function MasterHeader({
         </a>
 
         <a
+          href="#rawx"
+          onClick={(e) => handleTabNav(e, 'rawx-showcase')}
+          aria-current={activeTab === 'rawx-showcase' ? 'page' : undefined}
+          title="RAWx — Hide, Steel & Heavyweight Apparel Storefront & 19-Drop Lookbook Studio"
+          className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+            activeTab === 'rawx-showcase'
+              ? 'bg-[#C8A96A] text-[#0A0B0D] font-bold shadow-[0_0_16px_rgba(200,169,106,0.35)]'
+              : 'text-[#C8A96A]/90 hover:text-[#C8A96A] hover:bg-[#C8A96A]/10'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span className="normal-case tracking-[0.12em]">{t.nav.rawx}</span>
+        </a>
+
+        <a
           href="#apps"
           onClick={(e) => handleTabNav(e, 'ecosystem')}
           aria-current={activeTab === 'ecosystem' ? 'page' : undefined}
@@ -180,21 +195,6 @@ export default function MasterHeader({
         >
           <Layers className="w-3.5 h-3.5" />
           <span>{t.nav.apps}</span>
-        </a>
-
-        <a
-          href="#sliders"
-          onClick={(e) => handleTabNav(e, 'rawx-showcase')}
-          aria-current={activeTab === 'rawx-showcase' ? 'page' : undefined}
-          title="RAWx 16 Ultra Sliders Visual Engine"
-          className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
-            activeTab === 'rawx-showcase'
-              ? 'bg-[#C8A96A] text-[#0A0B0D] font-bold shadow-[0_0_14px_rgba(200,169,106,0.28)]'
-              : 'text-[#C8A96A]/85 hover:text-[#C8A96A] hover:bg-[#C8A96A]/10'
-          }`}
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>{t.nav.sliders}</span>
         </a>
       </nav>
 
