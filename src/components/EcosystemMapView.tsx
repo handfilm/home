@@ -169,10 +169,10 @@ export default function EcosystemMapView({
       });
     });
 
-    // 3. Specialized Featured Engine: RAWx 16 Sliders Engine Node
+    // 3. Specialized Featured Engine: RAWx 19 Sliders Engine Node
     const engineNode: GraphNode = {
       id: 'rawx-engine',
-      label: 'RAWX 16 SLIDERS',
+      label: 'RAWx 19 SLIDERS',
       categoryKey: 'engines',
       categoryLabel: 'CORE ENGINE',
       sub: 'Ultra Slider System & Color LUT Shaders',
@@ -267,16 +267,20 @@ export default function EcosystemMapView({
   return (
     <div className="w-full space-y-4 font-mono select-none">
       {/* Control Bar: Filter Clusters + Search */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-[#f3efe6]/10 pb-3">
+      <div
+        className="flex flex-wrap items-center justify-between gap-3 text-xs border-b pb-3"
+        style={{ borderColor: 'var(--hh-border)' }}
+      >
         {/* Category Clusters Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 no-scrollbar">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-bold tracking-wider uppercase transition-colors cursor-pointer whitespace-nowrap ${
-              selectedCategory === 'all'
-                ? 'bg-[#f3efe6] text-[#0e0d0b]'
-                : 'bg-[#181613] text-[#f3efe6]/60 hover:text-[#f3efe6] border border-[#f3efe6]/15'
-            }`}
+            className="px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-bold tracking-wider uppercase transition-colors cursor-pointer whitespace-nowrap border"
+            style={{
+              backgroundColor: selectedCategory === 'all' ? 'var(--hh-accent)' : 'var(--hh-surface)',
+              borderColor: selectedCategory === 'all' ? 'var(--hh-accent)' : 'var(--hh-border)',
+              color: selectedCategory === 'all' ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
+            }}
           >
             ALL ({sections.length})
           </button>
@@ -288,19 +292,16 @@ export default function EcosystemMapView({
               <button
                 key={cat.key}
                 onClick={() => setSelectedCategory(isSelected ? 'all' : cat.key)}
-                className={`px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-bold tracking-wider uppercase transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                  isSelected
-                    ? 'text-[#0e0d0b] shadow-md'
-                    : 'bg-[#181613] text-[#f3efe6]/60 hover:text-[#f3efe6] border border-[#f3efe6]/15'
-                }`}
+                className="px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-bold tracking-wider uppercase transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 border"
                 style={{
-                  backgroundColor: isSelected ? conf?.color || '#c8b89a' : undefined,
-                  borderColor: isSelected ? conf?.color : undefined,
+                  backgroundColor: isSelected ? conf?.color || 'var(--hh-accent)' : 'var(--hh-surface)',
+                  borderColor: isSelected ? conf?.color || 'var(--hh-accent)' : 'var(--hh-border)',
+                  color: isSelected ? '#ffffff' : 'var(--hh-muted)',
                 }}
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: conf?.color || '#c8b89a' }}
+                  style={{ backgroundColor: conf?.color || 'var(--hh-accent)' }}
                 />
                 <span>{cat.label.split('/')[0].trim()}</span>
               </button>
@@ -311,26 +312,34 @@ export default function EcosystemMapView({
         {/* Search Input & Metrics */}
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
           <div className="relative flex items-center">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 text-[#f3efe6]/40 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 pointer-events-none" style={{ color: 'var(--hh-muted)' }} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Find node..."
-              className="bg-[#141310] border border-[#f3efe6]/15 rounded-md pl-8 pr-2.5 py-1 text-[11px] text-[#f3efe6] placeholder-[#f3efe6]/30 focus:outline-none focus:border-amber-400/70 w-32 sm:w-36 transition-all"
+              className="border rounded-md pl-8 pr-2.5 py-1 text-[11px] focus:outline-none w-32 sm:w-36 transition-all"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             />
           </div>
 
-          <div className="text-[10px] text-[#f3efe6]/60 flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-emerald-400 font-bold">{visitedCount}</span>
+          <div className="text-[10px] flex items-center gap-1.5 whitespace-nowrap" style={{ color: 'var(--hh-muted)' }}>
+            <span className="text-emerald-500 font-bold">{visitedCount}</span>
             <span>/ {sections.length}</span>
-            <span className="text-emerald-400/70">({visitedPercent}%)</span>
+            <span className="text-emerald-500/80">({visitedPercent}%)</span>
           </div>
         </div>
       </div>
 
-      {/* SVG Canvas Map Area */}
-      <div className="relative w-full h-[460px] sm:h-[500px] bg-[#0c0b09] rounded-xl border border-[#f3efe6]/15 overflow-hidden flex items-center justify-center p-2 sm:p-4 shadow-inner">
+      {/* SVG Canvas Map Area (Deep Constellation Viewport) */}
+      <div
+        className="relative w-full h-[460px] sm:h-[500px] bg-[#0c0b09] rounded-xl border overflow-hidden flex items-center justify-center p-2 sm:p-4 shadow-inner"
+        style={{ borderColor: 'var(--hh-border)' }}
+      >
         {/* Subtle grid and constellation background */}
         <div className="absolute inset-0 bg-[radial-gradient(#f3efe6_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(200,184,154,0.04),transparent_70%)] pointer-events-none" />

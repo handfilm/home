@@ -144,24 +144,42 @@ export default function RawxProductDrawer({
       role="dialog"
       aria-modal="true"
       aria-label={`${dropMeta.title} Product & Lookbook Drawer`}
-      className="fixed inset-0 z-[145] bg-black/80 backdrop-blur-md flex justify-end"
+      className="fixed inset-0 z-[145] bg-black/70 backdrop-blur-md flex justify-end"
       onClick={onClose}
     >
       <aside
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl h-full bg-[#09090b] border-l border-[#f4f0e8]/15 text-[#f4f0e8] flex flex-col shadow-2xl overflow-hidden"
+        className="w-full max-w-2xl h-full border-l flex flex-col shadow-2xl overflow-hidden hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-bg)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+        }}
       >
         {/* Top Drawer Command Bar */}
-        <div className="px-5 sm:px-6 py-4 bg-[#111114] border-b border-[#f4f0e8]/10 flex items-center justify-between gap-3 shrink-0">
+        <div
+          className="px-5 sm:px-6 py-4 border-b flex items-center justify-between gap-3 shrink-0"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[10px] font-space-mono uppercase tracking-[0.18em] text-[#C8A96A]">
-              <span className="font-bold text-[#e11d48]">RAWx</span>
-              <span className="text-[#f4f0e8]/30">·</span>
-              <span>{dropMeta.dropCode}</span>
-              <span className="text-[#f4f0e8]/30">·</span>
-              <span className="truncate text-[#f4f0e8]/65">{dropMeta.collection}</span>
+            <div className="flex items-center gap-2 text-[10px] font-space-mono uppercase tracking-[0.18em]">
+              <span className="font-bold normal-case" style={{ color: 'var(--hh-accent)' }}>
+                RAWx
+              </span>
+              <span style={{ color: 'var(--hh-border)' }}>·</span>
+              <span style={{ color: 'var(--hh-accent)' }}>{dropMeta.dropCode}</span>
+              <span style={{ color: 'var(--hh-border)' }}>·</span>
+              <span className="truncate" style={{ color: 'var(--hh-muted)' }}>
+                {dropMeta.collection}
+              </span>
             </div>
-            <h2 className="font-bebas text-2xl sm:text-3xl tracking-wide text-white truncate mt-0.5">
+            <h2
+              className="font-bebas text-2xl sm:text-3xl tracking-wide truncate mt-0.5"
+              style={{ color: 'var(--hh-text)' }}
+            >
               {dropMeta.title}
             </h2>
           </div>
@@ -171,16 +189,21 @@ export default function RawxProductDrawer({
               type="button"
               onClick={handleCopy}
               title="Copy direct drop link"
-              className="px-2.5 py-1.5 rounded bg-[#18181b] border border-[#f4f0e8]/15 hover:border-[#C8A96A]/60 text-[10px] font-space-mono uppercase tracking-wider text-[#f4f0e8]/80 hover:text-[#C8A96A] flex items-center gap-1.5 cursor-pointer transition-colors"
+              className="px-2.5 py-1.5 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
               {copiedJustNow ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-300">Copied</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="text-emerald-500">Copied</span>
                 </>
               ) : (
                 <>
-                  <Share2 className="w-3.5 h-3.5" />
+                  <Share2 className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
                   <span className="hidden sm:inline">Share Drop</span>
                 </>
               )}
@@ -190,7 +213,12 @@ export default function RawxProductDrawer({
               type="button"
               onClick={onClose}
               aria-label="Close drop drawer"
-              className="p-2 rounded bg-[#18181b] border border-[#f4f0e8]/15 hover:border-[#e11d48] text-[#f4f0e8]/70 hover:text-white cursor-pointer transition-colors"
+              className="p-2 rounded border cursor-pointer transition-colors"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
               <X className="w-4 h-4" />
             </button>
@@ -201,7 +229,13 @@ export default function RawxProductDrawer({
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 pb-24">
           {/* Active Visual Plate + Grade Overlay Info */}
           <div className="space-y-3">
-            <div className="relative aspect-[16/10] bg-[#121216] rounded-lg overflow-hidden border border-[#f4f0e8]/12 group">
+            <div
+              className="relative aspect-[16/10] rounded-lg overflow-hidden border group"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+              }}
+            >
               {activeSlide?.url ? (
                 <img
                   src={activeSlide.url}
@@ -210,7 +244,10 @@ export default function RawxProductDrawer({
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs font-space-mono text-[#f4f0e8]/40">
+                <div
+                  className="w-full h-full flex items-center justify-center text-xs font-space-mono"
+                  style={{ color: 'var(--hh-muted)' }}
+                >
                   RAWx Studio Preview Unavailable
                 </div>
               )}
@@ -219,10 +256,10 @@ export default function RawxProductDrawer({
 
               {/* Top LUT / Grade Metadata Badges */}
               <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                <span className="px-2.5 py-1 rounded bg-black/75 border border-[#C8A96A]/40 text-[9px] font-space-mono uppercase tracking-wider text-[#C8A96A]">
+                <span className="px-2.5 py-1 rounded bg-black/75 border border-white/20 text-[9px] font-space-mono uppercase tracking-wider text-amber-400">
                   LUT: {dropMeta.lutPreset}
                 </span>
-                <span className="px-2.5 py-1 rounded bg-black/75 border border-[#f4f0e8]/15 text-[9px] font-space-mono uppercase tracking-wider text-[#f4f0e8]/80">
+                <span className="px-2.5 py-1 rounded bg-black/75 border border-white/20 text-[9px] font-space-mono uppercase tracking-wider text-zinc-200">
                   OS Grade: {activeGradeObj.name}
                 </span>
               </div>
@@ -230,7 +267,7 @@ export default function RawxProductDrawer({
               {/* Bottom Frame Info & Lightbox Expand */}
               <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="text-[9px] font-space-mono uppercase tracking-widest text-[#C8A96A] block">
+                  <span className="text-[9px] font-space-mono uppercase tracking-widest text-amber-400 block">
                     {activeSlide?.tag || dropMeta.dropCode} · Frame {String(selectedFrameIdx + 1).padStart(2, '0')} /{' '}
                     {String(Math.max(1, slides.length)).padStart(2, '0')}
                   </span>
@@ -238,7 +275,7 @@ export default function RawxProductDrawer({
                     {activeSlide?.title || dropMeta.title}
                   </p>
                   {activeSlide?.sub && (
-                    <span className="text-[10px] font-space-mono text-[#f4f0e8]/65 block truncate">
+                    <span className="text-[10px] font-space-mono text-zinc-300 block truncate">
                       {activeSlide.sub}
                     </span>
                   )}
@@ -248,7 +285,7 @@ export default function RawxProductDrawer({
                   <button
                     type="button"
                     onClick={() => onOpenLightbox(lightboxItems, selectedFrameIdx)}
-                    className="px-2.5 py-1.5 rounded bg-black/80 hover:bg-[#C8A96A] border border-[#f4f0e8]/25 hover:border-[#C8A96A] text-[10px] font-space-mono uppercase tracking-wider text-white hover:text-black flex items-center gap-1.5 cursor-pointer transition-all shrink-0"
+                    className="px-2.5 py-1.5 rounded bg-black/80 hover:bg-amber-600 border border-white/25 text-[10px] font-space-mono uppercase tracking-wider text-white flex items-center gap-1.5 cursor-pointer transition-all shrink-0"
                   >
                     <Maximize2 className="w-3 h-3" />
                     <span>Lightbox</span>
@@ -265,11 +302,12 @@ export default function RawxProductDrawer({
                     key={slide.id || `${dropMeta.dropId}-frame-${idx}`}
                     type="button"
                     onClick={() => setSelectedFrameIdx(idx)}
-                    className={`relative w-20 h-14 rounded overflow-hidden border-2 shrink-0 cursor-pointer transition-all bg-[#141418] ${
-                      idx === selectedFrameIdx
-                        ? 'border-[#C8A96A] ring-2 ring-[#C8A96A]/25 opacity-100'
-                        : 'border-transparent opacity-55 hover:opacity-95'
-                    }`}
+                    className="relative w-20 h-14 rounded overflow-hidden border-2 shrink-0 cursor-pointer transition-all"
+                    style={{
+                      backgroundColor: 'var(--hh-surface)',
+                      borderColor: idx === selectedFrameIdx ? 'var(--hh-accent)' : 'transparent',
+                      opacity: idx === selectedFrameIdx ? 1 : 0.6,
+                    }}
                   >
                     <img
                       src={slide.url}
@@ -277,7 +315,7 @@ export default function RawxProductDrawer({
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover"
                     />
-                    <span className="absolute bottom-0.5 right-1 text-[8px] font-space-mono bg-black/75 px-1 rounded text-[#C8A96A] tabular-nums">
+                    <span className="absolute bottom-0.5 right-1 text-[8px] font-space-mono bg-black/75 px-1 rounded text-amber-300 tabular-nums">
                       0{idx + 1}
                     </span>
                   </button>
@@ -287,17 +325,29 @@ export default function RawxProductDrawer({
           </div>
 
           {/* Pricing, POD/JIT Window & Editorial Story */}
-          <div className="p-4 rounded-lg bg-[#111115] border border-[#f4f0e8]/10 space-y-3">
+          <div
+            className="p-4 rounded-lg border space-y-3"
+            style={{
+              backgroundColor: 'var(--hh-surface)',
+              borderColor: 'var(--hh-border)',
+            }}
+          >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <span className="text-[10px] font-space-mono uppercase tracking-[0.2em] text-[#C8A96A] block">
+                <span
+                  className="text-[10px] font-space-mono uppercase tracking-[0.2em] block font-semibold"
+                  style={{ color: 'var(--hh-accent)' }}
+                >
                   {dropMeta.materialSpec}
                 </span>
                 <div className="flex items-baseline gap-3 mt-1">
-                  <span className="font-bebas text-3xl text-white tabular-nums tracking-wide">
+                  <span
+                    className="font-bebas text-3xl tabular-nums tracking-wide"
+                    style={{ color: 'var(--hh-text)' }}
+                  >
                     {dropMeta.priceDisplay}
                   </span>
-                  <span className="text-[10px] font-space-mono uppercase tracking-wider text-emerald-400">
+                  <span className="text-[10px] font-space-mono uppercase tracking-wider text-emerald-500 font-semibold">
                     {dropMeta.preorderWindow}
                   </span>
                 </div>
@@ -313,22 +363,28 @@ export default function RawxProductDrawer({
                     lutPreset: dropMeta.lutPreset,
                   })
                 }
-                className="px-3 py-1.5 rounded bg-[#18181d] border border-[#e11d48]/45 hover:bg-[#e11d48] text-[10px] font-space-mono uppercase tracking-wider text-[#fda4af] hover:text-white flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-accent)',
+                  color: 'var(--hh-accent)',
+                }}
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Remix Look in Storyboard</span>
+                <span>Launch in Storyboard ↗</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
 
-            <p className="font-inter text-xs sm:text-sm text-[#f4f0e8]/80 leading-relaxed">
+            <p className="font-inter text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--hh-text)' }}>
               {dropMeta.storyCaption}
             </p>
 
             {dropMeta.banglaTagline && (
               <p
                 lang="bn"
-                className="bangla-text text-xs text-[#C8A96A]/90 pt-1 border-t border-[#f4f0e8]/10"
+                className="bangla-text text-xs pt-2 border-t"
+                style={{ color: 'var(--hh-accent)', borderColor: 'var(--hh-border)' }}
               >
                 {dropMeta.banglaTagline}
               </p>
@@ -337,55 +393,57 @@ export default function RawxProductDrawer({
 
           {/* Technical Material & Craftsmanship Breakdown */}
           <div className="space-y-2.5">
-            <div className="flex items-center gap-2 text-[10px] font-space-mono uppercase tracking-[0.2em] text-[#f4f0e8]/60">
-              <Layers className="w-3.5 h-3.5 text-[#C8A96A]" />
+            <div
+              className="flex items-center gap-2 text-[10px] font-space-mono uppercase tracking-[0.2em]"
+              style={{ color: 'var(--hh-muted)' }}
+            >
+              <Layers className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
               <span>Technical Material &amp; Craftsmanship Breakdown</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div className="p-3 rounded bg-[#111115] border border-[#f4f0e8]/10">
-                <span className="text-[9px] font-space-mono uppercase tracking-widest text-[#f4f0e8]/45 block">
-                  Material Grade
-                </span>
-                <span className="text-xs font-inter text-[#f4f0e8]/90 mt-1 block">
-                  {dropMeta.craftsmanshipSpecs.materialGrade}
-                </span>
-              </div>
-
-              <div className="p-3 rounded bg-[#111115] border border-[#f4f0e8]/10">
-                <span className="text-[9px] font-space-mono uppercase tracking-widest text-[#f4f0e8]/45 block">
-                  Hardware &amp; Trim
-                </span>
-                <span className="text-xs font-inter text-[#f4f0e8]/90 mt-1 block">
-                  {dropMeta.craftsmanshipSpecs.hardwareOrTrim}
-                </span>
-              </div>
-
-              <div className="p-3 rounded bg-[#111115] border border-[#f4f0e8]/10">
-                <span className="text-[9px] font-space-mono uppercase tracking-widest text-[#f4f0e8]/45 block">
-                  Weight / Gauge
-                </span>
-                <span className="text-xs font-inter text-[#f4f0e8]/90 mt-1 block">
-                  {dropMeta.craftsmanshipSpecs.weightOrGauge}
-                </span>
-              </div>
-
-              <div className="p-3 rounded bg-[#111115] border border-[#f4f0e8]/10">
-                <span className="text-[9px] font-space-mono uppercase tracking-widest text-[#f4f0e8]/45 block">
-                  Construction
-                </span>
-                <span className="text-xs font-inter text-[#f4f0e8]/90 mt-1 block">
-                  {dropMeta.craftsmanshipSpecs.construction}
-                </span>
-              </div>
+              {[
+                { label: 'Material Grade', val: dropMeta.craftsmanshipSpecs.materialGrade },
+                { label: 'Hardware & Trim', val: dropMeta.craftsmanshipSpecs.hardwareOrTrim },
+                { label: 'Weight / Gauge', val: dropMeta.craftsmanshipSpecs.weightOrGauge },
+                { label: 'Construction', val: dropMeta.craftsmanshipSpecs.construction },
+              ].map((spec) => (
+                <div
+                  key={spec.label}
+                  className="p-3 rounded border"
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: 'var(--hh-border)',
+                  }}
+                >
+                  <span
+                    className="text-[9px] font-space-mono uppercase tracking-widest block"
+                    style={{ color: 'var(--hh-muted)' }}
+                  >
+                    {spec.label}
+                  </span>
+                  <span className="text-xs font-inter mt-1 block" style={{ color: 'var(--hh-text)' }}>
+                    {spec.val}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Interactive Size/Fit Selector & POD/JIT Quantity Stepper */}
-          <div className="p-4 rounded-lg bg-[#111115] border border-[#f4f0e8]/12 space-y-4">
+          <div
+            className="p-4 rounded-lg border space-y-4"
+            style={{
+              backgroundColor: 'var(--hh-surface)',
+              borderColor: 'var(--hh-border)',
+            }}
+          >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-2">
-                <span className="text-[10px] font-space-mono uppercase tracking-[0.18em] text-[#f4f0e8]/65 block">
+                <span
+                  className="text-[10px] font-space-mono uppercase tracking-[0.18em] block"
+                  style={{ color: 'var(--hh-muted)' }}
+                >
                   {dropMeta.sizingType === 'wrist'
                     ? 'Bracelet Wrist Fit'
                     : dropMeta.sizingType === 'footwear'
@@ -398,11 +456,13 @@ export default function RawxProductDrawer({
                       key={size}
                       type="button"
                       onClick={() => setSelectedSize(size)}
-                      className={`px-3 py-1.5 rounded text-xs font-space-mono uppercase tracking-wider cursor-pointer transition-all tabular-nums ${
-                        selectedSize === size
-                          ? 'bg-[#C8A96A] text-black font-bold shadow'
-                          : 'bg-[#18181d] text-[#f4f0e8]/75 border border-[#f4f0e8]/15 hover:border-[#f4f0e8]/40'
-                      }`}
+                      className="px-3 py-1.5 rounded text-xs font-space-mono uppercase tracking-wider cursor-pointer transition-all tabular-nums border"
+                      style={{
+                        backgroundColor: selectedSize === size ? 'var(--hh-accent)' : 'var(--hh-bg)',
+                        borderColor: selectedSize === size ? 'var(--hh-accent)' : 'var(--hh-border)',
+                        color: selectedSize === size ? 'var(--hh-accent-ink)' : 'var(--hh-text)',
+                        fontWeight: selectedSize === size ? 700 : 500,
+                      }}
                     >
                       {size}
                     </button>
@@ -411,26 +471,37 @@ export default function RawxProductDrawer({
               </div>
 
               <div className="space-y-2">
-                <span className="text-[10px] font-space-mono uppercase tracking-[0.18em] text-[#f4f0e8]/65 block">
+                <span
+                  className="text-[10px] font-space-mono uppercase tracking-[0.18em] block"
+                  style={{ color: 'var(--hh-muted)' }}
+                >
                   JIT Batch Qty
                 </span>
-                <div className="inline-flex items-center rounded bg-[#18181d] border border-[#f4f0e8]/15">
+                <div
+                  className="inline-flex items-center rounded border"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                  }}
+                >
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     aria-label="Decrease quantity"
-                    className="p-2 text-[#f4f0e8]/75 hover:text-white cursor-pointer"
+                    className="p-2 cursor-pointer"
+                    style={{ color: 'var(--hh-muted)' }}
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
-                  <span className="px-4 text-xs font-space-mono font-bold text-white tabular-nums">
+                  <span className="px-4 text-xs font-space-mono font-bold tabular-nums" style={{ color: 'var(--hh-text)' }}>
                     {quantity}
                   </span>
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.min(25, q + 1))}
                     aria-label="Increase quantity"
-                    className="p-2 text-[#f4f0e8]/75 hover:text-white cursor-pointer"
+                    className="p-2 cursor-pointer"
+                    style={{ color: 'var(--hh-muted)' }}
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
@@ -438,8 +509,11 @@ export default function RawxProductDrawer({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-[10px] font-space-mono text-[#f4f0e8]/55 pt-2 border-t border-[#f4f0e8]/10">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <div
+              className="flex items-center gap-2 text-[10px] font-space-mono pt-2 border-t"
+              style={{ color: 'var(--hh-muted)', borderColor: 'var(--hh-border)' }}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
               <span>
                 Small-batch Print-on-Demand &amp; Just-In-Time craft in Dhaka. Serialized QC before dispatch.
               </span>
@@ -448,7 +522,13 @@ export default function RawxProductDrawer({
         </div>
 
         {/* Sticky Bottom Pre-Order & Wishlist Action Bar */}
-        <div className="px-5 sm:px-6 py-4 bg-[#111114] border-t border-[#f4f0e8]/12 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+        <div
+          className="px-5 sm:px-6 py-4 border-t flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
           <a
             href={whatsappUrl}
             target="_blank"
@@ -461,20 +541,25 @@ export default function RawxProductDrawer({
                 quantity,
               })
             }
-            className="flex-1 py-3 px-4 rounded bg-[#e11d48] hover:bg-[#be123c] text-white font-space-mono text-xs font-bold uppercase tracking-[0.14em] flex items-center justify-center gap-2 transition-colors shadow-[0_0_24px_rgba(225,29,72,0.35)]"
+            className="flex-1 py-3 px-4 rounded font-space-mono text-xs font-bold uppercase tracking-[0.14em] flex items-center justify-center gap-2 transition-colors"
+            style={{
+              backgroundColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent-ink)',
+            }}
           >
             <MessageCircle className="w-4 h-4 shrink-0" />
-            <span>Reserve Pre-Order via WhatsApp Concierge</span>
+            <span>Reserve Pre-Order via WhatsApp</span>
           </a>
 
           <button
             type="button"
             onClick={() => onToggleSave(dropMeta.dropId)}
-            className={`py-3 px-4 rounded font-space-mono text-xs uppercase tracking-wider border flex items-center justify-center gap-2 cursor-pointer transition-all ${
-              isSaved
-                ? 'bg-[#C8A96A]/15 border-[#C8A96A] text-[#C8A96A] font-bold'
-                : 'bg-[#18181d] border-[#f4f0e8]/20 text-[#f4f0e8]/85 hover:border-[#C8A96A]/60 hover:text-[#C8A96A]'
-            }`}
+            className="py-3 px-4 rounded font-space-mono text-xs uppercase tracking-wider border flex items-center justify-center gap-2 cursor-pointer transition-all"
+            style={{
+              backgroundColor: isSaved ? 'var(--hh-surface-2)' : 'var(--hh-bg)',
+              borderColor: isSaved ? 'var(--hh-accent)' : 'var(--hh-border)',
+              color: isSaved ? 'var(--hh-accent)' : 'var(--hh-text)',
+            }}
           >
             {isSaved ? (
               <>
@@ -484,7 +569,7 @@ export default function RawxProductDrawer({
             ) : (
               <>
                 <Bookmark className="w-4 h-4" />
-                <span>Add to Saved Lookbook</span>
+                <span>Save Drop</span>
               </>
             )}
           </button>

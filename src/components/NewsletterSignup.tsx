@@ -49,13 +49,19 @@ export default function NewsletterSignup({ t }: NewsletterSignupProps) {
 
   if (alreadySubscribed || status === 'success') {
     return (
-      <div className="p-4 rounded-xl bg-[#151411] border border-emerald-500/30 text-emerald-400 font-mono text-xs flex items-center gap-3">
-        <ShieldCheck className="w-5 h-5 flex-shrink-0 text-emerald-400" />
+      <div
+        className="p-4 rounded-xl border text-emerald-500 font-mono text-xs flex items-center gap-3 hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-surface)',
+          borderColor: 'rgba(16, 185, 129, 0.35)',
+        }}
+      >
+        <ShieldCheck className="w-5 h-5 flex-shrink-0 text-emerald-500" />
         <div>
           <div className="font-bold uppercase tracking-wider">
             {t.newsletter.badge} · SUBSCRIBED
           </div>
-          <div className="text-[10.5px] text-[#f3efe6]/70 mt-0.5">
+          <div className="text-[10.5px] mt-0.5" style={{ color: 'var(--hh-muted)' }}>
             {t.newsletter.success}
           </div>
         </div>
@@ -64,39 +70,61 @@ export default function NewsletterSignup({ t }: NewsletterSignupProps) {
   }
 
   return (
-    <div className="p-4 sm:p-5 rounded-xl bg-[#161512] border border-[#f3efe6]/15 font-mono space-y-3">
+    <div
+      className="p-4 sm:p-5 rounded-xl border font-mono space-y-3 hh-theme-transition"
+      style={{
+        backgroundColor: 'var(--hh-surface)',
+        borderColor: 'var(--hh-border)',
+      }}
+    >
       <div className="flex items-center gap-2">
-        <span className="text-[9.5px] px-2 py-0.5 rounded font-bold uppercase bg-[#c8b89a]/15 text-[#c8b89a] border border-[#c8b89a]/30">
+        <span
+          className="text-[9.5px] px-2 py-0.5 rounded font-bold uppercase border"
+          style={{
+            backgroundColor: 'var(--hh-bg)',
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-accent)',
+          }}
+        >
           {t.newsletter.badge}
         </span>
       </div>
 
       <div>
-        <h4 className="text-sm sm:text-base font-bold uppercase text-[#f3efe6] tracking-tight">
+        <h4 className="text-sm sm:text-base font-bold uppercase tracking-tight" style={{ color: 'var(--hh-text)' }}>
           {t.newsletter.title}
         </h4>
-        <p className="text-xs text-[#f3efe6]/60 mt-1 leading-relaxed">
+        <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
           {t.newsletter.subtitle}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 pt-1">
         <div className="relative flex-1">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#f3efe6]/40" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--hh-muted)' }} />
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t.newsletter.placeholder}
             disabled={status === 'loading'}
-            className="w-full pl-9 pr-3 py-2 bg-[#0e0d0b] border border-[#f3efe6]/20 rounded text-xs text-[#f3efe6] placeholder-[#f3efe6]/30 focus:border-[#c8b89a] outline-none"
+            className="w-full pl-9 pr-3 py-2 border rounded text-xs outline-none"
+            style={{
+              backgroundColor: 'var(--hh-bg)',
+              borderColor: 'var(--hh-border)',
+              color: 'var(--hh-text)',
+            }}
           />
         </div>
 
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="px-4 py-2 bg-[#f3efe6] text-[#0e0d0b] hover:bg-[#c8b89a] font-bold text-xs uppercase tracking-wider rounded transition-all cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 disabled:opacity-50"
+          className="px-4 py-2 font-bold text-xs uppercase tracking-wider rounded transition-all cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 disabled:opacity-50"
+          style={{
+            backgroundColor: 'var(--hh-accent)',
+            color: 'var(--hh-accent-ink)',
+          }}
         >
           <span>{status === 'loading' ? 'REGISTERING...' : t.newsletter.submit}</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -104,10 +132,10 @@ export default function NewsletterSignup({ t }: NewsletterSignupProps) {
       </form>
 
       {status === 'error' && (
-        <div className="text-[10px] text-rose-400">{errorMessage}</div>
+        <div className="text-[10px] text-rose-500">{errorMessage}</div>
       )}
 
-      <div className="text-[9.5px] text-[#f3efe6]/40 flex items-center gap-1.5">
+      <div className="text-[9.5px] flex items-center gap-1.5" style={{ color: 'var(--hh-muted)' }}>
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
         <span>{t.newsletter.note}</span>
       </div>

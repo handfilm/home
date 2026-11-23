@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { TaskItem, SectionItem, SyncState, ActiveTab, ColorGrade, EasingType } from './types';
 import { INITIAL_SECTIONS, INITIAL_TASKS, GRADES } from './data/initialData';
 import { MultiDeviceSyncEngine, getStoredRoomId, getDeviceName } from './services/syncService';
-import { TRANSLATIONS, Language } from './i18n/translations';
+import { TRANSLATIONS, Language, isSupportedLanguage } from './i18n/translations';
 import { audioEngine } from './services/audioEngine';
 import { getInitialRouteFromUrl, updateUrlForTab } from './services/deepLinkService';
 import { initPwa, subscribeToInstallPrompt, promptPwaInstall } from './services/pwaService';
 import { getStoredVisitorState, recordPortalVisit } from './services/visitorState';
 import { trackEvent } from './services/analytics';
 import { useSeoHead } from './hooks/useSeoHead';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 import GrainCanvas from './components/GrainCanvas';
 import CustomCursor from './components/CustomCursor';
@@ -31,57 +32,60 @@ import ReturningVisitorBanner from './components/ReturningVisitorBanner';
 
 const LANGUAGE_STORAGE_KEY = 'hh_master_language';
 
-export default function App() {
+interface AppShellProps {
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
+  targetRawxDropId: string | null;
+  sections: SectionItem[];
+  setSections: React.Dispatch<React.SetStateAction<SectionItem[]>>;
+  tasks: TaskItem[];
+  setTasks: React.Dispatch<React.SetStateAction<TaskItem[]>>;
+  currentSectionIndex: number;
+  setCurrentSectionIndex: React.Dispatch<React.SetStateAction<number>>;
+}
+
+function AppShell({
+  activeTab,
+  setActiveTab,
+  targetRawxDropId,
+  sections,
+  setSections,
+  tasks,
+  setTasks,
+  currentSectionIndex,
+  setCurrentSectionIndex,
+}: AppShellProps) {
+  const { colorMode, toggleColorMode, palette, isDark } = useTheme();
   const [loading, setLoading] = useState(true);
 
-  // Sections & Tasks State
-  const [sections, setSections] = useState<SectionItem[]>(INITIAL_SECTIONS);
-  const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_TASKS);
-
-  // Resolve initial 3-tab route from URL (#home | #apps | #sliders | #tasks | #<portalId>)
-  // Defaults cleanly to 'home' on first visit
-  const initialRoute = useMemo(
-    () => getInitialRouteFromUrl(INITIAL_SECTIONS.map((s) => s.id)),
-    []
-  );
-
-  const [activeTab, setActiveTabState] = useState<ActiveTab>(initialRoute.tab);
-  const [targetRawxDropId, setTargetRawxDropId] = useState<string | null>(initialRoute.rawxDropId);
-  const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(() => {
-    if (initialRoute.portalId) {
-      const idx = INITIAL_SECTIONS.findIndex(
-        (s) => s.id.toLowerCase() === initialRoute.portalId!.toLowerCase()
-      );
-      if (idx !== -1) return idx;
-    }
-    return 0;
-  });
-
-  const setActiveTab = useCallback((nextTab: ActiveTab) => {
-    setActiveTabState(nextTab);
-    if (nextTab !== 'rawx-showcase') {
-      setTargetRawxDropId(null);
-    }
-    if (
-      typeof window !== 'undefined' &&
-      (nextTab === 'home' || nextTab === 'handfilm' || nextTab === 'rawx-showcase' || nextTab === 'tasks-hub')
-    ) {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    }
-  }, []);
-
-  // Language State (EN | BN)
+  // Language State (8 Languages: EN | BN | HI | ZH | JA | ES | DE | NL)
   const [language, setLanguage] = useState<Language>(() => {
     try {
       const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-      if (saved === 'bn' || saved === 'en') return saved;
+      if (isSupportedLanguage(saved)) return saved;
     } catch {
       // ignore
     }
     return 'en';
   });
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('lang', language);
+    }
+  }, [language]);
+
   const t = TRANSLATIONS[language];
+
+  const handleSelectLanguage = useCallback((nextLang: Language) => {
+    setLanguage(nextLang);
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLang);
+    } catch {
+      // ignore
+    }
+    trackEvent('MASTER_LANGUAGE_SELECT', { language: nextLang });
+  }, []);
 
   // Ambient Sound State (Off by default)
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
@@ -114,7 +118,7 @@ export default function App() {
 
   // Grade & Speed Settings
   const [currentGrade, setCurrentGrade] = useState<ColorGrade>('off');
-  const [speed, setSpeed] = useState<number>(7); // 0.7s
+  const [speed, setSpeed] = useState<number>(7);
   const [easing, setEasing] = useState<EasingType>('ease');
   const [isConsoleOpen, setIsConsoleOpen] = useState(false);
 
@@ -149,34 +153,14 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 2. Listen for browser hashchange / deep-link navigation (#home, #handfilm, #rawx, #rawx-s01..19, #apps, #sliders legacy, #<portalId>)
-  useEffect(() => {
-    const handleHashChange = () => {
-      const resolved = getInitialRouteFromUrl(sections.map((s) => s.id));
-      setActiveTabState(resolved.tab);
-      setTargetRawxDropId(resolved.rawxDropId);
-      if (resolved.portalId) {
-        const idx = sections.findIndex(
-          (s) => s.id.toLowerCase() === resolved.portalId!.toLowerCase()
-        );
-        if (idx !== -1) {
-          setCurrentSectionIndex(idx);
-        }
-      }
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [sections]);
-
-  // 3. Synchronize document head SEO tags dynamically across tabs & all 24 slides
+  // 2. Synchronize document head SEO tags dynamically across tabs & all 24 slides
   useSeoHead({
     activeTab,
     currentSection: sections[currentSectionIndex],
     sectionsCount: sections.length,
   });
 
-  // 4. Synchronize URL hash, ambient audio, and visited portals
+  // 3. Synchronize URL hash, ambient audio, and visited portals
   useEffect(() => {
     const cur = sections[currentSectionIndex];
     if (activeTab === 'ecosystem' && cur) {
@@ -225,7 +209,7 @@ export default function App() {
     return () => {
       engine.disconnect();
     };
-  }, [initialRoom]);
+  }, [initialRoom, setSections, setTasks]);
 
   // Dismiss loader on boot
   useEffect(() => {
@@ -233,20 +217,6 @@ export default function App() {
       setLoading(false);
     }, 350);
     return () => clearTimeout(timer);
-  }, []);
-
-  // Language Switcher Handler
-  const handleToggleLanguage = useCallback(() => {
-    setLanguage((prev) => {
-      const next: Language = prev === 'en' ? 'bn' : 'en';
-      try {
-        localStorage.setItem(LANGUAGE_STORAGE_KEY, next);
-      } catch {
-        // ignore
-      }
-      trackEvent('MASTER_LANGUAGE_TOGGLE', { language: next });
-      return next;
-    });
   }, []);
 
   // Ambient Sound Toggle Handler
@@ -277,7 +247,7 @@ export default function App() {
       }
       setActiveTab('ecosystem');
     },
-    [sections, setActiveTab]
+    [sections, setActiveTab, setCurrentSectionIndex]
   );
 
   // Global Keyboard shortcuts
@@ -287,7 +257,6 @@ export default function App() {
         return;
       }
 
-      // Cmd+K or Ctrl+K or / opens Command Palette
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setIsCommandPaletteOpen((prev) => !prev);
@@ -406,7 +375,6 @@ export default function App() {
     setActiveTab('tasks-hub');
   };
 
-  // Section tasks counts
   const sectionTasksCount = useMemo(() => {
     const counts: Record<string, number> = {};
     tasks.forEach((tItem) => {
@@ -429,32 +397,36 @@ export default function App() {
   const activeGradeObj = GRADES.find((g) => g.id === currentGrade);
   const currentSection = sections[currentSectionIndex] || sections[0];
   const activeAccentColor =
-    activeTab === 'home'
-      ? '#E50914'
-      : activeTab === 'handfilm'
-      ? '#e11d48'
-      : currentSection?.accent || '#b14a26';
+    activeTab === 'home' || activeTab === 'handfilm' || activeTab === 'rawx-showcase'
+      ? palette.accent
+      : currentSection?.accent || palette.accent;
 
   return (
     <div
-      className={`min-h-screen bg-[#0A0B0D] text-[#f3efe6] relative selection:bg-[#E50914] selection:text-white ${
-        activeGradeObj?.cls || ''
+      className={`min-h-screen relative hh-theme-transition ${activeGradeObj?.cls || ''} ${
+        language === 'bn' ? 'bangla-text' : ''
       }`}
+      style={{
+        backgroundColor: 'var(--hh-bg)',
+        color: 'var(--hh-text)',
+      }}
     >
-      {/* Background Film Grain */}
-      <GrainCanvas />
+      {/* Background Film Grain (subtle in dark mode) */}
+      {isDark && <GrainCanvas />}
 
-      {/* GPU Ambient Shader Canvas */}
-      <AmbientShaderCanvas
-        accentColor={activeAccentColor}
-        portalId={
-          activeTab === 'home'
-            ? 'home'
-            : activeTab === 'handfilm'
-            ? 'studio'
-            : currentSection?.id || 'd2c'
-        }
-      />
+      {/* GPU Ambient Shader Canvas (subtle ambient glow in dark mode) */}
+      {isDark && (
+        <AmbientShaderCanvas
+          accentColor={activeAccentColor}
+          portalId={
+            activeTab === 'home'
+              ? 'home'
+              : activeTab === 'handfilm'
+              ? 'studio'
+              : currentSection?.id || 'd2c'
+          }
+        />
+      )}
 
       {/* Custom Crosshair Desktop Cursor */}
       <CustomCursor label={cursorLabel} />
@@ -462,19 +434,23 @@ export default function App() {
       {/* Initial Page Loader */}
       <div
         id="loader"
-        className={`fixed inset-0 z-[200] bg-[#0A0B0D] flex flex-col items-center justify-center gap-4 transition-opacity duration-500 ${
+        className={`fixed inset-0 z-[200] flex flex-col items-center justify-center gap-4 transition-opacity duration-500 ${
           loading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
+        style={{ backgroundColor: 'var(--hh-bg)', color: 'var(--hh-text)' }}
       >
-        <div className="text-sm tracking-[0.3em] uppercase text-[#f3efe6]/80 font-mono flex items-center gap-2">
+        <div className="text-sm tracking-[0.3em] uppercase font-mono flex items-center gap-2 opacity-85">
           <b>{t.brand.name}</b> — {t.brand.tagline}
         </div>
-        <div className="w-48 h-[1px] bg-[#f3efe6]/20 relative overflow-hidden">
-          <div className="absolute left-0 top-0 h-full w-full bg-[#E50914] animate-[load_0.8s_ease_forwards]" />
+        <div className="w-48 h-[1px] relative overflow-hidden" style={{ backgroundColor: 'var(--hh-border)' }}>
+          <div
+            className="absolute left-0 top-0 h-full w-full animate-[load_0.8s_ease_forwards]"
+            style={{ backgroundColor: palette.accent }}
+          />
         </div>
       </div>
 
-      {/* Top Universal Master Header (3-Tab Hardware Switcher: HOME | APPS | SLIDERS) */}
+      {/* Top Universal Master Header */}
       <MasterHeader
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -492,15 +468,15 @@ export default function App() {
         isSoundEnabled={isSoundEnabled}
         onToggleSound={handleToggleSound}
         language={language}
-        onToggleLanguage={handleToggleLanguage}
+        onSelectLanguage={handleSelectLanguage}
         canInstallPwa={canInstallPwa}
         onPromptInstall={promptPwaInstall}
         t={t}
       />
 
-      {/* Non-Destructive Zero-Latency 3-Tab Shell (Keep-Alive Mounted Views) */}
+      {/* Non-Destructive Zero-Latency Keep-Alive Views */}
       <main className="relative z-10">
-        {/* TAB 1: HOME — Tech-First Enterprise Landing (Default First Screen) */}
+        {/* TAB 1: HOME — Dynamic Enterprise OS */}
         <div
           id="panel-home"
           className={activeTab === 'home' ? 'block' : 'hidden'}
@@ -515,20 +491,21 @@ export default function App() {
             onOpenSyncModal={() => setIsSyncModalOpen(true)}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
             onSetCursorLabel={setCursorLabel}
+            language={language}
             t={t}
           />
         </div>
 
-        {/* TAB 2: HANDFILM — CapCut-Grade Product & AI Model Showcase Hub */}
+        {/* TAB 2: HANDFILM — CapCut-Inspired Airy Creator Studio */}
         <div
           id="panel-handfilm"
           className={activeTab === 'handfilm' ? 'block' : 'hidden'}
           aria-hidden={activeTab !== 'handfilm'}
         >
-          <HandFilmHubView onSetCursorLabel={setCursorLabel} />
+          <HandFilmHubView onSetCursorLabel={setCursorLabel} language={language} t={t} />
         </div>
 
-        {/* TAB 2: APPS — Existing 24-Section Ultra-Fast Stage Slider Engine (100% Preserved) */}
+        {/* TAB 4: APPS — Existing 24-Section Ultra-Fast Stage Slider Engine */}
         <div
           id="panel-apps"
           className={activeTab === 'ecosystem' ? 'block' : 'hidden'}
@@ -549,7 +526,7 @@ export default function App() {
           />
         </div>
 
-        {/* TAB 3: RAWx — Flagship Brand Storefront & 19-Drop Lookbook Studio (All 19 Slider Engines Preserved) */}
+        {/* TAB 3: RAWx — Brutalist Industrial Luxury Storefront & 19 Slider Engines */}
         <div
           id="panel-sliders"
           className={activeTab === 'rawx-showcase' ? 'block' : 'hidden'}
@@ -561,6 +538,8 @@ export default function App() {
             targetDropId={targetRawxDropId}
             onBackToEcosystem={() => setActiveTab('ecosystem')}
             isActiveTab={activeTab === 'rawx-showcase'}
+            language={language}
+            t={t}
             onOpenLightbox={(items, startIndex) => {
               setLightboxState({
                 isOpen: true,
@@ -624,7 +603,9 @@ export default function App() {
         onToggleSound={handleToggleSound}
         isSoundEnabled={isSoundEnabled}
         language={language}
-        onToggleLanguage={handleToggleLanguage}
+        onSelectLanguage={handleSelectLanguage}
+        colorMode={colorMode}
+        onToggleTheme={toggleColorMode}
         onCycleGrade={cycleGrade}
         onOpenSyncModal={() => setIsSyncModalOpen(true)}
         onOpenSpeedConsole={() => setIsConsoleOpen(true)}
@@ -695,3 +676,76 @@ export default function App() {
     </div>
   );
 }
+
+export default function App() {
+  const [sections, setSections] = useState<SectionItem[]>(INITIAL_SECTIONS);
+  const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_TASKS);
+
+  const initialRoute = useMemo(
+    () => getInitialRouteFromUrl(INITIAL_SECTIONS.map((s) => s.id)),
+    []
+  );
+
+  const [activeTab, setActiveTabState] = useState<ActiveTab>(initialRoute.tab);
+  const [targetRawxDropId, setTargetRawxDropId] = useState<string | null>(initialRoute.rawxDropId);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(() => {
+    if (initialRoute.portalId) {
+      const idx = INITIAL_SECTIONS.findIndex(
+        (s) => s.id.toLowerCase() === initialRoute.portalId!.toLowerCase()
+      );
+      if (idx !== -1) return idx;
+    }
+    return 0;
+  });
+
+  const setActiveTab = useCallback((nextTab: ActiveTab) => {
+    setActiveTabState(nextTab);
+    if (nextTab !== 'rawx-showcase') {
+      setTargetRawxDropId(null);
+    }
+    if (
+      typeof window !== 'undefined' &&
+      (nextTab === 'home' || nextTab === 'handfilm' || nextTab === 'rawx-showcase' || nextTab === 'tasks-hub')
+    ) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, []);
+
+  // Listen for browser hashchange / deep-link navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const resolved = getInitialRouteFromUrl(sections.map((s) => s.id));
+      setActiveTabState(resolved.tab);
+      setTargetRawxDropId(resolved.rawxDropId);
+      if (resolved.portalId) {
+        const idx = sections.findIndex(
+          (s) => s.id.toLowerCase() === resolved.portalId!.toLowerCase()
+        );
+        if (idx !== -1) {
+          setCurrentSectionIndex(idx);
+        }
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [sections]);
+
+  return (
+    <ThemeProvider activeTab={activeTab}>
+      <AppShell
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        targetRawxDropId={targetRawxDropId}
+        sections={sections}
+        setSections={setSections}
+        tasks={tasks}
+        setTasks={setTasks}
+        currentSectionIndex={currentSectionIndex}
+        setCurrentSectionIndex={setCurrentSectionIndex}
+      />
+    </ThemeProvider>
+  );
+}
+// END OF FILE: src/App.tsx
+

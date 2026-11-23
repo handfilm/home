@@ -1,8 +1,9 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --ink: #0e0d0b;
-  --ink-2: #141310;
+  --ink: #09090b;
+  --ink-2: #121216;
   --paper: #f3efe6;
   --paper-dim: rgba(243, 239, 230, 0.62);
   --paper-faint: rgba(243, 239, 230, 0.15);
@@ -28,19 +29,171 @@
   --rx-hot: #ff4d1a;
   --rx-ease: cubic-bezier(0.77, 0, 0.18, 1);
   --rx-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Master OS Multi-Theme Tokens (Default: HOME Dark) */
+  --hh-bg: #09090b;
+  --hh-surface: #121216;
+  --hh-surface-2: #191920;
+  --hh-accent: #e11d48;
+  --hh-accent-2: #f59e0b;
+  --hh-accent-ink: #ffffff;
+  --hh-text: #f4f4f5;
+  --hh-muted: #a1a1aa;
+  --hh-border: rgba(244, 244, 245, 0.12);
+  --hh-header-bg: rgba(9, 9, 11, 0.88);
+  --hh-glass-bg: rgba(18, 18, 22, 0.86);
+  --hh-card-shadow: 0 18px 42px rgba(0, 0, 0, 0.45);
+  --hh-grid-line: rgba(244, 244, 245, 0.06);
+}
+
+/* 1. HOME — Dynamic Enterprise OS */
+html[data-theme="dark"][data-tab="home"] {
+  --hh-bg: #09090b;
+  --hh-surface: #121216;
+  --hh-surface-2: #1a1a22;
+  --hh-accent: #e11d48;
+  --hh-accent-2: #f59e0b;
+  --hh-accent-ink: #ffffff;
+  --hh-text: #f4f4f5;
+  --hh-muted: #a1a1aa;
+  --hh-border: rgba(244, 244, 245, 0.12);
+  --hh-header-bg: rgba(9, 9, 11, 0.90);
+  --hh-glass-bg: rgba(18, 18, 22, 0.88);
+  --hh-card-shadow: 0 18px 46px rgba(0, 0, 0, 0.5);
+  --hh-grid-line: rgba(244, 244, 245, 0.055);
+}
+
+html[data-theme="light"][data-tab="home"] {
+  --hh-bg: #fafafa;
+  --hh-surface: #ffffff;
+  --hh-surface-2: #f1f5f9;
+  --hh-accent: #be123c;
+  --hh-accent-2: #d97706;
+  --hh-accent-ink: #ffffff;
+  --hh-text: #0f172a;
+  --hh-muted: #475569;
+  --hh-border: rgba(15, 23, 42, 0.12);
+  --hh-header-bg: rgba(250, 250, 250, 0.92);
+  --hh-glass-bg: rgba(255, 255, 255, 0.90);
+  --hh-card-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  --hh-grid-line: rgba(15, 23, 42, 0.05);
+}
+
+/* 2. HANDFILM — CapCut-Inspired Airy Creator Studio */
+html[data-theme="dark"][data-tab="handfilm"] {
+  --hh-bg: #0a0c10;
+  --hh-surface: #131720;
+  --hh-surface-2: #1b2130;
+  --hh-accent: #06b6d4;
+  --hh-accent-2: #8b5cf6;
+  --hh-accent-ink: #041218;
+  --hh-text: #f8fafc;
+  --hh-muted: #94a3b8;
+  --hh-border: rgba(248, 250, 252, 0.12);
+  --hh-header-bg: rgba(10, 12, 16, 0.90);
+  --hh-glass-bg: rgba(19, 23, 32, 0.88);
+  --hh-card-shadow: 0 20px 44px rgba(0, 0, 0, 0.52);
+  --hh-grid-line: rgba(6, 182, 212, 0.06);
+}
+
+html[data-theme="light"][data-tab="handfilm"] {
+  --hh-bg: #ffffff;
+  --hh-surface: #f4f6f9;
+  --hh-surface-2: #e9eef5;
+  --hh-accent: #0284c7;
+  --hh-accent-2: #7c3aed;
+  --hh-accent-ink: #ffffff;
+  --hh-text: #111827;
+  --hh-muted: #4b5563;
+  --hh-border: rgba(17, 24, 39, 0.10);
+  --hh-header-bg: rgba(255, 255, 255, 0.92);
+  --hh-glass-bg: rgba(244, 246, 249, 0.92);
+  --hh-card-shadow: 0 18px 40px rgba(17, 24, 39, 0.07);
+  --hh-grid-line: rgba(2, 132, 199, 0.05);
+}
+
+/* 3. RAWx — Brutalist Industrial Luxury & Craft */
+html[data-theme="dark"][data-tab="rawx"] {
+  --hh-bg: #0c0b0a;
+  --hh-surface: #171513;
+  --hh-surface-2: #221f1c;
+  --hh-accent: #d97706;
+  --hh-accent-2: #a1a1aa;
+  --hh-accent-ink: #0c0b0a;
+  --hh-text: #f4f0e8;
+  --hh-muted: #a1a1aa;
+  --hh-border: rgba(244, 240, 232, 0.14);
+  --hh-header-bg: rgba(12, 11, 10, 0.92);
+  --hh-glass-bg: rgba(23, 21, 19, 0.90);
+  --hh-card-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  --hh-grid-line: rgba(217, 119, 6, 0.05);
+}
+
+html[data-theme="light"][data-tab="rawx"] {
+  --hh-bg: #f5f2eb;
+  --hh-surface: #eae5d9;
+  --hh-surface-2: #dfd8c8;
+  --hh-accent: #b45309;
+  --hh-accent-2: #292524;
+  --hh-accent-ink: #ffffff;
+  --hh-text: #292524;
+  --hh-muted: #57534e;
+  --hh-border: rgba(41, 37, 36, 0.16);
+  --hh-header-bg: rgba(245, 242, 235, 0.93);
+  --hh-glass-bg: rgba(234, 229, 217, 0.92);
+  --hh-card-shadow: 0 16px 38px rgba(41, 37, 36, 0.09);
+  --hh-grid-line: rgba(41, 37, 36, 0.055);
+}
+
+/* 4. APPS — Clean Ecosystem Matrix */
+html[data-theme="dark"][data-tab="apps"] {
+  --hh-bg: #09090b;
+  --hh-surface: #121216;
+  --hh-surface-2: #18181f;
+  --hh-accent: #10b981;
+  --hh-accent-2: #f59e0b;
+  --hh-accent-ink: #052e16;
+  --hh-text: #f3efe6;
+  --hh-muted: #a1a1aa;
+  --hh-border: rgba(243, 239, 230, 0.14);
+  --hh-header-bg: rgba(9, 9, 11, 0.90);
+  --hh-glass-bg: rgba(18, 18, 22, 0.88);
+  --hh-card-shadow: 0 18px 42px rgba(0, 0, 0, 0.48);
+  --hh-grid-line: rgba(16, 185, 129, 0.05);
+}
+
+html[data-theme="light"][data-tab="apps"] {
+  --hh-bg: #fafafa;
+  --hh-surface: #ffffff;
+  --hh-surface-2: #f1f5f9;
+  --hh-accent: #059669;
+  --hh-accent-2: #0f172a;
+  --hh-accent-ink: #ffffff;
+  --hh-text: #0f172a;
+  --hh-muted: #475569;
+  --hh-border: rgba(15, 23, 42, 0.12);
+  --hh-header-bg: rgba(250, 250, 250, 0.92);
+  --hh-glass-bg: rgba(255, 255, 255, 0.92);
+  --hh-card-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  --hh-grid-line: rgba(5, 150, 105, 0.05);
 }
 
 body {
-  background-color: var(--ink);
-  color: var(--paper);
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--hh-bg);
+  color: var(--hh-text);
+  font-family: 'Space Grotesk', 'Inter', 'Noto Sans Devanagari', 'Noto Sans SC', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 250ms ease, color 250ms ease;
+}
+
+.hh-theme-transition {
+  transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--ink);
+  background: var(--hh-accent);
+  color: var(--hh-accent-ink);
 }
 
 .mono {
@@ -65,18 +218,195 @@ body {
 }
 
 .font-inter {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', 'Noto Sans Devanagari', 'Noto Sans SC', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Bangla Typography Lock: preserve natural conjunct ligatures & kerning */
 .bangla-text,
 [lang="bn"],
-:lang(bn) {
+:lang(bn),
+html[lang="bn"] * {
   font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
   letter-spacing: 0 !important;
   font-kerning: normal;
   font-variant-ligatures: normal;
   font-feature-settings: "kern" 1, "liga" 1, "clig" 1;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ANIMATED CUSTOM BRAND TAB SVG ICONS (GPU-ACCELERATED)
+════════════════════════════════════════════════════════════════ */
+
+@keyframes hh-core-heartbeat {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.16); opacity: 0.85; }
+}
+
+@keyframes hh-iris-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes hh-prism-shimmer {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.18); opacity: 0.65; }
+}
+
+@keyframes hh-rawx-edge-glow {
+  0%, 100% { filter: drop-shadow(0 0 0px currentColor); }
+  50% { filter: drop-shadow(0 0 6px currentColor); }
+}
+
+@keyframes hh-matrix-telemetry {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  25% { opacity: 0.55; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+@keyframes hh-ambient-grid-shift {
+  0% { background-position: 0px 0px; }
+  100% { background-position: 72px 72px; }
+}
+
+@keyframes hh-stagger-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Icon structural defaults */
+.hh-icon-bracket-left,
+.hh-icon-bracket-right,
+.hh-icon-core-diamond,
+.hh-icon-iris,
+.hh-icon-prism,
+.hh-icon-rawx-wrap,
+.hh-icon-rawx-sheen,
+.hh-icon-block,
+.hh-icon-crossnode {
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform, opacity;
+  transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 220ms ease;
+}
+
+.hh-icon-rawx-sheen {
+  opacity: 0;
+  transform: translate(-10px, 10px);
+}
+
+/* Hover States via parent .group */
+.group:hover .hh-icon-bracket-left {
+  transform: translateX(-1.5px);
+}
+.group:hover .hh-icon-bracket-right {
+  transform: translateX(1.5px);
+}
+.group:hover .hh-icon-core-diamond {
+  transform: scale(1.18);
+}
+
+.group:hover .hh-icon-iris {
+  transform: rotate(60deg) scale(1.12);
+}
+.group:hover .hh-icon-prism {
+  transform: scale(1.16);
+}
+
+.group:hover .hh-icon-rawx-wrap {
+  transform: rotate(0deg) scale(1.15);
+}
+.hh-icon-rawx-wrap {
+  transform: rotate(-6deg);
+}
+.group:hover .hh-icon-rawx-sheen {
+  opacity: 0.9;
+  transform: translate(16px, -16px);
+  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease;
+}
+
+.group:hover .hh-icon-block-1 {
+  transform: scale(1.16) translate(-0.8px, -0.8px);
+  transition-delay: 0ms;
+}
+.group:hover .hh-icon-block-2 {
+  transform: scale(1.16) translate(0.8px, -0.8px);
+  transition-delay: 60ms;
+}
+.group:hover .hh-icon-block-3 {
+  transform: scale(1.16) translate(-0.8px, 0.8px);
+  transition-delay: 120ms;
+}
+.group:hover .hh-icon-block-4 {
+  transform: scale(1.16) translate(0.8px, 0.8px);
+  transition-delay: 180ms;
+}
+.group:hover .hh-icon-crossnode {
+  transform: rotate(90deg);
+}
+
+/* Active Tab Continuous Animations */
+.hh-icon-core-active {
+  animation: hh-core-heartbeat 2.4s ease-in-out infinite;
+}
+.hh-icon-iris-active {
+  animation: hh-iris-spin 8s linear infinite;
+}
+.hh-icon-prism-active {
+  animation: hh-prism-shimmer 2.2s ease-in-out infinite;
+}
+.hh-icon-rawx-active {
+  transform: rotate(0deg);
+  animation: hh-rawx-edge-glow 2.2s ease-in-out infinite;
+}
+.hh-icon-block-active-1 { animation: hh-matrix-telemetry 2.6s ease-in-out 0s infinite; }
+.hh-icon-block-active-2 { animation: hh-matrix-telemetry 2.6s ease-in-out 0.3s infinite; }
+.hh-icon-block-active-3 { animation: hh-matrix-telemetry 2.6s ease-in-out 0.6s infinite; }
+.hh-icon-block-active-4 { animation: hh-matrix-telemetry 2.6s ease-in-out 0.9s infinite; }
+
+.hh-home-grid-motion {
+  animation: hh-ambient-grid-shift 18s linear infinite;
+}
+
+.hh-stagger-1 { animation: hh-stagger-enter 420ms var(--ease) both; }
+.hh-stagger-2 { animation: hh-stagger-enter 520ms var(--ease) 70ms both; }
+.hh-stagger-3 { animation: hh-stagger-enter 620ms var(--ease) 140ms both; }
+.hh-stagger-4 { animation: hh-stagger-enter 720ms var(--ease) 210ms both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hh-icon-core-active,
+  .hh-icon-iris-active,
+  .hh-icon-prism-active,
+  .hh-icon-rawx-active,
+  .hh-icon-block-active-1,
+  .hh-icon-block-active-2,
+  .hh-icon-block-active-3,
+  .hh-icon-block-active-4,
+  .hh-home-grid-motion,
+  .hh-stagger-1,
+  .hh-stagger-2,
+  .hh-stagger-3,
+  .hh-stagger-4 {
+    animation: none !important;
+  }
+  .group:hover .hh-icon-bracket-left,
+  .group:hover .hh-icon-bracket-right,
+  .group:hover .hh-icon-core-diamond,
+  .group:hover .hh-icon-iris,
+  .group:hover .hh-icon-prism,
+  .group:hover .hh-icon-rawx-wrap,
+  .group:hover .hh-icon-block-1,
+  .group:hover .hh-icon-block-2,
+  .group:hover .hh-icon-block-3,
+  .group:hover .hh-icon-block-4,
+  .group:hover .hh-icon-crossnode {
+    transform: none !important;
+  }
 }
 
 /* Textures */
@@ -505,14 +835,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--hh-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: var(--hh-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #444444;
+  background: var(--hh-muted);
 }

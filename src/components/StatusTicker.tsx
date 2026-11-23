@@ -54,9 +54,14 @@ export default function StatusTicker({
     >
       <div className="mx-auto max-w-7xl px-3 sm:px-8 pb-2">
         <div
-          className={`bg-[#12110e]/90 backdrop-blur-md border border-[#f3efe6]/15 rounded-lg shadow-xl overflow-hidden transition-all duration-300 ${
+          className={`backdrop-blur-md border rounded-lg shadow-xl overflow-hidden transition-all duration-300 hh-theme-transition ${
             isCollapsed ? 'py-1.5 px-3' : 'py-2 px-3 sm:px-4'
           }`}
+          style={{
+            backgroundColor: 'var(--hh-glass-bg)',
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-text)',
+          }}
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
@@ -67,7 +72,10 @@ export default function StatusTicker({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="text-[9.5px] uppercase font-bold text-[#c8b89a] hidden sm:inline">
+              <span
+                className="text-[9.5px] uppercase font-bold hidden sm:inline"
+                style={{ color: 'var(--hh-accent)' }}
+              >
                 {t.ticker.prefix}
               </span>
             </div>
@@ -84,30 +92,39 @@ export default function StatusTicker({
                 >
                   {currentItem.title}
                 </span>
-                <span className="text-[#f3efe6]/90 group-hover:text-[#f3efe6] transition-colors truncate font-medium">
+                <span
+                  className="transition-colors truncate font-medium"
+                  style={{ color: 'var(--hh-text)' }}
+                >
                   {currentItem.status}
                 </span>
-                <span className="text-[#c8b89a] opacity-0 group-hover:opacity-100 transition-opacity text-[9px] hidden md:inline">
+                <span
+                  className="opacity-0 group-hover:opacity-100 transition-opacity text-[9px] hidden md:inline"
+                  style={{ color: 'var(--hh-accent)' }}
+                >
                   → JUMP
                 </span>
               </div>
             )}
 
             {/* Right Controls */}
-            <div className="flex items-center gap-2 flex-shrink-0 text-[#f3efe6]/50">
+            <div
+              className="flex items-center gap-2 flex-shrink-0"
+              style={{ color: 'var(--hh-muted)' }}
+            >
               <button
                 onClick={() => setIsPaused((prev) => !prev)}
                 title={isPaused ? t.ticker.resume : t.ticker.pause}
-                className="p-1 hover:text-[#f3efe6] transition-colors cursor-pointer"
+                className="p-1 hover:opacity-100 opacity-80 transition-opacity cursor-pointer"
                 aria-label={isPaused ? 'Resume Ticker' : 'Pause Ticker'}
               >
-                {isPaused ? <Play className="w-3 h-3 text-amber-400" /> : <Pause className="w-3 h-3" />}
+                {isPaused ? <Play className="w-3 h-3 text-amber-500" /> : <Pause className="w-3 h-3" />}
               </button>
 
               <button
                 onClick={() => setIsCollapsed((prev) => !prev)}
                 title={isCollapsed ? 'Expand Ticker' : 'Collapse Ticker'}
-                className="p-1 hover:text-[#f3efe6] transition-colors cursor-pointer"
+                className="p-1 hover:opacity-100 opacity-80 transition-opacity cursor-pointer"
                 aria-label={isCollapsed ? 'Expand Ticker' : 'Collapse Ticker'}
               >
                 {isCollapsed ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}

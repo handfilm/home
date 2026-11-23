@@ -25,6 +25,7 @@ import { copyRawxDropShareLink } from '../services/deepLinkService';
 import { trackEvent } from '../services/analytics';
 import DynamicPhotoManagerModal from './DynamicPhotoManagerModal';
 import RawxProductDrawer from './rawx/RawxProductDrawer';
+import { Language, TRANSLATIONS, TranslationDictionary } from '../i18n/translations';
 import {
   Play,
   Pause,
@@ -41,6 +42,7 @@ import {
   Sparkles,
   Check,
   Tv,
+  ChevronDown,
 } from 'lucide-react';
 
 interface RawxShowcaseProps {
@@ -50,6 +52,8 @@ interface RawxShowcaseProps {
   targetDropId?: string | null;
   onBackToEcosystem?: () => void;
   isActiveTab?: boolean;
+  language?: Language;
+  t?: TranslationDictionary;
 }
 
 interface DropBlockHeaderProps {
@@ -63,6 +67,7 @@ interface DropBlockHeaderProps {
   onCopyLink: (dropId: string) => void;
   onToggleSave: (dropId: string) => void;
   onEditSection: (sectionKey: string) => void;
+  t: TranslationDictionary;
 }
 
 function DropBlockHeader({
@@ -76,127 +81,193 @@ function DropBlockHeader({
   onCopyLink,
   onToggleSave,
   onEditSection,
+  t,
 }: DropBlockHeaderProps) {
+  const [isDetailsPinned, setIsDetailsPinned] = useState(false);
+
   const storyboardRemixUrl = `https://storyboard.handsandhead.com/?tool=mood-pad&drop=${encodeURIComponent(
     dropMeta.dropId
   )}&lut=${encodeURIComponent(dropMeta.lutPreset)}`;
 
   return (
-    <div className="space-y-2.5 border-b border-[#1c1c1c] pb-3">
-      {/* Top Meta Row: Drop Code, Title, Material Pill, Price & Pre-Order Window */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
-        <div className="space-y-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 text-[10px] font-space-mono uppercase tracking-[0.2em]">
-            <span className="text-[#e11d48] font-bold">{dropMeta.dropCode}</span>
-            <span className="text-[#f4f0e8]/25">·</span>
-            <span className="text-[#C8A96A]">{dropMeta.collection}</span>
-            <span className="text-[#f4f0e8]/25">·</span>
-            <span className="text-[#f4f0e8]/55">{engineSpec}</span>
-          </div>
+    <div
+      className="group/drop rounded-2xl border p-4 sm:p-5 transition-all duration-300 ease-out hh-theme-transition"
+      style={{
+        backgroundColor: 'var(--hh-surface)',
+        borderColor: 'var(--hh-border)',
+        boxShadow: 'var(--hh-card-shadow)',
+      }}
+    >
+      {/* Minimalist Resting Header: Badge + Bold Title + Price + Quick Toggle */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
+          <span
+            className="px-2.5 py-1 rounded-md border font-space-mono text-[10px] font-bold uppercase tracking-wider shrink-0"
+            style={{
+              backgroundColor: 'var(--hh-bg)',
+              borderColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent)',
+            }}
+          >
+            {dropMeta.dropCode} · {dropMeta.collection}
+          </span>
 
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h2 className="font-bebas text-2xl sm:text-3xl tracking-wide text-white leading-none">
-              {dropMeta.title}
-            </h2>
-            <span className="px-2.5 py-0.5 rounded bg-[#141418] border border-[#C8A96A]/35 text-[10px] font-space-mono text-[#C8A96A] tracking-wider">
+          <h2
+            className="font-bebas text-2xl sm:text-3xl tracking-wide leading-none truncate"
+            style={{ color: 'var(--hh-text)' }}
+          >
+            {dropMeta.title}
+          </h2>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <span
+            className="font-bebas text-2xl tabular-nums leading-none"
+            style={{ color: 'var(--hh-text)' }}
+          >
+            {dropMeta.priceDisplay}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => onEditSection(editSectionKey)}
+            className="px-2.5 py-1 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors"
+            style={{
+              backgroundColor: 'var(--hh-bg)',
+              borderColor: 'var(--hh-border)',
+              color: 'var(--hh-accent)',
+            }}
+          >
+            <Camera className="w-3 h-3" />
+            <span className="hidden sm:inline">{t.rawx.editSection}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsDetailsPinned((prev) => !prev)}
+            aria-expanded={isDetailsPinned}
+            aria-label="Toggle drop details"
+            className="px-2.5 py-1 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors"
+            style={{
+              backgroundColor: isDetailsPinned ? 'var(--hh-accent)' : 'var(--hh-bg)',
+              borderColor: 'var(--hh-border)',
+              color: isDetailsPinned ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
+            }}
+          >
+            <span className="tabular-nums">{counterLabel}</span>
+            <ChevronDown className={`w-3 h-3 transition-transform ${isDetailsPinned ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Hover / Tap Smooth Reveal Glassmorphic Specs & Actions */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-out ${
+          isDetailsPinned
+            ? 'max-h-72 opacity-100 mt-3.5 pt-3.5 border-t'
+            : 'max-h-0 opacity-0 group-hover/drop:max-h-72 group-hover/drop:opacity-100 group-hover/drop:mt-3.5 group-hover/drop:pt-3.5 group-hover/drop:border-t'
+        }`}
+        style={{ borderColor: 'var(--hh-border)' }}
+      >
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-space-mono uppercase tracking-wider">
+            <span
+              className="px-2 py-0.5 rounded border"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
+            >
               {dropMeta.materialSpec}
             </span>
+            <span style={{ color: 'var(--hh-muted)' }}>{engineSpec}</span>
+            <span className="text-emerald-500 font-semibold">{dropMeta.preorderWindow}</span>
           </div>
 
-          <p className="font-inter text-xs text-[#f4f0e8]/65 max-w-3xl leading-relaxed">
+          <p className="font-inter text-xs leading-relaxed max-w-3xl" style={{ color: 'var(--hh-muted)' }}>
             {dropMeta.storyCaption}
             {dropMeta.banglaTagline ? (
-              <span lang="bn" className="bangla-text text-[#C8A96A]/85 ml-2">
+              <span lang="bn" className="bangla-text ml-2" style={{ color: 'var(--hh-accent)' }}>
                 · {dropMeta.banglaTagline}
               </span>
             ) : null}
           </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
-          <div className="text-left lg:text-right mr-1">
-            <span className="font-bebas text-2xl text-white tabular-nums block leading-none">
-              {dropMeta.priceDisplay}
-            </span>
-            <span className="text-[9px] font-space-mono uppercase tracking-wider text-emerald-400 block mt-0.5">
-              {dropMeta.preorderWindow}
-            </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onInspect(dropMeta.sectionKey, 0)}
+              className="px-3 py-1.5 rounded font-space-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
+              style={{
+                backgroundColor: 'var(--hh-accent)',
+                color: 'var(--hh-accent-ink)',
+              }}
+            >
+              <ShoppingBag className="w-3 h-3" />
+              <span>{t.rawx.inspectPreorder}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onCopyLink(dropMeta.dropId)}
+              className="px-2.5 py-1.5 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
+            >
+              {copiedDropId === dropMeta.dropId ? (
+                <>
+                  <Check className="w-3 h-3 text-emerald-500" />
+                  <span className="text-emerald-500">#{dropMeta.dropId}</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-3 h-3" style={{ color: 'var(--hh-accent)' }} />
+                  <span>{t.rawx.copyDropLink}</span>
+                </>
+              )}
+            </button>
+
+            <a
+              href={storyboardRemixUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                trackEvent('RAWX_STORYBOARD_REMIX', {
+                  dropId: dropMeta.dropId,
+                  lutPreset: dropMeta.lutPreset,
+                })
+              }
+              className="px-2.5 py-1.5 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
+            >
+              <Sparkles className="w-3 h-3" style={{ color: 'var(--hh-accent)' }} />
+              <span>{t.rawx.remixStoryboard}</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+
+            <button
+              type="button"
+              onClick={() => onToggleSave(dropMeta.dropId)}
+              aria-label={isSaved ? 'Remove from Saved Lookbook' : 'Save to Lookbook'}
+              className="px-2.5 py-1.5 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors"
+              style={{
+                backgroundColor: isSaved ? 'var(--hh-surface-2)' : 'var(--hh-bg)',
+                borderColor: isSaved ? 'var(--hh-accent)' : 'var(--hh-border)',
+                color: isSaved ? 'var(--hh-accent)' : 'var(--hh-text)',
+              }}
+            >
+              {isSaved ? <BookmarkCheck className="w-3 h-3" /> : <Bookmark className="w-3 h-3" />}
+              <span>{isSaved ? t.rawx.saved : t.rawx.save}</span>
+            </button>
           </div>
-        </div>
-      </div>
-
-      {/* Bottom Action Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <button
-            type="button"
-            onClick={() => onInspect(dropMeta.sectionKey, 0)}
-            className="px-3 py-1.5 rounded bg-[#e11d48] hover:bg-[#be123c] text-white font-space-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors shadow-[0_0_14px_rgba(225,29,72,0.28)]"
-          >
-            <ShoppingBag className="w-3 h-3" />
-            <span>Inspect Drop &amp; Pre-Order</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onCopyLink(dropMeta.dropId)}
-            className="px-2.5 py-1.5 rounded bg-[#141316] border border-[#f4f0e8]/15 hover:border-[#C8A96A]/60 text-[10px] font-space-mono uppercase tracking-wider text-[#f4f0e8]/80 hover:text-[#C8A96A] flex items-center gap-1.5 cursor-pointer transition-colors"
-          >
-            {copiedDropId === dropMeta.dropId ? (
-              <>
-                <Check className="w-3 h-3 text-emerald-400" />
-                <span className="text-emerald-300">Copied #{dropMeta.dropId}</span>
-              </>
-            ) : (
-              <>
-                <Share2 className="w-3 h-3" />
-                <span>Copy Drop Link</span>
-              </>
-            )}
-          </button>
-
-          <a
-            href={storyboardRemixUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() =>
-              trackEvent('RAWX_STORYBOARD_REMIX', {
-                dropId: dropMeta.dropId,
-                lutPreset: dropMeta.lutPreset,
-              })
-            }
-            className="px-2.5 py-1.5 rounded bg-[#141316] border border-[#f4f0e8]/15 hover:border-[#e11d48]/60 text-[10px] font-space-mono uppercase tracking-wider text-[#f4f0e8]/80 hover:text-[#fda4af] flex items-center gap-1.5 transition-colors"
-          >
-            <Sparkles className="w-3 h-3 text-[#e11d48]" />
-            <span>Remix Look in Storyboard</span>
-            <ExternalLink className="w-2.5 h-2.5" />
-          </a>
-
-          <button
-            type="button"
-            onClick={() => onToggleSave(dropMeta.dropId)}
-            aria-label={isSaved ? 'Remove from Saved Lookbook' : 'Save to Lookbook'}
-            className={`px-2.5 py-1.5 rounded border text-[10px] font-space-mono uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors ${
-              isSaved
-                ? 'bg-[#C8A96A]/15 border-[#C8A96A] text-[#C8A96A] font-bold'
-                : 'bg-[#141316] border-[#f4f0e8]/15 text-[#f4f0e8]/65 hover:text-[#C8A96A]'
-            }`}
-          >
-            {isSaved ? <BookmarkCheck className="w-3 h-3" /> : <Bookmark className="w-3 h-3" />}
-            <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save'}</span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3 text-[10px] font-space-mono uppercase tracking-wider">
-          <button
-            type="button"
-            onClick={() => onEditSection(editSectionKey)}
-            className="text-[#C8A96A] hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <Camera className="w-3 h-3" />
-            <span>Edit Section</span>
-          </button>
-          <span className="text-[#C8A96A] tabular-nums">{counterLabel}</span>
         </div>
       </div>
     </div>
@@ -210,6 +281,8 @@ export default function RawxShowcase({
   targetDropId = null,
   onBackToEcosystem,
   isActiveTab = true,
+  language = 'en',
+  t = TRANSLATIONS.en,
 }: RawxShowcaseProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -703,19 +776,31 @@ export default function RawxShowcase({
   return (
     <div
       ref={rootRef}
-      className={`w-full bg-[#09090b] text-[#f4f0e8] font-mono pb-32 space-y-12 overflow-y-auto ${
-        isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-4' : 'mt-[65px]'
-      }`}
+      className={`w-full font-mono pb-32 space-y-12 overflow-y-auto hh-theme-transition ${
+        language === 'bn' ? 'bangla-text' : ''
+      } ${isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-4' : 'mt-[65px]'}`}
+      style={{
+        backgroundColor: 'var(--hh-bg)',
+        color: 'var(--hh-text)',
+      }}
     >
       {/* Ticker Tape */}
-      <div className="w-full overflow-hidden h-8 bg-[#050505] border-y border-[#1c1c1c] flex items-center">
+      <div
+        className="w-full overflow-hidden h-8 border-y flex items-center"
+        style={{
+          backgroundColor: 'var(--hh-surface)',
+          borderColor: 'var(--hh-border)',
+        }}
+      >
         <div className="flex gap-0 whitespace-nowrap animate-tape text-[9px] tracking-[0.25em] uppercase">
           {TICKER_ITEMS.map((item, idx) => (
             <span
               key={idx}
-              className={`px-8 border-r border-[#1c1c1c] ${
-                item.hot ? 'text-[#c8b89a] font-bold' : 'text-[#888888]'
-              }`}
+              className={`px-8 border-r ${item.hot ? 'font-bold' : ''}`}
+              style={{
+                borderColor: 'var(--hh-border)',
+                color: item.hot ? 'var(--hh-accent)' : 'var(--hh-muted)',
+              }}
             >
               {item.text}
             </span>
@@ -725,25 +810,43 @@ export default function RawxShowcase({
 
       {/* A. RAWx Brand Command Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-2">
-        <div className="rounded-xl bg-[#0f0f13] border border-[#f4f0e8]/12 p-5 sm:p-7 flex flex-col xl:flex-row xl:items-center justify-between gap-6 shadow-2xl">
+        <div
+          className="rounded-2xl border p-5 sm:p-7 flex flex-col xl:flex-row xl:items-center justify-between gap-6 hh-theme-transition"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+            boxShadow: 'var(--hh-card-shadow)',
+          }}
+        >
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2.5 text-[10px] font-space-mono uppercase tracking-[0.2em]">
-              <span className="px-2.5 py-0.5 rounded bg-[#e11d48]/15 border border-[#e11d48]/45 text-[#fda4af] font-bold">
-                POD &amp; JIT Pre-Order Studio
+              <span
+                className="px-2.5 py-0.5 rounded border font-bold"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-accent)',
+                  color: 'var(--hh-accent)',
+                }}
+              >
+                {t.rawx.studioBadge}
               </span>
-              <span className="text-[#C8A96A]">19 Interactive Flagship Drops</span>
-              <span className="text-[#f4f0e8]/30">·</span>
-              <span className="text-[#f4f0e8]/60">Dhaka Atelier</span>
+              <span style={{ color: 'var(--hh-accent)' }}>19 Interactive Sliders</span>
+              <span style={{ color: 'var(--hh-border)' }}>·</span>
+              <span style={{ color: 'var(--hh-muted)' }}>{t.rawx.hoverHint}</span>
             </div>
 
-            <h1 className="font-bebas text-3xl sm:text-5xl tracking-wide text-white leading-none">
-              <span className="normal-case text-[#e11d48]">RAWx</span> — HIDE, STEEL &amp; HEAVYWEIGHT APPAREL
+            <h1
+              className="font-bebas text-3xl sm:text-5xl tracking-wide leading-none"
+              style={{ color: 'var(--hh-text)' }}
+            >
+              <span className="normal-case" style={{ color: 'var(--hh-accent)' }}>
+                RAWx
+              </span>{' '}
+              — {t.rawx.heroTitle.replace(/^RAWx\s*—\s*/i, '')}
             </h1>
 
-            <p className="font-inter text-xs sm:text-sm text-[#f4f0e8]/70 leading-relaxed">
-              Standalone <span className="normal-case font-semibold text-white">RAWx</span> brand storefront &amp;
-              lookbook engine combining small-batch 320 GSM combed cotton streetwear, full-grain cowhide, 316L surgical
-              steel hardware, Goodyear-welted footwear, and all 19 real-time WebGL slider studios.
+            <p className="font-inter text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
+              {t.rawx.heroSubtitle}
             </p>
           </div>
 
@@ -756,106 +859,139 @@ export default function RawxShowcase({
                   e.preventDefault();
                   onBackToEcosystem();
                 }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded bg-[#18181d] border border-[#f4f0e8]/20 hover:border-[#f4f0e8]/55 text-[11px] font-space-mono text-[#f4f0e8] tracking-wider uppercase transition-all cursor-pointer font-bold whitespace-nowrap"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider uppercase transition-all cursor-pointer font-bold whitespace-nowrap"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               >
-                <span>← Ecosystem Apps</span>
+                <span>{t.rawx.backToApps}</span>
               </a>
             )}
 
             <button
               type="button"
               onClick={() => setIsSavedTrayOpen((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded border text-[11px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap ${
-                isSavedTrayOpen || savedDropIds.length > 0
-                  ? 'bg-[#C8A96A]/15 border-[#C8A96A]/60 text-[#C8A96A] font-bold'
-                  : 'bg-[#18181d] border-[#f4f0e8]/15 text-[#f4f0e8]/75 hover:border-[#f4f0e8]/40'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap font-semibold"
+              style={{
+                backgroundColor: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-surface-2)' : 'var(--hh-bg)',
+                borderColor: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-accent)' : 'var(--hh-border)',
+                color: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-accent)' : 'var(--hh-text)',
+              }}
             >
               <BookmarkCheck className="w-3.5 h-3.5" />
-              <span>Saved Lookbook ({savedDropIds.length})</span>
+              <span>
+                {t.rawx.savedLookbook} ({savedDropIds.length})
+              </span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsAutoplayActive((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded border text-[11px] font-space-mono tracking-wider transition-all cursor-pointer whitespace-nowrap ${
-                isAutoplayActive
-                  ? 'bg-emerald-950/40 border-emerald-500/35 text-emerald-300 hover:bg-emerald-900/50'
-                  : 'bg-amber-950/40 border-amber-500/35 text-amber-300 hover:bg-amber-900/50'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider transition-all cursor-pointer whitespace-nowrap font-semibold"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: isAutoplayActive ? '#10b981' : 'var(--hh-accent)',
+                color: isAutoplayActive ? '#10b981' : 'var(--hh-accent)',
+              }}
             >
               {isAutoplayActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span>{isAutoplayActive ? 'AUTOPLAY' : 'PAUSED'}</span>
+              <span>{isAutoplayActive ? t.rawx.autoplayOn : t.rawx.autoplayPaused}</span>
             </button>
 
             <button
               type="button"
               onClick={handleToggleTheaterMode}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded border text-[11px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap ${
-                isTheaterMode
-                  ? 'bg-[#e11d48] border-[#e11d48] text-white font-bold shadow-[0_0_18px_rgba(225,29,72,0.4)]'
-                  : 'bg-[#18181d] border-[#f4f0e8]/20 text-[#f4f0e8]/85 hover:border-[#e11d48]/60'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap"
+              style={{
+                backgroundColor: isTheaterMode ? 'var(--hh-accent)' : 'var(--hh-bg)',
+                borderColor: isTheaterMode ? 'var(--hh-accent)' : 'var(--hh-border)',
+                color: isTheaterMode ? 'var(--hh-accent-ink)' : 'var(--hh-text)',
+              }}
             >
-              {isTheaterMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Tv className="w-3.5 h-3.5 text-[#e11d48]" />}
-              <span>{isTheaterMode ? 'Exit Theater' : 'Cinema Theater Mode'}</span>
+              {isTheaterMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Tv className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />}
+              <span>{isTheaterMode ? t.rawx.theaterExit : t.rawx.theaterEnter}</span>
             </button>
 
             <button
               type="button"
               onClick={() => openPhotoManagerFor('s1')}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded bg-[#C8A96A] text-black font-space-mono font-bold text-[11px] tracking-wider uppercase hover:bg-white transition-all cursor-pointer shadow-md whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-space-mono font-bold text-[11px] tracking-wider uppercase transition-all cursor-pointer shadow-md whitespace-nowrap"
+              style={{
+                backgroundColor: 'var(--hh-accent)',
+                color: 'var(--hh-accent-ink)',
+              }}
             >
               <Camera className="w-3.5 h-3.5" />
-              <span>Customize Photos / Drops</span>
+              <span>{t.rawx.customizePhotos}</span>
             </button>
 
             <button
               type="button"
               onClick={() => onOpenLightbox(allCurrentLightboxItems, 0)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded bg-[#18181d] border border-[#f4f0e8]/15 hover:border-[#f4f0e8]/45 text-[11px] font-space-mono uppercase text-[#C8A96A] cursor-pointer whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[11px] font-space-mono uppercase cursor-pointer whitespace-nowrap"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Cinema Lightbox</span>
+              <Maximize2 className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
+              <span className="hidden sm:inline">{t.rawx.lightbox}</span>
             </button>
           </div>
         </div>
 
         {/* Saved Lookbook Expandable Strip */}
         {isSavedTrayOpen && (
-          <div className="mt-3 p-4 rounded-xl bg-[#111116] border border-[#C8A96A]/40 space-y-3">
+          <div
+            className="mt-3 p-4 rounded-xl border space-y-3"
+            style={{
+              backgroundColor: 'var(--hh-surface)',
+              borderColor: 'var(--hh-accent)',
+            }}
+          >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-space-mono uppercase tracking-[0.18em] text-[#C8A96A] font-bold">
-                Saved <span className="normal-case">RAWx</span> Lookbook ({savedDropList.length} Drops)
+              <span
+                className="text-[11px] font-space-mono uppercase tracking-[0.18em] font-bold"
+                style={{ color: 'var(--hh-accent)' }}
+              >
+                {t.rawx.savedLookbook} · <span className="normal-case">RAWx</span> ({savedDropList.length})
               </span>
               <button
                 type="button"
                 onClick={() => setIsSavedTrayOpen(false)}
-                className="text-xs text-[#f4f0e8]/60 hover:text-white cursor-pointer"
+                className="text-xs cursor-pointer"
+                style={{ color: 'var(--hh-muted)' }}
               >
-                Close
+                {t.actions.close}
               </button>
             </div>
             {savedDropList.length === 0 ? (
-              <p className="text-xs font-inter text-[#f4f0e8]/55">
-                No drops bookmarked yet. Click &quot;Save&quot; on any drop or inside the Product Spec Drawer to build your curated lookbook.
+              <p className="text-xs font-inter" style={{ color: 'var(--hh-muted)' }}>
+                No drops bookmarked yet. Click &quot;{t.rawx.save}&quot; on any drop card.
               </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                 {savedDropList.map((item) => (
                   <div
                     key={item.dropId}
-                    className="p-3 rounded-lg bg-[#18181e] border border-[#f4f0e8]/12 flex items-center justify-between gap-2"
+                    className="p-3 rounded-lg border flex items-center justify-between gap-2"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                    }}
                   >
                     <button
                       type="button"
                       onClick={() => handleInspectDrop(item.sectionKey, 0)}
                       className="text-left min-w-0 cursor-pointer group"
                     >
-                      <span className="text-[9px] font-space-mono text-[#e11d48] uppercase block">
+                      <span className="text-[9px] font-space-mono uppercase block" style={{ color: 'var(--hh-accent)' }}>
                         {item.dropCode} · {item.priceDisplay}
                       </span>
-                      <span className="text-xs font-inter text-white group-hover:text-[#C8A96A] truncate block">
+                      <span className="text-xs font-inter truncate block" style={{ color: 'var(--hh-text)' }}>
                         {item.title}
                       </span>
                     </button>
@@ -863,7 +999,8 @@ export default function RawxShowcase({
                       type="button"
                       onClick={() => handleToggleSaveDrop(item.dropId)}
                       aria-label={`Remove ${item.title} from saved lookbook`}
-                      className="p-1 text-[#f4f0e8]/45 hover:text-red-400 cursor-pointer shrink-0"
+                      className="p-1 hover:text-red-500 cursor-pointer shrink-0"
+                      style={{ color: 'var(--hh-muted)' }}
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -879,7 +1016,11 @@ export default function RawxShowcase({
       <div
         className={`sticky ${
           isTheaterMode ? 'top-0' : 'top-[60px]'
-        } z-40 bg-[#09090b]/95 backdrop-blur-md border-y border-[#1c1c1c] px-4 sm:px-8 py-3 shadow-xl`}
+        } z-40 backdrop-blur-md border-y px-4 sm:px-8 py-3 shadow-xl hh-theme-transition`}
+        style={{
+          backgroundColor: 'var(--hh-header-bg)',
+          borderColor: 'var(--hh-border)',
+        }}
       >
         <div className="max-w-7xl mx-auto space-y-2.5">
           {/* Collection Filter Pills + Search */}
@@ -893,13 +1034,15 @@ export default function RawxShowcase({
                     key={cat}
                     type="button"
                     onClick={() => setSelectedCollection(cat)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded text-[10px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap ${
-                      active
-                        ? 'bg-[#e11d48] text-white font-bold shadow-[0_0_14px_rgba(225,29,72,0.3)]'
-                        : 'bg-[#141418] text-[#f4f0e8]/70 hover:text-white border border-[#f4f0e8]/12 hover:border-[#f4f0e8]/30'
-                    }`}
+                    className="flex-shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap border"
+                    style={{
+                      backgroundColor: active ? 'var(--hh-accent)' : 'var(--hh-surface)',
+                      borderColor: active ? 'var(--hh-accent)' : 'var(--hh-border)',
+                      color: active ? 'var(--hh-accent-ink)' : 'var(--hh-text)',
+                      fontWeight: active ? 700 : 500,
+                    }}
                   >
-                    {cat === 'ALL' ? `ALL DROPS (${count})` : `${cat} (${count})`}
+                    {cat === 'ALL' ? `${t.rawx.allDrops} (${count})` : `${cat} (${count})`}
                   </button>
                 );
               })}
@@ -907,20 +1050,29 @@ export default function RawxShowcase({
 
             {/* Live Search Bar */}
             <div className="relative w-full lg:w-80 shrink-0">
-              <Search className="w-3.5 h-3.5 text-[#C8A96A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search
+                className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: 'var(--hh-accent)' }}
+              />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Filter by drop name, code, or material..."
-                className="w-full bg-[#141418] border border-[#f4f0e8]/15 focus:border-[#C8A96A] rounded pl-8 pr-8 py-1.5 text-xs font-space-mono text-[#f4f0e8] placeholder-[#f4f0e8]/40 focus:outline-none"
+                placeholder={t.rawx.searchPlaceholder}
+                className="w-full border rounded-lg pl-8 pr-8 py-1.5 text-xs font-space-mono focus:outline-none"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   aria-label="Clear drop search"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#f4f0e8]/50 hover:text-white cursor-pointer"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"
+                  style={{ color: 'var(--hh-muted)' }}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -930,7 +1082,10 @@ export default function RawxShowcase({
 
           {/* S01-S19 Quick-Jump Bar */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            <span className="text-[9px] text-[#888888] tracking-widest uppercase flex-shrink-0 mr-1 hidden lg:inline">
+            <span
+              className="text-[9px] tracking-widest uppercase flex-shrink-0 mr-1 hidden lg:inline"
+              style={{ color: 'var(--hh-muted)' }}
+            >
               DROPS:
             </span>
             {RAWX_DROP_ORDER.map((dropKey) => {
@@ -943,13 +1098,14 @@ export default function RawxShowcase({
                   type="button"
                   title={`${meta.dropCode}: ${meta.title}`}
                   onClick={() => scrollToDropSection(dropKey)}
-                  className={`flex-shrink-0 px-2.5 py-1 rounded text-[9px] font-space-mono tracking-wider uppercase transition-all cursor-pointer tabular-nums ${
-                    isActive
-                      ? 'bg-[#C8A96A] text-black font-bold'
-                      : isVisible
-                      ? 'bg-[#141310] text-[#f4f0e8]/75 hover:text-white hover:bg-[#1f1e1a] border border-[#24242a]'
-                      : 'bg-[#0f0f12] text-[#f4f0e8]/30 border border-[#1a1a1f] hover:text-[#f4f0e8]/70'
-                  }`}
+                  className="flex-shrink-0 px-2.5 py-1 rounded text-[9px] font-space-mono tracking-wider uppercase transition-all cursor-pointer tabular-nums border"
+                  style={{
+                    backgroundColor: isActive ? 'var(--hh-accent)' : 'var(--hh-surface)',
+                    borderColor: isActive ? 'var(--hh-accent)' : 'var(--hh-border)',
+                    color: isActive ? 'var(--hh-accent-ink)' : isVisible ? 'var(--hh-text)' : 'var(--hh-muted)',
+                    opacity: isActive || isVisible ? 1 : 0.45,
+                    fontWeight: isActive ? 700 : 500,
+                  }}
                 >
                   {meta.dropId.toUpperCase()}
                 </button>
@@ -962,10 +1118,10 @@ export default function RawxShowcase({
       {/* Empty Search / Filter Fallback */}
       {visibleDropKeys.length === 0 && (
         <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-4">
-          <p className="font-bebas text-3xl text-white tracking-wide">
+          <p className="font-bebas text-3xl tracking-wide" style={{ color: 'var(--hh-text)' }}>
             No <span className="normal-case">RAWx</span> Drops Matched &quot;{searchQuery}&quot;
           </p>
-          <p className="font-inter text-xs text-[#f4f0e8]/60">
+          <p className="font-inter text-xs" style={{ color: 'var(--hh-muted)' }}>
             Try clearing your filter or searching by material (e.g. Cowhide, 316L, 320 GSM, Goodyear).
           </p>
           <button
@@ -974,7 +1130,11 @@ export default function RawxShowcase({
               setSelectedCollection('ALL');
               setSearchQuery('');
             }}
-            className="px-5 py-2.5 rounded bg-[#e11d48] text-white text-xs font-space-mono font-bold uppercase tracking-wider cursor-pointer"
+            className="px-5 py-2.5 rounded-lg text-xs font-space-mono font-bold uppercase tracking-wider cursor-pointer"
+            style={{
+              backgroundColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent-ink)',
+            }}
           >
             Show All 19 Drops
           </button>
@@ -997,6 +1157,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl group">
@@ -1099,6 +1260,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
@@ -1284,6 +1446,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[32/9] sm:aspect-[32/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -1344,6 +1507,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -1449,6 +1613,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -1590,6 +1755,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -1637,6 +1803,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -1714,6 +1881,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -1814,6 +1982,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-video bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -1889,6 +2058,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[8/1] sm:aspect-[8/1] bg-[#111111] overflow-hidden rounded shadow-xl">
@@ -1950,6 +2120,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           {/* Preset filter selector */}
@@ -2037,6 +2208,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -2114,6 +2286,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -2185,6 +2358,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[16/7] bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -2234,6 +2408,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-video bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -2315,6 +2490,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[16/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -2423,6 +2599,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div
@@ -2486,6 +2663,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
@@ -2559,6 +2737,7 @@ export default function RawxShowcase({
             onCopyLink={handleCopyDropLink}
             onToggleSave={handleToggleSaveDrop}
             onEditSection={openPhotoManagerFor}
+            t={t}
           />
 
           <div className="relative aspect-[16/9] bg-[#111111] overflow-hidden rounded shadow-2xl border border-[#C8A96A]/20">
@@ -2631,25 +2810,32 @@ export default function RawxShowcase({
       )}
 
       {/* Semantic Ecosystem Subdomain Index Footer */}
-      <footer className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 border-t border-[#1c1c1c] flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.18em] uppercase text-[#888888]">
+      <footer
+        className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 border-t flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.18em] uppercase"
+        style={{
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-muted)',
+        }}
+      >
         <span>
-          HANDS &amp; HEAD · <span className="normal-case text-[#f4f0e8]">RAWx</span> BRAND &amp; 19-DROP LOOKBOOK ENGINE
+          HANDS &amp; HEAD · <span className="normal-case font-bold" style={{ color: 'var(--hh-accent)' }}>RAWx</span> BRAND &amp; 19-DROP LOOKBOOK ENGINE
         </span>
         <nav aria-label="Hands and Head Ecosystem Links" className="flex flex-wrap items-center gap-4">
-          <a href="#home" className="hover:text-[#f4f0e8] transition-colors">
+          <a href="#home" className="hover:underline transition-colors" style={{ color: 'var(--hh-text)' }}>
             Home Hub
           </a>
-          <a href="#handfilm" className="hover:text-[#e11d48] transition-colors">
+          <a href="#handfilm" className="hover:underline transition-colors" style={{ color: 'var(--hh-text)' }}>
             HandFilm Studio
           </a>
-          <a href="#apps" className="hover:text-[#f4f0e8] transition-colors">
+          <a href="#apps" className="hover:underline transition-colors" style={{ color: 'var(--hh-text)' }}>
             24 Ecosystem Apps
           </a>
           <a
             href="https://storyboard.handsandhead.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-[#E50914] transition-colors"
+            className="hover:underline transition-colors"
+            style={{ color: 'var(--hh-accent)' }}
           >
             storyboard.handsandhead.com ↗
           </a>
@@ -2657,7 +2843,8 @@ export default function RawxShowcase({
             href="https://b2b.handsandhead.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-[#c8b89a] transition-colors"
+            className="hover:underline transition-colors"
+            style={{ color: 'var(--hh-accent)' }}
           >
             b2b.handsandhead.com ↗
           </a>

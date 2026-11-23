@@ -1,21 +1,31 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ActiveTab, ColorGrade, SyncState } from '../types';
 import { GRADES } from '../data/initialData';
 import {
   Smartphone,
-  Layers,
   CheckSquare,
   SlidersHorizontal,
-  Sparkles,
   Search,
   Volume2,
   VolumeX,
   Globe,
   Download,
-  Home,
-  Film,
+  Sun,
+  Moon,
+  Check,
 } from 'lucide-react';
-import { Language, TranslationDictionary } from '../i18n/translations';
+import {
+  Language,
+  LANGUAGE_OPTIONS,
+  TranslationDictionary,
+} from '../i18n/translations';
+import { useTheme } from '../context/ThemeContext';
+import {
+  HomeCoreIcon,
+  HandfilmCinemaIcon,
+  RawxForgedIcon,
+  AppsMatrixIcon,
+} from './navigation/BrandTabIcons';
 
 interface MasterHeaderProps {
   activeTab: ActiveTab;
@@ -34,7 +44,7 @@ interface MasterHeaderProps {
   isSoundEnabled: boolean;
   onToggleSound: () => void;
   language: Language;
-  onToggleLanguage: () => void;
+  onSelectLanguage: (lang: Language) => void;
   canInstallPwa: boolean;
   onPromptInstall: () => void;
   t: TranslationDictionary;
@@ -43,7 +53,6 @@ interface MasterHeaderProps {
 export default function MasterHeader({
   activeTab,
   setActiveTab,
-  accentColor,
   syncState,
   onOpenSyncModal,
   onOpenIndex,
@@ -56,11 +65,14 @@ export default function MasterHeader({
   isSoundEnabled,
   onToggleSound,
   language,
-  onToggleLanguage,
+  onSelectLanguage,
   canInstallPwa,
   onPromptInstall,
   t,
 }: MasterHeaderProps) {
+  const { colorMode, toggleColorMode, themeTabKey, palette } = useTheme();
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement | null>(null);
   const activeGradeObj = GRADES.find((g) => g.id === currentGrade) || GRADES[0];
 
   const handleTabNav = (e: React.MouseEvent<HTMLAnchorElement>, tab: ActiveTab) => {
@@ -69,27 +81,99 @@ export default function MasterHeader({
     setActiveTab(tab);
   };
 
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setIsLangOpen(false);
+      }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
+  const isDark = colorMode === 'dark';
+
+  const getTabActiveStyle = (tabKey: 'home' | 'handfilm' | 'rawx' | 'apps'): React.CSSProperties | undefined => {
+    if (tabKey === 'home' && activeTab === 'home') {
+      return {
+        backgroundColor: palette.accent,
+        color: '#ffffff',
+        boxShadow: isDark
+          ? '0 0 18px rgba(225, 29, 72, 0.42)'
+          : '0 6px 16px rgba(190, 18, 60, 0.28)',
+      };
+    }
+    if (tabKey === 'handfilm' && activeTab === 'handfilm') {
+      return {
+        backgroundColor: palette.accent,
+        color: isDark ? '#041218' : '#ffffff',
+        boxShadow: isDark
+          ? '0 0 18px rgba(6, 182, 212, 0.38)'
+          : '0 6px 16px rgba(2, 132, 199, 0.25)',
+      };
+    }
+    if (tabKey === 'rawx' && activeTab === 'rawx-showcase') {
+      return {
+        backgroundColor: palette.accent,
+        color: isDark ? '#0c0b0a' : '#ffffff',
+        boxShadow: isDark
+          ? '0 0 18px rgba(217, 119, 6, 0.38)'
+          : '0 6px 16px rgba(180, 83, 9, 0.28)',
+      };
+    }
+    if (tabKey === 'apps' && activeTab === 'ecosystem') {
+      return {
+        backgroundColor: isDark ? '#f3efe6' : '#0f172a',
+        color: isDark ? '#09090b' : '#ffffff',
+        boxShadow: isDark
+          ? '0 0 14px rgba(16, 185, 129, 0.28)'
+          : '0 6px 16px rgba(15, 23, 42, 0.22)',
+      };
+    }
+    return undefined;
+  };
+
+  const currentLangOption = LANGUAGE_OPTIONS.find((opt) => opt.code === language);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-2 px-3 sm:px-8 py-3 bg-[#0A0B0D]/92 backdrop-blur-md border-b border-[#f3efe6]/10 transition-colors duration-200">
+    <header
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-2 px-3 sm:px-8 py-2.5 backdrop-blur-xl hh-theme-transition border-b"
+      style={{
+        backgroundColor: 'var(--hh-header-bg)',
+        borderColor: 'var(--hh-border)',
+        color: 'var(--hh-text)',
+      }}
+    >
       {/* Left: Brand Identity & Quick Tools */}
-      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+      <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
         <a
           href="#home"
           onClick={(e) => handleTabNav(e, 'home')}
-          className="flex items-center gap-2 text-[12.5px] sm:text-[14px] font-bold tracking-[0.08em] uppercase text-[#f3efe6] hover:opacity-90 transition-opacity cursor-pointer group whitespace-nowrap shrink-0"
+          className="flex items-center gap-2 text-[12px] sm:text-[13.5px] font-bold tracking-[0.08em] uppercase hover:opacity-90 transition-opacity cursor-pointer group whitespace-nowrap shrink-0"
+          style={{ color: 'var(--hh-text)' }}
           aria-label="Hands & Head Master OS Home"
         >
           <span
-            className="w-2.5 h-2.5 rounded-full transition-colors duration-300 group-hover:scale-125 shrink-0"
-            style={{
-              backgroundColor:
-                activeTab === 'home' || activeTab === 'handfilm'
-                  ? '#e11d48'
-                  : accentColor || '#C8A96A',
-            }}
+            className="w-2.5 h-2.5 rounded-full transition-transform duration-300 group-hover:scale-125 shrink-0"
+            style={{ backgroundColor: palette.accent }}
           />
-          <span className="truncate">{t.brand.name}</span>
-          <span className="hidden xl:inline text-[9px] tracking-[0.2em] text-[#C8A96A]/70 font-mono pl-2 border-l border-[#f3efe6]/20">
+          <span className={`truncate ${language === 'bn' ? 'bangla-text' : ''}`}>{t.brand.name}</span>
+          <span
+            className="hidden xl:inline text-[9px] tracking-[0.2em] font-mono pl-2 border-l"
+            style={{
+              color: palette.secondaryAccent,
+              borderColor: 'var(--hh-border)',
+            }}
+          >
             {t.brand.tagline}
           </span>
         </a>
@@ -99,9 +183,14 @@ export default function MasterHeader({
           type="button"
           onClick={onOpenCommandPalette}
           title="Open Command Palette (Cmd/Ctrl+K)"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#14161A] border border-[#f3efe6]/12 hover:border-[#f3efe6]/35 text-[10px] sm:text-[11px] font-mono tracking-wider transition-all cursor-pointer text-[#f3efe6]/70 hover:text-[#f3efe6] whitespace-nowrap shrink-0"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-[10px] sm:text-[11px] font-mono tracking-wider hh-theme-transition cursor-pointer whitespace-nowrap shrink-0 hover:opacity-90"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-muted)',
+          }}
         >
-          <Search className="w-3 h-3 text-[#C8A96A]" />
+          <Search className="w-3 h-3 shrink-0" style={{ color: palette.accent }} />
           <span className="hidden lg:inline">{t.nav.searchOrJump}</span>
           <span className="lg:hidden">⌘K</span>
         </button>
@@ -110,8 +199,13 @@ export default function MasterHeader({
         <button
           type="button"
           onClick={onOpenSyncModal}
-          title="Multi-Device Task Sync Status. Click to connect another device or view room."
-          className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded bg-[#14161A] border border-[#f3efe6]/12 hover:border-[#f3efe6]/35 text-[10px] font-mono tracking-wider transition-all cursor-pointer group whitespace-nowrap shrink-0"
+          title="Multi-Device Task Sync Status"
+          className="hidden md:flex items-center gap-1.5 px-2 py-1.5 rounded-md border text-[10px] font-mono tracking-wider hh-theme-transition cursor-pointer group whitespace-nowrap shrink-0"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-text)',
+          }}
         >
           <div className="relative flex items-center justify-center">
             <span
@@ -123,33 +217,40 @@ export default function MasterHeader({
               <span className="absolute w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping opacity-75" />
             )}
           </div>
-          <Smartphone className="w-3 h-3 text-[#f3efe6]/60 group-hover:text-[#f3efe6]" />
-          <span className="text-[#f3efe6]/90 font-medium hidden xl:inline tabular-nums">
-            <span className="text-emerald-400 font-semibold">{syncState.roomId}</span>
+          <Smartphone className="w-3 h-3 opacity-65" />
+          <span className="font-semibold hidden xl:inline tabular-nums text-emerald-500">
+            {syncState.roomId}
           </span>
-          <span className="text-[#f3efe6]/50 text-[9px] tabular-nums">
+          <span className="opacity-60 text-[9px] tabular-nums">
             {syncState.deviceCount} {syncState.deviceCount === 1 ? 'DEV' : 'DEVS'}
           </span>
         </button>
       </div>
 
-      {/* Center: Hardware-Style 4-Tab Top-Level Switcher (HOME | HANDFILM | RAWx | APPS) */}
+      {/* Center: Hardware 4-Tab Switcher (HOME | HANDFILM | RAWx | APPS) with Bold Custom Animated Icons */}
       <nav
         aria-label="Primary Operating System Views"
-        className="flex items-center gap-0.5 sm:gap-1 bg-[#14161A] p-1 rounded-lg border border-[#f3efe6]/15 font-mono text-[10.5px] sm:text-[11px] tracking-[0.14em] uppercase shadow-inner shrink-0"
+        data-active-theme-tab={themeTabKey}
+        className="flex items-center gap-0.5 sm:gap-1 p-1 rounded-xl border font-mono text-[10.5px] sm:text-[11px] tracking-[0.12em] uppercase hh-theme-transition shrink-0"
+        style={{
+          backgroundColor: 'var(--hh-surface)',
+          borderColor: 'var(--hh-border)',
+          boxShadow: isDark ? 'inset 0 1px 0 rgba(255,255,255,0.04)' : '0 2px 10px rgba(15,23,42,0.05)',
+        }}
       >
         <a
           href="#home"
           onClick={(e) => handleTabNav(e, 'home')}
           aria-current={activeTab === 'home' ? 'page' : undefined}
-          className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+          style={getTabActiveStyle('home')}
+          className={`group px-2.5 sm:px-3.5 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === 'home'
-              ? 'bg-[#e11d48] text-white font-bold shadow-[0_0_16px_rgba(225,29,72,0.38)]'
-              : 'text-[#f3efe6]/65 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
+              ? 'font-bold'
+              : 'opacity-75 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'
           }`}
         >
-          <Home className="w-3.5 h-3.5" />
-          <span>{t.nav.home}</span>
+          <HomeCoreIcon isActive={activeTab === 'home'} />
+          <span className={language === 'bn' ? 'bangla-text' : ''}>{t.nav.home}</span>
         </a>
 
         <a
@@ -157,13 +258,14 @@ export default function MasterHeader({
           onClick={(e) => handleTabNav(e, 'handfilm')}
           aria-current={activeTab === 'handfilm' ? 'page' : undefined}
           title="HandFilm Studio — Product & AI Model Showcase"
-          className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+          style={getTabActiveStyle('handfilm')}
+          className={`group px-2.5 sm:px-3.5 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === 'handfilm'
-              ? 'bg-[#e11d48] text-white font-bold shadow-[0_0_16px_rgba(225,29,72,0.4)]'
-              : 'text-[#f3efe6]/75 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
+              ? 'font-bold'
+              : 'opacity-80 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'
           }`}
         >
-          <Film className="w-3.5 h-3.5" />
+          <HandfilmCinemaIcon isActive={activeTab === 'handfilm'} />
           <span className={language === 'bn' ? 'bangla-text' : ''}>{t.nav.handfilm}</span>
         </a>
 
@@ -171,15 +273,16 @@ export default function MasterHeader({
           href="#rawx"
           onClick={(e) => handleTabNav(e, 'rawx-showcase')}
           aria-current={activeTab === 'rawx-showcase' ? 'page' : undefined}
-          title="RAWx — Hide, Steel & Heavyweight Apparel Storefront & 19-Drop Lookbook Studio"
-          className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+          title="RAWx — Hide, Steel & Heavyweight Apparel Storefront & 19-Drop Studio"
+          style={getTabActiveStyle('rawx')}
+          className={`group px-2.5 sm:px-3.5 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === 'rawx-showcase'
-              ? 'bg-[#C8A96A] text-[#0A0B0D] font-bold shadow-[0_0_16px_rgba(200,169,106,0.35)]'
-              : 'text-[#C8A96A]/90 hover:text-[#C8A96A] hover:bg-[#C8A96A]/10'
+              ? 'font-bold'
+              : 'opacity-85 hover:opacity-100 hover:bg-amber-500/10'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span className="normal-case tracking-[0.12em]">{t.nav.rawx}</span>
+          <RawxForgedIcon isActive={activeTab === 'rawx-showcase'} />
+          <span className="normal-case tracking-[0.10em] font-bold">RAWx</span>
         </a>
 
         <a
@@ -187,14 +290,15 @@ export default function MasterHeader({
           onClick={(e) => handleTabNav(e, 'ecosystem')}
           aria-current={activeTab === 'ecosystem' ? 'page' : undefined}
           title="24-Section Ultra-Fast Stage Slider Engine"
-          className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+          style={getTabActiveStyle('apps')}
+          className={`group px-2.5 sm:px-3.5 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === 'ecosystem'
-              ? 'bg-[#f3efe6] text-[#0A0B0D] font-bold shadow-sm'
-              : 'text-[#f3efe6]/65 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
+              ? 'font-bold'
+              : 'opacity-75 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'
           }`}
         >
-          <Layers className="w-3.5 h-3.5" />
-          <span>{t.nav.apps}</span>
+          <AppsMatrixIcon isActive={activeTab === 'ecosystem'} />
+          <span className={language === 'bn' ? 'bangla-text' : ''}>{t.nav.apps}</span>
         </a>
       </nav>
 
@@ -206,16 +310,25 @@ export default function MasterHeader({
           onClick={(e) => handleTabNav(e, 'tasks-hub')}
           aria-current={activeTab === 'tasks-hub' ? 'page' : undefined}
           title="Multi-Device Task Sync Hub"
-          className={`px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+          className={`px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded-lg hh-theme-transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
             activeTab === 'tasks-hub'
-              ? 'border-emerald-400 bg-emerald-400/15 text-emerald-300 font-bold'
-              : 'border-[#f3efe6]/12 bg-[#14161A] text-[#f3efe6]/70 hover:border-[#f3efe6]/35 hover:text-[#f3efe6]'
+              ? 'border-emerald-500 bg-emerald-500/15 text-emerald-500 font-bold'
+              : 'hover:opacity-90'
           }`}
+          style={
+            activeTab === 'tasks-hub'
+              ? undefined
+              : {
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }
+          }
         >
-          <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
+          <CheckSquare className="w-3.5 h-3.5 text-emerald-500" />
           <span className="hidden xl:inline">{t.nav.tasks}</span>
           {tasksCount.pending > 0 && (
-            <span className="text-[9px] font-bold text-[#E50914] tabular-nums">
+            <span className="text-[9px] font-bold text-rose-500 tabular-nums">
               {tasksCount.pending}
             </span>
           )}
@@ -226,35 +339,119 @@ export default function MasterHeader({
           type="button"
           onClick={onToggleSound}
           title={isSoundEnabled ? t.nav.soundOn : t.nav.soundOff}
-          className={`px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
-            isSoundEnabled
-              ? 'border-emerald-400/80 bg-emerald-400/10 text-emerald-300 font-bold'
-              : 'border-[#f3efe6]/12 bg-[#14161A] text-[#f3efe6]/60 hover:text-[#f3efe6]'
+          aria-label={isSoundEnabled ? t.nav.soundOn : t.nav.soundOff}
+          className={`p-1.5 sm:px-2 sm:py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded-lg hh-theme-transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+            isSoundEnabled ? 'border-emerald-500/80 bg-emerald-500/10 text-emerald-500 font-bold' : ''
           }`}
+          style={
+            isSoundEnabled
+              ? undefined
+              : {
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-muted)',
+                }
+          }
         >
           {isSoundEnabled ? (
-            <>
-              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden 2xl:inline">{t.nav.sound}</span>
-            </>
+            <Volume2 className="w-3.5 h-3.5 text-emerald-500" />
           ) : (
-            <>
-              <VolumeX className="w-3.5 h-3.5 text-[#f3efe6]/45" />
-              <span className="hidden 2xl:inline">{t.nav.sound}</span>
-            </>
+            <VolumeX className="w-3.5 h-3.5 opacity-60" />
+          )}
+          <span className="hidden 2xl:inline">{t.nav.sound}</span>
+        </button>
+
+        {/* Global Light / Dark Mode Toggle Button (Icon-Only Pill) */}
+        <button
+          type="button"
+          onClick={toggleColorMode}
+          aria-label={isDark ? t.theme.switchToLight : t.theme.switchToDark}
+          title={isDark ? t.theme.switchToLight : t.theme.switchToDark}
+          className="w-8 h-8 rounded-full border flex items-center justify-center hh-theme-transition cursor-pointer shrink-0 hover:scale-105"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+            color: palette.secondaryAccent,
+          }}
+        >
+          {isDark ? (
+            <Sun className="w-4 h-4 transition-transform duration-200 hover:rotate-45" />
+          ) : (
+            <Moon className="w-4 h-4 transition-transform duration-200 hover:-rotate-12" />
           )}
         </button>
 
-        {/* Language Switcher Button (EN / BN) */}
-        <button
-          type="button"
-          onClick={onToggleLanguage}
-          title="Switch Language (English / বাংলা)"
-          className="px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border border-[#f3efe6]/12 bg-[#14161A] hover:border-[#f3efe6]/35 text-[#f3efe6] transition-all cursor-pointer rounded flex items-center gap-1 whitespace-nowrap shrink-0"
-        >
-          <Globe className="w-3 h-3 text-[#C8A96A]" />
-          <span className="font-bold">{language === 'en' ? 'EN' : 'বাং'}</span>
-        </button>
+        {/* 8-Language Icon-Only Dropdown (Globe icon only on closed trigger) */}
+        <div ref={langMenuRef} className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsLangOpen((prev) => !prev)}
+            aria-haspopup="listbox"
+            aria-expanded={isLangOpen}
+            aria-label={`${t.theme.selectLanguage}: ${currentLangOption?.nativeLabel || language}`}
+            title={`${t.theme.selectLanguage} (${currentLangOption?.nativeLabel || language})`}
+            className="w-8 h-8 rounded-full border flex items-center justify-center hh-theme-transition cursor-pointer shrink-0 hover:scale-105"
+            style={{
+              backgroundColor: isLangOpen ? palette.accent : 'var(--hh-surface)',
+              borderColor: isLangOpen ? palette.accent : 'var(--hh-border)',
+              color: isLangOpen ? palette.accent === '#f3efe6' ? '#09090b' : '#ffffff' : palette.accent,
+            }}
+          >
+            <Globe className="w-4 h-4" />
+          </button>
+
+          {isLangOpen && (
+            <div
+              role="listbox"
+              aria-label={t.theme.selectLanguage}
+              className="absolute right-0 top-full mt-2 w-52 rounded-2xl border backdrop-blur-2xl p-1.5 shadow-2xl z-50"
+              style={{
+                backgroundColor: 'var(--hh-glass-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+                boxShadow: 'var(--hh-card-shadow)',
+              }}
+            >
+              {LANGUAGE_OPTIONS.map((opt) => {
+                const isSelected = language === opt.code;
+                return (
+                  <button
+                    key={opt.code}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    onClick={() => {
+                      onSelectLanguage(opt.code);
+                      setIsLangOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
+                      opt.code === 'bn' ? 'bangla-text' : 'font-sans'
+                    }`}
+                    style={
+                      isSelected
+                        ? {
+                            backgroundColor: palette.accent,
+                            color: isDark && themeTabKey === 'handfilm' ? '#041218' : isDark && themeTabKey === 'rawx' ? '#0c0b0a' : '#ffffff',
+                            fontWeight: 700,
+                          }
+                        : {
+                            color: 'var(--hh-text)',
+                          }
+                    }
+                  >
+                    <span className="flex items-center gap-2.5 min-w-0">
+                      <span className="font-mono text-[10px] uppercase tracking-wider opacity-75 w-5 shrink-0">
+                        {opt.shortLabel}
+                      </span>
+                      <span className="truncate">{opt.nativeLabel}</span>
+                    </span>
+                    {isSelected && <Check className="w-3.5 h-3.5 shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* PWA Install Button (if available) */}
         {canInstallPwa && (
@@ -262,7 +459,12 @@ export default function MasterHeader({
             type="button"
             onClick={onPromptInstall}
             title={t.nav.installApp}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 text-[10px] uppercase tracking-wider border border-[#C8A96A]/60 bg-[#C8A96A]/10 text-[#C8A96A] hover:bg-[#C8A96A] hover:text-black transition-all cursor-pointer rounded font-bold whitespace-nowrap shrink-0"
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 text-[10px] uppercase tracking-wider border rounded-lg transition-all cursor-pointer font-bold whitespace-nowrap shrink-0"
+            style={{
+              borderColor: palette.secondaryAccent,
+              color: palette.secondaryAccent,
+              backgroundColor: 'var(--hh-surface)',
+            }}
           >
             <Download className="w-3 h-3" />
             <span>{t.nav.installApp}</span>
@@ -274,11 +476,12 @@ export default function MasterHeader({
           type="button"
           onClick={onCycleGrade}
           title="Toggle Cinematic Film Grade LUT"
-          className={`hidden sm:flex px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded transition-all cursor-pointer items-center gap-1 whitespace-nowrap shrink-0 ${
-            currentGrade !== 'off'
-              ? 'border-[#C8A96A]/80 bg-[#C8A96A]/10 text-[#C8A96A] font-bold'
-              : 'border-[#f3efe6]/12 bg-[#14161A] text-[#f3efe6]/70 hover:border-[#f3efe6]/35 hover:text-[#f3efe6]'
-          }`}
+          className="hidden sm:flex px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded-lg hh-theme-transition cursor-pointer items-center gap-1 whitespace-nowrap shrink-0"
+          style={{
+            backgroundColor: currentGrade !== 'off' ? palette.accent : 'var(--hh-surface)',
+            borderColor: currentGrade !== 'off' ? palette.accent : 'var(--hh-border)',
+            color: currentGrade !== 'off' ? '#ffffff' : 'var(--hh-muted)',
+          }}
         >
           <span>◈</span>
           <span className="hidden 2xl:inline">{activeGradeObj.name}</span>
@@ -289,11 +492,12 @@ export default function MasterHeader({
           type="button"
           onClick={onToggleConsole}
           title="Toggle speed and transition easing console"
-          className={`hidden md:flex px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded transition-all cursor-pointer items-center gap-1 whitespace-nowrap shrink-0 ${
-            isConsoleOpen
-              ? 'border-[#f3efe6] bg-[#f3efe6] text-[#0A0B0D] font-bold'
-              : 'border-[#f3efe6]/12 bg-[#14161A] text-[#f3efe6]/70 hover:border-[#f3efe6]/35 hover:text-[#f3efe6]'
-          }`}
+          className="hidden md:flex px-2 py-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider border rounded-lg hh-theme-transition cursor-pointer items-center gap-1 whitespace-nowrap shrink-0"
+          style={{
+            backgroundColor: isConsoleOpen ? palette.accent : 'var(--hh-surface)',
+            borderColor: isConsoleOpen ? palette.accent : 'var(--hh-border)',
+            color: isConsoleOpen ? '#ffffff' : 'var(--hh-muted)',
+          }}
         >
           <SlidersHorizontal className="w-3 h-3" />
         </button>
@@ -302,7 +506,12 @@ export default function MasterHeader({
         <button
           type="button"
           onClick={onOpenIndex}
-          className="px-2.5 sm:px-3 py-1.5 text-[10.5px] sm:text-[11px] uppercase tracking-[0.14em] text-[#f3efe6] border border-[#f3efe6]/20 hover:border-[#C8A96A] hover:bg-[#14161A] transition-all cursor-pointer rounded font-medium whitespace-nowrap shrink-0"
+          className="px-2.5 sm:px-3 py-1.5 text-[10.5px] sm:text-[11px] uppercase tracking-[0.14em] border rounded-lg hh-theme-transition cursor-pointer font-medium whitespace-nowrap shrink-0"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-text)',
+          }}
         >
           {t.nav.index}
         </button>
@@ -310,3 +519,4 @@ export default function MasterHeader({
     </header>
   );
 }
+// END OF FILE: src/components/MasterHeader.tsx

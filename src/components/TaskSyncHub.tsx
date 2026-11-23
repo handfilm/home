@@ -158,47 +158,59 @@ export default function TaskSyncHub({
   const getPriorityBadge = (p: Priority) => {
     switch (p) {
       case 'urgent':
-        return 'bg-red-500/20 text-red-300 border-red-500/40';
+        return 'bg-red-500/15 text-red-500 border-red-500/40';
       case 'high':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        return 'bg-amber-500/15 text-amber-500 border-amber-500/40';
       case 'medium':
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+        return 'bg-blue-500/15 text-blue-500 border-blue-500/40';
       case 'low':
-        return 'bg-neutral-500/20 text-neutral-300 border-neutral-500/40';
+        return 'bg-neutral-500/15 text-neutral-500 border-neutral-500/40';
     }
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-65px)] mt-[65px] bg-[#0a0a0a] text-[#f3efe6] px-4 sm:px-8 py-8">
+    <div
+      className="w-full min-h-[calc(100vh-65px)] mt-[65px] px-4 sm:px-8 py-8 hh-theme-transition"
+      style={{
+        backgroundColor: 'var(--hh-bg)',
+        color: 'var(--hh-text)',
+      }}
+    >
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Top Multi-Device Live Sync Control Bar */}
-        <div className="bg-[#12110f] border border-[#f3efe6]/15 rounded-xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+        <div
+          className="border rounded-xl p-5 sm:p-6 shadow-xl relative overflow-hidden"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
           <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
             {/* Left: Sync Status & Room ID */}
             <div className="flex flex-wrap items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <div className="w-12 h-12 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500">
                 <Smartphone className="w-6 h-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#f3efe6]/50 uppercase">
+                  <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: 'var(--hh-muted)' }}>
                     Cross-Device Sync Protocol
                   </span>
                   <span
                     className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
                       syncState.isConnected
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30'
+                        : 'bg-amber-500/15 text-amber-500 border border-amber-500/30'
                     }`}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     {syncState.isConnected ? 'LIVE BIDIRECTIONAL SYNC' : 'CONNECTING...'}
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold font-mono text-[#f3efe6] flex items-center gap-3">
-                  ROOM: <span className="text-emerald-400 tracking-wider">{syncState.roomId}</span>
+                <h2 className="text-xl sm:text-2xl font-bold font-mono flex items-center gap-3" style={{ color: 'var(--hh-text)' }}>
+                  ROOM: <span className="text-emerald-500 tracking-wider">{syncState.roomId}</span>
                 </h2>
               </div>
             </div>
@@ -206,9 +218,15 @@ export default function TaskSyncHub({
             {/* Right: Actions & Connected Devices Pill */}
             <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
               {/* Connected Devices Badge */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-[#1a1815] border border-[#f3efe6]/15 rounded-lg">
-                <Laptop className="w-4 h-4 text-emerald-400" />
-                <span className="text-[#f3efe6]/80 font-medium">
+              <div
+                className="flex items-center gap-2 px-3 py-2 border rounded-lg"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-border)',
+                }}
+              >
+                <Laptop className="w-4 h-4 text-emerald-500" />
+                <span className="font-medium" style={{ color: 'var(--hh-text)' }}>
                   {syncState.deviceCount} {syncState.deviceCount === 1 ? 'Device' : 'Devices'} Connected
                 </span>
               </div>
@@ -216,7 +234,7 @@ export default function TaskSyncHub({
               {/* Pair Device via QR Code */}
               <button
                 onClick={onOpenSyncModal}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-[#0e0d0b] font-bold rounded-lg transition-all cursor-pointer shadow-md"
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-all cursor-pointer shadow-md"
               >
                 <QrCode className="w-4 h-4" />
                 <span>Pair Phone / Tablet</span>
@@ -226,7 +244,12 @@ export default function TaskSyncHub({
               <button
                 onClick={onForceSync}
                 title="Force refresh & sync with cloud room"
-                className="flex items-center gap-1.5 px-3 py-2 bg-[#1a1815] hover:bg-[#25221e] border border-[#f3efe6]/15 rounded-lg text-[#f3efe6]/80 hover:text-[#f3efe6] transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 border rounded-lg transition-all cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Refresh</span>
@@ -235,22 +258,25 @@ export default function TaskSyncHub({
           </div>
 
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-[#f3efe6]/10 font-mono text-xs">
-            <div className="p-3 bg-[#181613] rounded-lg border border-[#f3efe6]/10">
-              <span className="text-[#f3efe6]/50 block text-[10px] uppercase">Active Tasks</span>
-              <span className="text-lg font-bold text-[#f3efe6]">{stats.pending}</span>
+          <div
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t font-mono text-xs"
+            style={{ borderColor: 'var(--hh-border)' }}
+          >
+            <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}>
+              <span className="block text-[10px] uppercase" style={{ color: 'var(--hh-muted)' }}>Active Tasks</span>
+              <span className="text-lg font-bold tabular-nums" style={{ color: 'var(--hh-text)' }}>{stats.pending}</span>
             </div>
-            <div className="p-3 bg-[#181613] rounded-lg border border-[#f3efe6]/10">
-              <span className="text-[#f3efe6]/50 block text-[10px] uppercase">Completed</span>
-              <span className="text-lg font-bold text-emerald-400">{stats.completed}</span>
+            <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}>
+              <span className="block text-[10px] uppercase" style={{ color: 'var(--hh-muted)' }}>Completed</span>
+              <span className="text-lg font-bold text-emerald-500 tabular-nums">{stats.completed}</span>
             </div>
-            <div className="p-3 bg-[#181613] rounded-lg border border-[#f3efe6]/10">
-              <span className="text-[#f3efe6]/50 block text-[10px] uppercase">High / Urgent</span>
-              <span className="text-lg font-bold text-amber-400">{stats.urgentCount}</span>
+            <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}>
+              <span className="block text-[10px] uppercase" style={{ color: 'var(--hh-muted)' }}>High / Urgent</span>
+              <span className="text-lg font-bold text-amber-500 tabular-nums">{stats.urgentCount}</span>
             </div>
-            <div className="p-3 bg-[#181613] rounded-lg border border-[#f3efe6]/10">
-              <span className="text-[#f3efe6]/50 block text-[10px] uppercase">Completion Rate</span>
-              <span className="text-lg font-bold text-blue-400">{stats.completionRate}%</span>
+            <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}>
+              <span className="block text-[10px] uppercase" style={{ color: 'var(--hh-muted)' }}>Completion Rate</span>
+              <span className="text-lg font-bold text-blue-500 tabular-nums">{stats.completionRate}%</span>
             </div>
           </div>
         </div>
@@ -258,26 +284,40 @@ export default function TaskSyncHub({
         {/* Quick Add Bar */}
         <form
           onSubmit={handleQuickAdd}
-          className="flex items-center gap-3 bg-[#141310] border border-[#f3efe6]/20 p-2 rounded-xl shadow-lg"
+          className="flex items-center gap-3 border p-2 rounded-xl shadow-lg"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+          }}
         >
           <input
             type="text"
             value={quickTitle}
             onChange={(e) => setQuickTitle(e.target.value)}
             placeholder="Quick capture a task to sync across all connected devices... (Press Enter)"
-            className="flex-1 bg-transparent px-4 py-2 text-sm text-[#f3efe6] placeholder-[#f3efe6]/40 focus:outline-none font-sans"
+            className="flex-1 bg-transparent px-4 py-2 text-sm focus:outline-none font-sans"
+            style={{ color: 'var(--hh-text)' }}
           />
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="hidden sm:flex items-center gap-1 px-3 py-2 text-xs font-mono text-[#f3efe6]/70 hover:text-[#f3efe6] bg-[#1d1b17] rounded-lg border border-[#f3efe6]/10 cursor-pointer"
+            className="hidden sm:flex items-center gap-1 px-3 py-2 text-xs font-mono rounded-lg border cursor-pointer"
+            style={{
+              backgroundColor: 'var(--hh-bg)',
+              borderColor: 'var(--hh-border)',
+              color: 'var(--hh-text)',
+            }}
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>Full Form</span>
           </button>
           <button
             type="submit"
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#f3efe6] hover:bg-white text-[#0e0d0b] font-bold text-xs rounded-lg transition-all cursor-pointer font-mono"
+            className="flex items-center gap-1.5 px-4 py-2.5 font-bold text-xs rounded-lg transition-all cursor-pointer font-mono"
+            style={{
+              backgroundColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent-ink)',
+            }}
           >
             <Plus className="w-4 h-4" />
             <span>Add Task</span>
@@ -285,19 +325,24 @@ export default function TaskSyncHub({
         </form>
 
         {/* Section Navigation Tabs & Add Website Button */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#f3efe6]/10 pb-4">
+        <div
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           {/* Section Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
             <button
               onClick={() => setSelectedSection('all')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-                selectedSection === 'all'
-                  ? 'bg-[#f3efe6] text-[#0e0d0b] font-bold'
-                  : 'bg-[#181613] text-[#f3efe6]/60 hover:text-[#f3efe6]'
-              }`}
+              className="px-3.5 py-1.5 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 border"
+              style={{
+                backgroundColor: selectedSection === 'all' ? 'var(--hh-accent)' : 'var(--hh-surface)',
+                borderColor: selectedSection === 'all' ? 'var(--hh-accent)' : 'var(--hh-border)',
+                color: selectedSection === 'all' ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
+                fontWeight: selectedSection === 'all' ? 700 : 500,
+              }}
             >
               <span>All Ecosystem</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#0e0d0b]/20 font-bold">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/15 font-bold">
                 {tasks.length}
               </span>
             </button>
@@ -309,21 +354,20 @@ export default function TaskSyncHub({
                 <button
                   key={sec.id}
                   onClick={() => setSelectedSection(sec.id)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-                    isSelected
-                      ? 'text-[#f3efe6] font-bold shadow-sm'
-                      : 'bg-[#181613] text-[#f3efe6]/60 hover:text-[#f3efe6]'
-                  }`}
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 border"
                   style={{
-                    backgroundColor: isSelected ? sec.accent : undefined,
+                    backgroundColor: isSelected ? sec.accent : 'var(--hh-surface)',
+                    borderColor: isSelected ? sec.accent : 'var(--hh-border)',
+                    color: isSelected ? '#ffffff' : 'var(--hh-muted)',
+                    fontWeight: isSelected ? 700 : 500,
                   }}
                 >
                   <span
                     className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: isSelected ? '#f3efe6' : sec.accent }}
+                    style={{ backgroundColor: isSelected ? '#ffffff' : sec.accent }}
                   />
                   <span>{sec.title}</span>
-                  <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#0e0d0b]/20 font-bold">
+                  <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/15 font-bold">
                     {count}
                   </span>
                 </button>
@@ -334,7 +378,12 @@ export default function TaskSyncHub({
             <button
               onClick={onOpenSectionManager}
               title="Add a new website as section"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1a1815] border border-dashed border-[#f3efe6]/30 hover:border-emerald-400 hover:text-emerald-400 text-xs font-mono text-[#f3efe6]/60 rounded-lg transition-all cursor-pointer whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-dashed hover:border-emerald-500 hover:text-emerald-500 text-xs font-mono rounded-lg transition-all cursor-pointer whitespace-nowrap"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-muted)',
+              }}
             >
               <Plus className="w-3.5 h-3.5" />
               <span>+ Add Website</span>
@@ -344,21 +393,31 @@ export default function TaskSyncHub({
           {/* Status Filters & Search */}
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#f3efe6]/40" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--hh-muted)' }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tasks..."
-                className="bg-[#181613] border border-[#f3efe6]/15 rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#f3efe6] placeholder-[#f3efe6]/40 focus:outline-none focus:border-[#f3efe6]/40 w-40 sm:w-48 font-mono"
+                className="border rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none w-40 sm:w-48 font-mono"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               />
             </div>
 
             {/* Status Dropdown */}
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="bg-[#181613] border border-[#f3efe6]/15 rounded-lg px-2.5 py-1.5 text-xs text-[#f3efe6] font-mono focus:outline-none"
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'todo' | 'in_progress' | 'done' | 'urgent')}
+              className="border rounded-lg px-2.5 py-1.5 text-xs font-mono focus:outline-none"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
               <option value="all">All Status</option>
               <option value="todo">To Do</option>
@@ -372,18 +431,28 @@ export default function TaskSyncHub({
         {/* Task Cards List */}
         <div className="space-y-3">
           {filteredTasks.length === 0 ? (
-            <div className="text-center py-16 px-4 bg-[#12110f] border border-dashed border-[#f3efe6]/15 rounded-xl">
-              <CheckSquare className="w-12 h-12 text-[#f3efe6]/20 mx-auto mb-3" />
-              <h3 className="text-base font-bold font-mono text-[#f3efe6]/80 uppercase mb-1">
+            <div
+              className="text-center py-16 px-4 border border-dashed rounded-xl"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+              }}
+            >
+              <CheckSquare className="w-12 h-12 mx-auto mb-3 opacity-30" style={{ color: 'var(--hh-muted)' }} />
+              <h3 className="text-base font-bold font-mono uppercase mb-1" style={{ color: 'var(--hh-text)' }}>
                 No Tasks Found
               </h3>
-              <p className="text-xs text-[#f3efe6]/40 max-w-sm mx-auto mb-4">
+              <p className="text-xs max-w-sm mx-auto mb-4" style={{ color: 'var(--hh-muted)' }}>
                 Add a task above or switch your filters. Any task created here instantly syncs across all
                 connected devices.
               </p>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-[#f3efe6] text-[#0e0d0b] text-xs font-mono font-bold rounded-lg cursor-pointer"
+                className="px-4 py-2 text-xs font-mono font-bold rounded-lg cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--hh-accent)',
+                  color: 'var(--hh-accent-ink)',
+                }}
               >
                 + Create First Task
               </button>
@@ -397,10 +466,12 @@ export default function TaskSyncHub({
                 <div
                   key={task.id}
                   className={`p-4 rounded-xl border transition-all duration-200 ${
-                    isDone
-                      ? 'bg-[#100f0d]/60 border-[#f3efe6]/10 opacity-60'
-                      : 'bg-[#151411] border-[#f3efe6]/15 hover:border-[#f3efe6]/35 shadow-md'
+                    isDone ? 'opacity-65' : 'shadow-md'
                   }`}
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: 'var(--hh-border)',
+                  }}
                 >
                   <div className="flex items-start justify-between gap-4">
                     {/* Left: Checkbox + Title + Description */}
@@ -412,11 +483,12 @@ export default function TaskSyncHub({
                             updatedAt: new Date().toISOString(),
                           })
                         }
-                        className="mt-0.5 text-[#f3efe6]/40 hover:text-emerald-400 cursor-pointer transition-colors"
+                        className="mt-0.5 hover:text-emerald-500 cursor-pointer transition-colors"
+                        style={{ color: 'var(--hh-muted)' }}
                         aria-label={isDone ? 'Mark as incomplete' : 'Mark as complete'}
                       >
                         {isDone ? (
-                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                         ) : (
                           <Circle className="w-5 h-5" />
                         )}
@@ -445,7 +517,7 @@ export default function TaskSyncHub({
 
                           {/* Due Date */}
                           {task.dueDate && (
-                            <span className="text-[10px] font-mono text-[#f3efe6]/50 flex items-center gap-1">
+                            <span className="text-[10px] font-mono flex items-center gap-1" style={{ color: 'var(--hh-muted)' }}>
                               <Calendar className="w-3 h-3" />
                               <span>Due: {task.dueDate}</span>
                             </span>
@@ -454,30 +526,36 @@ export default function TaskSyncHub({
 
                         {/* Title */}
                         <h4
-                          className={`text-sm sm:text-base font-semibold ${
-                            isDone ? 'line-through text-[#f3efe6]/50' : 'text-[#f3efe6]'
-                          }`}
+                          className={`text-sm sm:text-base font-semibold ${isDone ? 'line-through opacity-60' : ''}`}
+                          style={{ color: 'var(--hh-text)' }}
                         >
                           {task.title}
                         </h4>
 
                         {/* Description */}
                         {task.description && (
-                          <p className="text-xs text-[#f3efe6]/60 mt-1 leading-relaxed line-clamp-2">
+                          <p className="text-xs mt-1 leading-relaxed line-clamp-2" style={{ color: 'var(--hh-muted)' }}>
                             {task.description}
                           </p>
                         )}
 
                         {/* Tags & Origin Device Badge */}
-                        <div className="flex flex-wrap items-center gap-2 mt-2.5 font-mono text-[10px] text-[#f3efe6]/40">
+                        <div className="flex flex-wrap items-center gap-2 mt-2.5 font-mono text-[10px]" style={{ color: 'var(--hh-muted)' }}>
                           {task.tags &&
                             task.tags.map((tg, idx) => (
-                              <span key={idx} className="bg-[#f3efe6]/5 px-2 py-0.5 rounded">
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 rounded border"
+                                style={{
+                                  backgroundColor: 'var(--hh-bg)',
+                                  borderColor: 'var(--hh-border)',
+                                }}
+                              >
                                 #{tg}
                               </span>
                             ))}
 
-                          <span className="flex items-center gap-1 text-emerald-400/80 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20 ml-auto">
+                          <span className="flex items-center gap-1 text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25 ml-auto">
                             <Smartphone className="w-2.5 h-2.5" />
                             <span>{task.deviceOrigin}</span>
                           </span>
@@ -486,7 +564,7 @@ export default function TaskSyncHub({
                     </div>
 
                     {/* Right: Actions */}
-                    <div className="flex items-center gap-1 text-[#f3efe6]/40 font-mono">
+                    <div className="flex items-center gap-1 font-mono" style={{ color: 'var(--hh-muted)' }}>
                       {/* Status quick toggle */}
                       <select
                         value={task.status}
@@ -496,7 +574,12 @@ export default function TaskSyncHub({
                             updatedAt: new Date().toISOString(),
                           })
                         }
-                        className="bg-[#1b1915] border border-[#f3efe6]/15 rounded px-2 py-1 text-[10px] text-[#f3efe6]/80 focus:outline-none"
+                        className="border rounded px-2 py-1 text-[10px] focus:outline-none"
+                        style={{
+                          backgroundColor: 'var(--hh-bg)',
+                          borderColor: 'var(--hh-border)',
+                          color: 'var(--hh-text)',
+                        }}
                       >
                         <option value="todo">To Do</option>
                         <option value="in_progress">In Progress</option>
@@ -505,7 +588,7 @@ export default function TaskSyncHub({
 
                       <button
                         onClick={() => onDeleteTask(task.id)}
-                        className="p-1.5 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
+                        className="p-1.5 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
                         title="Delete task"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -521,20 +604,31 @@ export default function TaskSyncHub({
 
       {/* Add Full Task Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#161411] border border-[#f3efe6]/20 rounded-2xl w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-[#f3efe6]/10 pb-4">
+        <div className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className="border rounded-2xl w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-5 hh-theme-transition"
+            style={{
+              backgroundColor: 'var(--hh-surface)',
+              borderColor: 'var(--hh-border)',
+              color: 'var(--hh-text)',
+            }}
+          >
+            <div
+              className="flex items-center justify-between border-b pb-4"
+              style={{ borderColor: 'var(--hh-border)' }}
+            >
               <div>
-                <span className="text-[10px] font-mono tracking-[0.2em] text-emerald-400 uppercase">
+                <span className="text-[10px] font-mono tracking-[0.2em] text-emerald-500 uppercase">
                   Multi-Device Cloud Sync
                 </span>
-                <h3 className="text-xl font-bold uppercase font-mono text-[#f3efe6]">
+                <h3 className="text-xl font-bold uppercase font-mono" style={{ color: 'var(--hh-text)' }}>
                   Create New Task
                 </h3>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-[#f3efe6]/60 hover:text-[#f3efe6] font-mono text-sm cursor-pointer"
+                className="opacity-70 hover:opacity-100 font-mono text-sm cursor-pointer"
+                style={{ color: 'var(--hh-text)' }}
               >
                 ✕
               </button>
@@ -542,7 +636,7 @@ export default function TaskSyncHub({
 
             <form onSubmit={handleCreateDetailedTask} className="space-y-4 font-mono text-xs">
               <div>
-                <label className="block text-[#f3efe6]/70 uppercase tracking-wider mb-1.5">
+                <label className="block uppercase tracking-wider mb-1.5" style={{ color: 'var(--hh-muted)' }}>
                   Task Title *
                 </label>
                 <input
@@ -551,12 +645,17 @@ export default function TaskSyncHub({
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g., Update B2B catalogue pricing matrix"
-                  className="w-full bg-[#1e1c18] border border-[#f3efe6]/15 rounded-lg px-3.5 py-2.5 text-sm text-[#f3efe6] focus:outline-none focus:border-emerald-400 font-sans"
+                  className="w-full border rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 font-sans"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block text-[#f3efe6]/70 uppercase tracking-wider mb-1.5">
+                <label className="block uppercase tracking-wider mb-1.5" style={{ color: 'var(--hh-muted)' }}>
                   Description
                 </label>
                 <textarea
@@ -564,19 +663,29 @@ export default function TaskSyncHub({
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                   placeholder="Detailed instructions or specifications..."
-                  className="w-full bg-[#1e1c18] border border-[#f3efe6]/15 rounded-lg px-3.5 py-2.5 text-xs text-[#f3efe6] focus:outline-none focus:border-emerald-400 font-sans"
+                  className="w-full border rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:border-emerald-500 font-sans"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#f3efe6]/70 uppercase tracking-wider mb-1.5">
+                  <label className="block uppercase tracking-wider mb-1.5" style={{ color: 'var(--hh-muted)' }}>
                     Website / Section
                   </label>
                   <select
                     value={newSectionId}
                     onChange={(e) => setNewSectionId(e.target.value)}
-                    className="w-full bg-[#1e1c18] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none"
+                    className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-text)',
+                    }}
                   >
                     {sections.map((sec) => (
                       <option key={sec.id} value={sec.id}>
@@ -587,13 +696,18 @@ export default function TaskSyncHub({
                 </div>
 
                 <div>
-                  <label className="block text-[#f3efe6]/70 uppercase tracking-wider mb-1.5">
+                  <label className="block uppercase tracking-wider mb-1.5" style={{ color: 'var(--hh-muted)' }}>
                     Priority
                   </label>
                   <select
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value as Priority)}
-                    className="w-full bg-[#1e1c18] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none"
+                    className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-text)',
+                    }}
                   >
                     <option value="low">Low Priority</option>
                     <option value="medium">Medium Priority</option>
@@ -605,19 +719,24 @@ export default function TaskSyncHub({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#f3efe6]/70 uppercase tracking-wider mb-1.5">
+                  <label className="block uppercase tracking-wider mb-1.5" style={{ color: 'var(--hh-muted)' }}>
                     Due Date
                   </label>
                   <input
                     type="date"
                     value={newDueDate}
                     onChange={(e) => setNewDueDate(e.target.value)}
-                    className="w-full bg-[#1e1c18] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none"
+                    className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-text)',
+                    }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[#f3efe6]/70 uppercase tracking-wider mb-1.5">
+                  <label className="block uppercase tracking-wider mb-1.5" style={{ color: 'var(--hh-muted)' }}>
                     Tags (comma-separated)
                   </label>
                   <input
@@ -625,22 +744,35 @@ export default function TaskSyncHub({
                     value={newTags}
                     onChange={(e) => setNewTags(e.target.value)}
                     placeholder="e.g. ERP, Drops, WhatsApp"
-                    className="w-full bg-[#1e1c18] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none font-sans"
+                    className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none font-sans"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-text)',
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#f3efe6]/10">
+              <div
+                className="flex items-center justify-end gap-3 pt-4 border-t"
+                style={{ borderColor: 'var(--hh-border)' }}
+              >
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-[#1e1c18] hover:bg-[#25221e] text-[#f3efe6]/80 rounded-lg cursor-pointer"
+                  className="px-4 py-2 border rounded-lg cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-[#0e0d0b] font-bold rounded-lg cursor-pointer shadow-lg"
+                  className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg cursor-pointer shadow-lg"
                 >
                   Sync Across Devices
                 </button>

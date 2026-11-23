@@ -31,6 +31,8 @@ import {
   Terminal,
 } from 'lucide-react';
 import { trackEvent } from '../../services/analytics';
+import { Language, TRANSLATIONS, TranslationDictionary } from '../../i18n/translations';
+import { useTheme } from '../../context/ThemeContext';
 
 import adCampaignsImg from '../../assets/images/handfilm_ad_campaigns_1795465510343.jpg';
 import studioProjectsImg from '../../assets/images/handfilm_studio_projects_1795465511068.jpg';
@@ -69,6 +71,7 @@ interface VerticalShowcaseCard {
   duration: string;
   ratio: string;
   description: string;
+  chips: string[];
   imageUrl: string;
   fallbackGradient: string;
   href: string;
@@ -86,6 +89,7 @@ interface ModelShowcaseItem {
   highlights: string[];
   query: string;
   href: string;
+  gradientClass: string;
   accentHex: string;
 }
 
@@ -117,6 +121,8 @@ interface DownloadArtifact {
 
 export interface HandFilmHubViewProps {
   onSetCursorLabel?: (label: string) => void;
+  language?: Language;
+  t?: TranslationDictionary;
 }
 
 function buildStoryboardUrl(query: string): string {
@@ -138,7 +144,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: '1-click guided creator editor for instant assembly',
         tag: '?mode=easy',
         href: buildStoryboardUrl('mode=easy'),
-        icon: <Zap className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Zap className="w-4 h-4 text-[#0284c7]" />,
       },
       {
         id: 'prod-beast',
@@ -146,7 +152,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Full multi-track NLE & WebGL2 GPU color grading suite',
         tag: '?mode=beast',
         href: buildStoryboardUrl('mode=beast'),
-        icon: <Layers className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Layers className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'prod-capcut',
@@ -154,7 +160,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Rapid magnetic timeline & automated beat-sync workflow',
         tag: '?mode=capcut',
         href: buildStoryboardUrl('mode=capcut'),
-        icon: <Sparkles className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Sparkles className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'prod-ad-studio',
@@ -162,7 +168,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'F-Commerce & B2B high-converting product video generator',
         tag: '?tool=ad-studio',
         href: buildStoryboardUrl('tool=ad-studio'),
-        icon: <ShoppingBag className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <ShoppingBag className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'prod-100shots',
@@ -170,7 +176,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Instant 100-shot sequence assembly from raw clips & stills',
         tag: '?tool=100shots',
         href: buildStoryboardUrl('tool=100shots'),
-        icon: <Clapperboard className="w-4 h-4 text-white" />,
+        icon: <Clapperboard className="w-4 h-4 text-[#06b6d4]" />,
       },
     ],
   },
@@ -186,7 +192,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Silence removal, gaze framing, and scene boundary detection',
         tag: '?tool=smart-eye',
         href: buildStoryboardUrl('tool=smart-eye'),
-        icon: <Eye className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Eye className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'feat-bangla-type',
@@ -195,7 +201,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         banglaSample: 'গতিশীল বাংলা টাইপোগ্রাফি',
         tag: '?tool=bangla-type',
         href: buildStoryboardUrl('tool=bangla-type'),
-        icon: <Wand2 className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Wand2 className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'feat-mood-pad',
@@ -203,7 +209,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'XY tactile cinematic LUT interpolation in WebGL2',
         tag: '?tool=mood-pad',
         href: buildStoryboardUrl('tool=mood-pad'),
-        icon: <Sliders className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Sliders className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'feat-audio-master',
@@ -211,7 +217,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Vocal isolation, ducking, and broadcast loudness normalization',
         tag: '?tool=audio-master',
         href: buildStoryboardUrl('tool=audio-master'),
-        icon: <Volume2 className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Volume2 className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'feat-reframe',
@@ -219,7 +225,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Subject-locked vertical framing from 16:9 cinema masters',
         tag: '?tool=reframe-9-16',
         href: buildStoryboardUrl('tool=reframe-9-16'),
-        icon: <Ratio className="w-4 h-4 text-white" />,
+        icon: <Ratio className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'feat-decoder',
@@ -227,7 +233,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Direct .MOV / .MKV / .AVI hardware ingest without transcoding',
         tag: '?tool=universal-decoder',
         href: buildStoryboardUrl('tool=universal-decoder'),
-        icon: <Cpu className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Cpu className="w-4 h-4 text-[#8b5cf6]" />,
       },
     ],
   },
@@ -243,7 +249,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Subject bounding lock & optical motion pan smoothing',
         tag: '?model=smart-eye-vision',
         href: buildStoryboardUrl('model=smart-eye-vision'),
-        icon: <Eye className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Eye className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'mod-beat-sync',
@@ -251,7 +257,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Transient onset quantization across 100+ rapid cuts',
         tag: '?model=beat-sync',
         href: buildStoryboardUrl('model=beat-sync'),
-        icon: <Zap className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Zap className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'mod-bangla-sub',
@@ -260,7 +266,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         banglaSample: 'বাংলা + English সাবটাইটেল',
         tag: '?model=bangla-en-subtitles',
         href: buildStoryboardUrl('model=bangla-en-subtitles'),
-        icon: <Globe className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Globe className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'mod-mask',
@@ -268,7 +274,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Real-time product & subject cutout over custom plates',
         tag: '?model=mask-isolation',
         href: buildStoryboardUrl('model=mask-isolation'),
-        icon: <Layers className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Layers className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'mod-omni',
@@ -276,7 +282,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Simultaneous 9:16, 4:5, 1:1, 16:9 & 2.39:1 master exports',
         tag: '?model=omnichannel-resize',
         href: buildStoryboardUrl('model=omnichannel-resize'),
-        icon: <Maximize2 className="w-4 h-4 text-white" />,
+        icon: <Maximize2 className="w-4 h-4 text-[#06b6d4]" />,
       },
     ],
   },
@@ -292,7 +298,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'OAuth 2.0 direct upload, chapters & metadata push',
         tag: '?integration=youtube-studio',
         href: buildStoryboardUrl('integration=youtube-studio'),
-        icon: <Youtube className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Youtube className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'int-r2',
@@ -300,7 +306,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Zero-egress edge asset streaming & project state snapshots',
         tag: '?integration=cloudflare-r2',
         href: buildStoryboardUrl('integration=cloudflare-r2'),
-        icon: <Cloud className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Cloud className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'int-b2b',
@@ -308,7 +314,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Pull garment, leather & 316L SKUs from b2b.handsandhead.com',
         tag: 'b2b.handsandhead.com',
         href: B2B_CATALOG_URL,
-        icon: <Package className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Package className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'int-safezones',
@@ -316,7 +322,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Live HUD overlays protecting UI chrome margins',
         tag: '?integration=safe-zones',
         href: buildStoryboardUrl('integration=safe-zones'),
-        icon: <Smartphone className="w-4 h-4 text-white" />,
+        icon: <Smartphone className="w-4 h-4 text-[#8b5cf6]" />,
       },
     ],
   },
@@ -333,7 +339,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         banglaSample: 'এফ-কমার্স প্রোডাক্ট রিলস',
         tag: '?solution=f-commerce',
         href: buildStoryboardUrl('solution=f-commerce'),
-        icon: <ShoppingBag className="w-4 h-4 text-[#e11d48]" />,
+        icon: <ShoppingBag className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'sol-rmg',
@@ -341,7 +347,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Factory floor lookbooks, 300 GSM swatch reels & buyer pitch decks',
         tag: '?solution=rmg-leather-export',
         href: buildStoryboardUrl('solution=rmg-leather-export'),
-        icon: <Building2 className="w-4 h-4 text-[#C8A96A]" />,
+        icon: <Building2 className="w-4 h-4 text-[#8b5cf6]" />,
       },
       {
         id: 'sol-creators',
@@ -349,7 +355,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Beat-locked kinetic cuts, karaoke subtitles & 9:16 exports',
         tag: '?solution=short-form-creators',
         href: buildStoryboardUrl('solution=short-form-creators'),
-        icon: <Film className="w-4 h-4 text-[#e11d48]" />,
+        icon: <Film className="w-4 h-4 text-[#06b6d4]" />,
       },
       {
         id: 'sol-agencies',
@@ -357,7 +363,7 @@ const MEGA_MENU_GROUPS: MegaMenuGroup[] = [
         subtitle: 'Multi-track Beast NLE timelines with shared R2 asset vaults',
         tag: '?solution=agencies',
         href: buildStoryboardUrl('solution=agencies'),
-        icon: <Users className="w-4 h-4 text-white" />,
+        icon: <Users className="w-4 h-4 text-[#8b5cf6]" />,
       },
     ],
   },
@@ -372,8 +378,9 @@ const VERTICAL_SHOWCASE_CARDS: VerticalShowcaseCard[] = [
     duration: '00:15 REEL',
     ratio: '9:16',
     description: 'F-Commerce & D2C leather/apparel conversion cuts with instant price & CTA slates.',
+    chips: ['9:16 Vertical', 'Price Slates', 'Bangla+EN'],
     imageUrl: adCampaignsImg,
-    fallbackGradient: 'from-[#280b12] via-[#120b0d] to-[#09090b]',
+    fallbackGradient: 'from-[#083344] via-[#0f172a] to-[#0a0c10]',
     href: buildStoryboardUrl('tool=ad-studio&workflow=ad-campaigns'),
     queryTag: '?tool=ad-studio',
   },
@@ -384,8 +391,9 @@ const VERTICAL_SHOWCASE_CARDS: VerticalShowcaseCard[] = [
     duration: '02:40 FILM',
     ratio: '9:16',
     description: 'Multi-track timeline compositing, WebGL2 color LUTs, and -14 LUFS stem mastering.',
+    chips: ['WebGL2 LUT', 'Multi-Track', '-14 LUFS'],
     imageUrl: studioProjectsImg,
-    fallbackGradient: 'from-[#181410] via-[#0e0f12] to-[#09090b]',
+    fallbackGradient: 'from-[#1e1b4b] via-[#0f172a] to-[#0a0c10]',
     href: buildStoryboardUrl('mode=beast&workflow=studio-projects'),
     queryTag: '?mode=beast',
   },
@@ -396,8 +404,9 @@ const VERTICAL_SHOWCASE_CARDS: VerticalShowcaseCard[] = [
     duration: '00:30 LOOKBOOK',
     ratio: '9:16',
     description: '300 GSM combed cotton & 316L stainless hardware showcase reels synced from B2B.',
+    chips: ['300 GSM', '316L Steel', 'B2B Sync'],
     imageUrl: brandAssetsImg,
-    fallbackGradient: 'from-[#19191c] via-[#101012] to-[#09090b]',
+    fallbackGradient: 'from-[#0f172a] via-[#131720] to-[#0a0c10]',
     href: buildStoryboardUrl('tool=ad-studio&workflow=brand-assets'),
     queryTag: '?workflow=brand-assets',
   },
@@ -405,24 +414,26 @@ const VERTICAL_SHOWCASE_CARDS: VerticalShowcaseCard[] = [
     id: 'social-trends',
     title: 'Social Trends',
     kicker: 'CAPCUT RAPID',
-    duration: '00:12 BEAT-SYNC',
+    duration: '00:12 SYNC',
     ratio: '9:16',
     description: 'Magnetic timeline beat-snapping, Smart-Eye framing, and kinetic bilingual hooks.',
+    chips: ['Beat-Sync', 'Smart-Eye', 'Auto-Reframe'],
     imageUrl: socialTrendsImg,
-    fallbackGradient: 'from-[#250b14] via-[#140d10] to-[#09090b]',
+    fallbackGradient: 'from-[#164e63] via-[#131720] to-[#0a0c10]',
     href: buildStoryboardUrl('mode=capcut&workflow=social-trends'),
     queryTag: '?mode=capcut',
   },
   {
     id: 'tutorials',
-    title: 'Tutorials',
+    title: 'Creator Guides',
     kicker: 'EASY MODE',
     banglaTag: 'বাংলা টিউটোরিয়াল',
     duration: '01:05 GUIDE',
     ratio: '9:16',
     description: '1-click guided walkthroughs from raw .MOV/.MKV footage to finished cinema export.',
+    chips: ['.MOV/.MKV', '1-Click', 'Zero Install'],
     imageUrl: tutorialsImg,
-    fallbackGradient: 'from-[#1c1610] via-[#11100e] to-[#09090b]',
+    fallbackGradient: 'from-[#312e81] via-[#131720] to-[#0a0c10]',
     href: buildStoryboardUrl('mode=easy&workflow=tutorials'),
     queryTag: '?mode=easy',
   },
@@ -432,86 +443,86 @@ const MODEL_SHOWCASE_ITEMS: ModelShowcaseItem[] = [
   {
     id: 'easy-cockpit',
     name: 'Easy Cockpit',
-    kicker: '01 / GUIDED WORKFLOW',
+    kicker: '01 / GUIDED',
     filterGroup: 'editor',
     badge: '1-Click Creator',
     latency: '0.4s Boot',
-    description:
-      'Streamlined single-track cockpit for fast trims, automated Bangla-EN captions, and instant social aspect ratio presets.',
-    highlights: ['Auto Silence Trim', 'Instant Caption Styling', 'One-Tap 9:16 Export'],
+    description: 'Streamlined single-track cockpit for fast trims, automated Bangla-EN captions, and instant social exports.',
+    highlights: ['Auto Trim', 'Bangla Captions', '9:16 Preset'],
     query: '?mode=easy',
     href: buildStoryboardUrl('mode=easy'),
-    accentHex: '#e11d48',
+    gradientClass: 'from-cyan-500/25 via-sky-500/10 to-indigo-500/20',
+    accentHex: '#06b6d4',
   },
   {
     id: 'beast-nle',
     name: 'Beast NLE',
-    kicker: '02 / PRO MULTI-TRACK',
+    kicker: '02 / MULTI-TRACK',
     filterGroup: 'editor',
     badge: 'WebGL2 Cinema',
     latency: '60 FPS GPU',
-    description:
-      'Full non-linear multi-track timeline with custom GLSL shader nodes, 2D Mood-Pad grading, and -14 LUFS broadcast mastering.',
-    highlights: ['Unlimited Video/Audio Tracks', '2D Mood-Pad Grading', '.MOV / .MKV / .AVI Native'],
+    description: 'Full non-linear multi-track timeline with GLSL shaders, 2D Mood-Pad grading, and -14 LUFS mastering.',
+    highlights: ['Multi-Track', '2D Mood-Pad', '.MOV/.MKV Native'],
     query: '?mode=beast',
     href: buildStoryboardUrl('mode=beast'),
-    accentHex: '#C8A96A',
+    gradientClass: 'from-violet-500/25 via-indigo-500/10 to-cyan-500/20',
+    accentHex: '#8b5cf6',
   },
   {
     id: 'capcut-rapid',
     name: 'CapCut Rapid',
-    kicker: '03 / MAGNETIC TIMELINE',
+    kicker: '03 / MAGNETIC',
     filterGroup: 'editor',
-    badge: 'Beat-Sync Engine',
+    badge: 'Beat-Sync',
     latency: '12ms Snap',
-    description:
-      'Magnetic ripple timeline engineered for high-velocity short-form edits, transient beat markers, and viral velocity curves.',
-    highlights: ['Auto Beat-Sync Markers', 'Speed-Ramp Keyframes', 'Safe-Zone Overlays'],
+    description: 'Magnetic ripple timeline engineered for high-velocity short-form edits, transient markers, and velocity curves.',
+    highlights: ['Beat Markers', 'Speed-Ramp', 'Safe-Zones'],
     query: '?mode=capcut',
     href: buildStoryboardUrl('mode=capcut'),
-    accentHex: '#e11d48',
+    gradientClass: 'from-sky-500/25 via-cyan-500/15 to-teal-500/20',
+    accentHex: '#0284c7',
   },
   {
     id: 'smart-eye-vision',
     name: 'Smart-Eye Vision',
-    kicker: '04 / COMPUTER VISION',
+    kicker: '04 / VISION AI',
     filterGroup: 'ai',
     badge: 'AI Auto Cut',
     latency: 'Real-Time',
-    description:
-      'Intelligent vision tracker that identifies speakers, leather/garment product focal points, and dead air to cut automatically.',
-    highlights: ['Subject Focal Lock', 'Dead-Air Auto Removal', 'Mask & Cutout Isolation'],
+    description: 'Intelligent vision tracker that locks speakers, leather/garment focal points, and removes dead air automatically.',
+    highlights: ['Subject Lock', 'Dead-Air Cut', 'Mask Cutout'],
     query: '?tool=smart-eye',
     href: buildStoryboardUrl('tool=smart-eye'),
-    accentHex: '#C8A96A',
+    gradientClass: 'from-indigo-500/25 via-violet-500/15 to-cyan-500/20',
+    accentHex: '#7c3aed',
   },
   {
     id: 'ad-studio-gen',
-    name: 'AD Studio Generator',
-    kicker: '05 / COMMERCE VIDEO',
+    name: 'AD Studio',
+    kicker: '05 / COMMERCE',
     filterGroup: 'commerce',
     badge: 'F-Commerce & B2B',
     latency: '1→5 Formats',
-    description:
-      'Turns raw product photos or B2B catalog SKUs into high-converting vertical video ads with kinetic Bangla & English callouts.',
-    highlights: ['SKU-to-Video Assembly', 'Bangla Kinetic Titles', 'WhatsApp & Shop CTAs'],
+    description: 'Turns raw product photos or B2B catalog SKUs into high-converting vertical ads with Bangla & English hooks.',
+    highlights: ['SKU-to-Video', 'Bangla Titles', 'WhatsApp CTA'],
     query: '?tool=ad-studio',
     href: buildStoryboardUrl('tool=ad-studio'),
-    accentHex: '#e11d48',
+    gradientClass: 'from-cyan-500/25 via-emerald-500/10 to-sky-500/20',
+    accentHex: '#06b6d4',
   },
   {
     id: 'reels-reframe',
-    name: 'Reels 9:16 Reframe',
-    kicker: '06 / OMNICHANNEL RESIZE',
+    name: 'Reels Reframe',
+    kicker: '06 / RESIZE AI',
     filterGroup: 'ai',
-    badge: '1→5 Aspect Matrix',
+    badge: '1→5 Matrix',
     latency: 'Batch GPU',
-    description:
-      'Reframes horizontal 16:9 cinema timelines into 9:16 Reels, Shorts, TikTok, 4:5 Feed, and 1:1 square masters in one pass.',
-    highlights: ['Optical Pan Tracking', 'Platform Safe-Zones', 'Simultaneous Batch Export'],
+    description: 'Reframes horizontal 16:9 cinema timelines into 9:16 Reels, Shorts, TikTok, 4:5 Feed, and 1:1 square masters.',
+    highlights: ['Pan Tracking', 'Safe-Zones', 'Batch Export'],
     query: '?tool=reframe-9-16',
     href: buildStoryboardUrl('tool=reframe-9-16'),
-    accentHex: '#C8A96A',
+    gradientClass: 'from-violet-500/25 via-fuchsia-500/10 to-sky-500/20',
+    accentHex: '#8b5cf6',
   },
 ];
 
@@ -519,38 +530,38 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
   {
     number: '01',
     title: 'Start With Your Idea',
-    subtitle: 'Drop .MOV / .MKV / .AVI clips, a B2B product SKU, or a 100-Shot prompt',
+    subtitle: 'Drop .MOV / .MKV / .AVI clips, a B2B SKU, or a 100-Shot prompt',
     description:
       'Ingest raw camera footage directly in the browser with our universal decoder—or launch AD Studio with a product SKU to auto-build your hook, storyboard beats, and bilingual script.',
     banglaCaption: 'সহজ বাংলা ও ইংরেজি স্ক্রিপ্ট দিয়ে শুরু করুন',
     storyboardQuery: 'tool=100shots',
-    ctaLabel: 'Open Idea & 100-Shot Planner ↗',
+    ctaLabel: 'Launch in Storyboard ↗',
     previewHeader: 'INGEST & STORYBOARD SEED',
-    previewSpecs: ['Universal .MOV/.MKV/.AVI', 'B2B SKU Bridge', 'Bangla-EN Hook Generator'],
+    previewSpecs: ['Universal .MOV/.MKV/.AVI', 'B2B SKU Bridge', 'Bangla-EN Hook'],
   },
   {
     number: '02',
-    title: 'Shape It on the Timeline',
+    title: 'Shape on Timeline',
     subtitle: 'Switch seamlessly between Easy, CapCut Rapid, and Beast NLE modes',
     description:
       'Snap cuts to audio transients with Auto Beat-Sync, strip pauses via Smart-Eye Auto Cut, and layer crisp Bangla kinetic typography with intact conjunct ligatures.',
     banglaCaption: 'বিট-সিঙ্ক টাইমলাইনে নিখুঁত এডিটিং',
     storyboardQuery: 'mode=capcut',
-    ctaLabel: 'Open Timeline in Storyboard ↗',
+    ctaLabel: 'Launch in Storyboard ↗',
     previewHeader: 'MAGNETIC BEAT-SYNC & SMART-EYE NLE',
     previewSpecs: ['Smart-Eye Auto Cut', 'Magnetic Beat Snapping', 'Bangla Kinetic Titles'],
   },
   {
     number: '03',
-    title: 'Add the Final Touches',
+    title: 'Final Color & Export',
     subtitle: '2D Mood-Pad WebGL2 grade, -14 LUFS master & 1→5 Omnichannel Export',
     description:
       'Dial cinema color with the tactile 2D Mood-Pad, lock audio loudness to -14 LUFS, verify Shorts/Reels safe-zones, and publish directly to YouTube Studio or Cloudflare R2.',
     banglaCaption: 'কালার গ্রেড এবং -১৪ LUFS মাস্টারিং',
     storyboardQuery: 'mode=beast&tool=mood-pad',
-    ctaLabel: 'Open Color & Master Suite ↗',
+    ctaLabel: 'Launch in Storyboard ↗',
     previewHeader: 'WEBGL2 MOOD-PAD & OMNICHANNEL MASTER',
-    previewSpecs: ['2D Mood-Pad LUTs', '-14 LUFS Audio Master', 'YouTube OAuth & R2 Export'],
+    previewSpecs: ['2D Mood-Pad LUTs', '-14 LUFS Audio Master', 'YouTube OAuth & R2'],
   },
 ];
 
@@ -609,14 +620,23 @@ const DOWNLOAD_ARTIFACTS: DownloadArtifact[] = [
   },
 ];
 
-export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewProps) {
+export default function HandFilmHubView({
+  onSetCursorLabel,
+  language = 'en',
+  t = TRANSLATIONS.en,
+}: HandFilmHubViewProps) {
+  const { isDark } = useTheme();
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null);
   const [activeModelFilter, setActiveModelFilter] = useState<'all' | 'editor' | 'ai' | 'commerce'>('all');
   const [selectedModelId, setSelectedModelId] = useState<string>('easy-cockpit');
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
   const [moodPadPos, setMoodPadPos] = useState<{ x: number; y: number }>({ x: 64, y: 34 });
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(false);
-  const [hoveredVerticalId, setHoveredVerticalId] = useState<string | null>(null);
+
+  // Touch tap-to-reveal states for minimalist hover cards
+  const [expandedVerticalId, setExpandedVerticalId] = useState<string | null>(null);
+  const [expandedModelId, setExpandedModelId] = useState<string | null>(null);
+  const [expandedDiscoverId, setExpandedDiscoverId] = useState<string | null>(null);
 
   const navContainerRef = useRef<HTMLDivElement | null>(null);
   const closeHoverTimerRef = useRef<number | null>(null);
@@ -651,7 +671,6 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
     }, 140);
   }, [clearHoverTimer]);
 
-  // Close mega-menu or download modal on Escape / outside click
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -694,18 +713,29 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
     trackEvent('HANDFILM_STORYBOARD_LAUNCH', { source, targetUrl });
   };
 
+  const getSubnavLabel = (key: MegaMenuKey): string => {
+    return t.handfilm.subnav[key];
+  };
+
   return (
     <div
-      className="relative min-h-screen w-full bg-[#09090b] text-[#f3efe6] pt-[58px] sm:pt-[62px] pb-36 font-inter selection:bg-[#e11d48] selection:text-white"
+      className={`relative min-h-screen w-full pt-[58px] sm:pt-[62px] pb-36 font-inter hh-theme-transition ${
+        language === 'bn' ? 'bangla-text' : ''
+      }`}
+      style={{
+        backgroundColor: 'var(--hh-bg)',
+        color: 'var(--hh-text)',
+      }}
       onMouseEnter={() => onSetCursorLabel?.('HANDFILM STUDIO →')}
     >
-      {/* Subtle architectural background vignette & crimson aura */}
+      {/* Airy CapCut-Inspired Ambient Aura */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 opacity-75"
+        className="pointer-events-none fixed inset-0 z-0"
         style={{
-          background:
-            'radial-gradient(ellipse 70% 42% at 50% 0%, rgba(225, 29, 72, 0.13), transparent 72%), radial-gradient(ellipse 45% 35% at 85% 20%, rgba(200, 169, 106, 0.08), transparent 70%)',
+          background: isDark
+            ? 'radial-gradient(ellipse 68% 44% at 50% 0%, rgba(6, 182, 212, 0.14), transparent 72%), radial-gradient(ellipse 46% 36% at 86% 18%, rgba(139, 92, 246, 0.12), transparent 70%)'
+            : 'radial-gradient(ellipse 68% 44% at 50% 0%, rgba(2, 132, 199, 0.08), transparent 72%), radial-gradient(ellipse 46% 36% at 86% 18%, rgba(124, 58, 237, 0.07), transparent 70%)',
         }}
       />
 
@@ -715,7 +745,11 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
       <div
         ref={navContainerRef}
         onMouseLeave={handleScheduleCloseMenu}
-        className="sticky top-[57px] sm:top-[61px] z-40 border-b border-white/10 bg-[#09090b]/92 backdrop-blur-xl"
+        className="sticky top-[57px] sm:top-[61px] z-40 border-b backdrop-blur-xl hh-theme-transition"
+        style={{
+          borderColor: 'var(--hh-border)',
+          backgroundColor: 'var(--hh-header-bg)',
+        }}
       >
         <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between gap-4 py-2.5">
@@ -726,15 +760,23 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackStoryboardLaunch('subnav_brand', buildStoryboardUrl(''))}
-                className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#e11d48]/15 border border-[#e11d48]/45 text-white hover:bg-[#e11d48] transition-colors whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors whitespace-nowrap shrink-0"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-accent)',
+                  color: 'var(--hh-text)',
+                }}
               >
-                <Film className="w-3.5 h-3.5 text-[#e11d48] group-hover:text-white" />
-                <span className="font-space-mono text-[11px] font-bold tracking-[0.14em] uppercase">
-                  HANDFILM STUDIO
+                <Film className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
+                <span className="font-space-mono text-[11px] font-bold tracking-[0.12em] uppercase">
+                  {t.handfilm.studioLabel}
                 </span>
               </a>
-              <span className="hidden 2xl:inline font-space-mono text-[11px] text-zinc-400 whitespace-nowrap">
-                Powered by WebGL2 Cinema Engine
+              <span
+                className="hidden 2xl:inline font-space-mono text-[11px] whitespace-nowrap"
+                style={{ color: 'var(--hh-muted)' }}
+              >
+                WebGL2 Creator Engine
               </span>
             </div>
 
@@ -752,17 +794,18 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                     aria-expanded={isOpen}
                     onMouseEnter={() => handleOpenHoverMenu(group.key)}
                     onClick={() => setOpenMenu(isOpen ? null : group.key)}
-                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                      isOpen
-                        ? 'bg-white/10 text-white'
-                        : 'text-zinc-300 hover:text-white hover:bg-white/5'
-                    }`}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    style={{
+                      backgroundColor: isOpen ? 'var(--hh-surface-2)' : 'transparent',
+                      color: isOpen ? 'var(--hh-text)' : 'var(--hh-muted)',
+                    }}
                   >
-                    <span>{group.label}</span>
+                    <span>{getSubnavLabel(group.key)}</span>
                     <ChevronDown
                       className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                        isOpen ? 'rotate-180 text-[#e11d48]' : 'text-zinc-500'
+                        isOpen ? 'rotate-180' : ''
                       }`}
+                      style={{ color: isOpen ? 'var(--hh-accent)' : 'var(--hh-muted)' }}
                     />
                   </button>
                 );
@@ -772,18 +815,20 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 type="button"
                 onMouseEnter={() => setOpenMenu(null)}
                 onClick={() => scrollToSection('handfilm-discover')}
-                className="px-3 py-1.5 rounded-md text-[13px] font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                style={{ color: 'var(--hh-muted)' }}
               >
-                Discover
+                {t.handfilm.subnav.discover}
               </button>
 
               <button
                 type="button"
                 onMouseEnter={() => setOpenMenu(null)}
                 onClick={() => scrollToSection('handfilm-pricing')}
-                className="px-3 py-1.5 rounded-md text-[13px] font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                style={{ color: 'var(--hh-muted)' }}
               >
-                Pricing
+                {t.handfilm.subnav.pricing}
               </button>
             </nav>
 
@@ -796,10 +841,15 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                   setIsDownloadModalOpen(true);
                   trackEvent('HANDFILM_OPEN_DOWNLOAD_MODAL', { source: 'subnav' });
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-white/15 bg-zinc-900/90 hover:border-white/35 text-xs font-medium text-zinc-100 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               >
-                <Download className="w-3.5 h-3.5 text-[#C8A96A]" />
-                <span>Download</span>
+                <Download className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent-2)' }} />
+                <span>{t.handfilm.downloadBtn}</span>
               </button>
 
               <a
@@ -807,9 +857,13 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackStoryboardLaunch('subnav_try_online', buildStoryboardUrl(''))}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-[#e11d48] hover:bg-[#f43f5e] text-xs font-semibold text-white transition-colors whitespace-nowrap shrink-0 shadow-[0_0_20px_rgba(225,29,72,0.3)]"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
+                style={{
+                  backgroundColor: 'var(--hh-accent)',
+                  color: 'var(--hh-accent-ink)',
+                }}
               >
-                <span>Try online</span>
+                <span>{t.handfilm.tryOnline}</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </a>
             </div>
@@ -825,13 +879,14 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => setOpenMenu(isOpen ? null : group.key)}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium whitespace-nowrap shrink-0 cursor-pointer border ${
-                    isOpen
-                      ? 'bg-[#e11d48] border-[#e11d48] text-white'
-                      : 'bg-zinc-900 border-white/10 text-zinc-300'
-                  }`}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 cursor-pointer border"
+                  style={{
+                    backgroundColor: isOpen ? 'var(--hh-accent)' : 'var(--hh-surface)',
+                    borderColor: isOpen ? 'var(--hh-accent)' : 'var(--hh-border)',
+                    color: isOpen ? 'var(--hh-accent-ink)' : 'var(--hh-text)',
+                  }}
                 >
-                  <span>{group.label}</span>
+                  <span>{getSubnavLabel(group.key)}</span>
                   <ChevronDown className={`w-3 h-3 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
               );
@@ -839,16 +894,26 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
             <button
               type="button"
               onClick={() => scrollToSection('handfilm-discover')}
-              className="px-2.5 py-1 rounded text-xs font-medium bg-zinc-900 border border-white/10 text-zinc-300 whitespace-nowrap shrink-0 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg text-xs font-medium border whitespace-nowrap shrink-0 cursor-pointer"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
-              Discover
+              {t.handfilm.subnav.discover}
             </button>
             <button
               type="button"
               onClick={() => scrollToSection('handfilm-pricing')}
-              className="px-2.5 py-1 rounded text-xs font-medium bg-zinc-900 border border-white/10 text-zinc-300 whitespace-nowrap shrink-0 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg text-xs font-medium border whitespace-nowrap shrink-0 cursor-pointer"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
-              Pricing
+              {t.handfilm.subnav.pricing}
             </button>
           </div>
         </div>
@@ -857,19 +922,32 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
         {activeMenuGroup && (
           <div
             onMouseEnter={clearHoverTimer}
-            className="absolute left-0 right-0 top-full z-50 border-b border-white/12 bg-[#0d0d10]/98 backdrop-blur-2xl shadow-2xl"
+            className="absolute left-0 right-0 top-full z-50 border-b backdrop-blur-2xl shadow-2xl"
+            style={{
+              borderColor: 'var(--hh-border)',
+              backgroundColor: 'var(--hh-glass-bg)',
+            }}
           >
             <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12 py-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                {/* Left Editorial Context */}
-                <div className="lg:col-span-4 space-y-2 border-b lg:border-b-0 lg:border-r border-white/10 pb-4 lg:pb-0 lg:pr-6">
-                  <div className="font-space-mono text-[11px] uppercase tracking-[0.16em] text-[#e11d48]">
-                    {activeMenuGroup.label}
+                {/* Left Context */}
+                <div
+                  className="lg:col-span-4 space-y-2 border-b lg:border-b-0 lg:border-r pb-4 lg:pb-0 lg:pr-6"
+                  style={{ borderColor: 'var(--hh-border)' }}
+                >
+                  <div
+                    className="font-space-mono text-[11px] uppercase tracking-[0.16em] font-semibold"
+                    style={{ color: 'var(--hh-accent)' }}
+                  >
+                    {getSubnavLabel(activeMenuGroup.key)}
                   </div>
-                  <h3 className="font-bebas text-2xl sm:text-3xl tracking-wide text-white leading-none">
+                  <h3
+                    className="font-bebas text-2xl sm:text-3xl tracking-wide leading-none"
+                    style={{ color: 'var(--hh-text)' }}
+                  >
                     {activeMenuGroup.headline}
                   </h3>
-                  <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                  <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
                     {activeMenuGroup.summary}
                   </p>
                   <div className="pt-2">
@@ -880,9 +958,10 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                       onClick={() =>
                         trackStoryboardLaunch(`megamenu_${activeMenuGroup.key}_launch`, buildStoryboardUrl(''))
                       }
-                      className="inline-flex items-center gap-1.5 text-xs font-space-mono text-[#C8A96A] hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1.5 text-xs font-space-mono font-semibold hover:underline"
+                      style={{ color: 'var(--hh-accent)' }}
                     >
-                      <span>Open storyboard.handsandhead.com</span>
+                      <span>storyboard.handsandhead.com</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
                   </div>
@@ -900,31 +979,53 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                         trackStoryboardLaunch(`megamenu_${item.id}`, item.href);
                         setOpenMenu(null);
                       }}
-                      className="group flex flex-col justify-between gap-2.5 p-3.5 rounded-lg bg-[#131317] hover:bg-[#19191f] border border-white/10 hover:border-[#e11d48]/70 transition-all"
+                      className="group flex flex-col justify-between gap-2.5 p-3.5 rounded-[16px] border transition-all hover:-translate-y-0.5"
+                      style={{
+                        backgroundColor: 'var(--hh-surface)',
+                        borderColor: 'var(--hh-border)',
+                      }}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="w-8 h-8 rounded-md bg-[#09090b] border border-white/10 flex items-center justify-center shrink-0">
+                          <span
+                            className="w-8 h-8 rounded-lg border flex items-center justify-center shrink-0"
+                            style={{
+                              backgroundColor: 'var(--hh-bg)',
+                              borderColor: 'var(--hh-border)',
+                            }}
+                          >
                             {item.icon}
                           </span>
                           <div className="min-w-0">
-                            <div className="text-sm font-semibold text-white group-hover:text-[#e11d48] transition-colors truncate">
+                            <div
+                              className="text-sm font-semibold truncate"
+                              style={{ color: 'var(--hh-text)' }}
+                            >
                               {item.title}
                             </div>
-                            <div className="font-space-mono text-[10px] text-zinc-500 truncate">
+                            <div
+                              className="font-space-mono text-[10px] truncate"
+                              style={{ color: 'var(--hh-muted)' }}
+                            >
                               {item.tag}
                             </div>
                           </div>
                         </div>
-                        <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        <ArrowUpRight
+                          className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                          style={{ color: 'var(--hh-accent)' }}
+                        />
                       </div>
 
-                      <p className="text-xs text-zinc-400 leading-relaxed">{item.subtitle}</p>
+                      <p className="text-xs leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
+                        {item.subtitle}
+                      </p>
 
                       {item.banglaSample && (
                         <div
                           lang="bn"
-                          className="bangla-text text-xs text-[#C8A96A] pt-1 border-t border-white/5"
+                          className="bangla-text text-xs pt-1 border-t"
+                          style={{ color: 'var(--hh-accent-2)', borderColor: 'var(--hh-border)' }}
                         >
                           {item.banglaSample}
                         </div>
@@ -941,34 +1042,46 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
       {/* Main Content Container */}
       <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
         {/* ════════════════════════════════════════════════════════════════════════
-            B. HERO SHOWCASE & 5 VERTICAL 9:16 SHOWCASE CARDS
+            B. HERO SHOWCASE & 5 MINIMALIST 9:16 HOVER-REVEAL CARDS
         ════════════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="handfilm-hero-title" className="pt-10 sm:pt-14 pb-12 border-b border-white/10">
+        <section
+          aria-labelledby="handfilm-hero-title"
+          className="pt-10 sm:pt-14 pb-12 border-b"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           <div className="max-w-4xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-2.5 font-space-mono text-[11px] uppercase tracking-[0.2em] text-[#C8A96A]">
-              <span>HANDFILM STUDIO</span>
-              <span aria-hidden="true" className="text-zinc-600">·</span>
-              <span className="text-zinc-400">STORYBOARD.HANDSANDHEAD.COM</span>
-              <span aria-hidden="true" className="text-zinc-600">·</span>
-              <span className="text-[#e11d48]">WEBGL2 NLE</span>
+            <div className="inline-flex items-center gap-2.5 font-space-mono text-[11px] uppercase tracking-[0.2em]">
+              <span style={{ color: 'var(--hh-accent-2)' }} className="font-semibold">
+                {t.handfilm.studioLabel}
+              </span>
+              <span aria-hidden="true" style={{ color: 'var(--hh-border)' }}>·</span>
+              <span style={{ color: 'var(--hh-muted)' }}>STORYBOARD.HANDSANDHEAD.COM</span>
+              <span aria-hidden="true" style={{ color: 'var(--hh-border)' }}>·</span>
+              <span style={{ color: 'var(--hh-accent)' }} className="font-semibold">
+                WEBGL2 NLE
+              </span>
             </div>
 
             <h1
               id="handfilm-hero-title"
-              className="font-bebas tracking-[0.02em] text-white leading-[0.94]"
+              className="font-bold tracking-tight leading-[0.98]"
               style={{
-                fontSize: 'clamp(2.85rem, 6vw, 5.25rem)',
+                fontSize: 'clamp(2.5rem, 5.4vw, 4.75rem)',
                 textWrap: 'balance',
+                color: 'var(--hh-text)',
               }}
             >
-              AI-Powered Photo &amp; Video Editor for{' '}
-              <span className="font-cormorant italic font-semibold text-[#e11d48] tracking-normal">
-                Everyone
+              {t.handfilm.heroHeadlinePrefix}{' '}
+              <span
+                className="font-cormorant italic font-semibold tracking-normal"
+                style={{ color: 'var(--hh-accent)' }}
+              >
+                {t.handfilm.heroHeadlineAccent}
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-zinc-300 max-w-2xl mx-auto leading-relaxed">
-              Launch Easy Mode, Beast Mode, CapCut Mode, or AD Studio straight into Storyboard with zero latency.
+            <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
+              {t.handfilm.heroSubline}
             </p>
 
             {/* Hero Primary & Secondary CTAs */}
@@ -979,10 +1092,17 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 rel="noopener noreferrer"
                 onClick={() => trackStoryboardLaunch('hero_try_online', buildStoryboardUrl(''))}
                 onMouseEnter={() => onSetCursorLabel?.('LAUNCH STORYBOARD ↗')}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-md bg-[#e11d48] hover:bg-[#f43f5e] text-sm font-semibold text-white transition-colors shadow-[0_0_32px_rgba(225,29,72,0.35)] whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold transition-all hover:scale-[1.02] whitespace-nowrap shrink-0"
+                style={{
+                  backgroundColor: 'var(--hh-accent)',
+                  color: 'var(--hh-accent-ink)',
+                  boxShadow: isDark
+                    ? '0 12px 32px rgba(6, 182, 212, 0.28)'
+                    : '0 12px 28px rgba(2, 132, 199, 0.22)',
+                }}
               >
                 <Play className="w-4 h-4 fill-current" />
-                <span>Try online for free</span>
+                <span>{t.handfilm.tryOnline}</span>
                 <ArrowUpRight className="w-4 h-4" />
               </a>
 
@@ -993,145 +1113,177 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                   trackEvent('HANDFILM_OPEN_DOWNLOAD_MODAL', { source: 'hero' });
                 }}
                 onMouseEnter={() => onSetCursorLabel?.('GET DESKTOP / APK')}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-white/15 hover:border-white/35 text-sm font-medium text-zinc-100 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl border text-sm font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               >
-                <Download className="w-4 h-4 text-[#C8A96A]" />
-                <span>Download Desktop / Android</span>
+                <Download className="w-4 h-4" style={{ color: 'var(--hh-accent-2)' }} />
+                <span>{t.handfilm.downloadBtn}</span>
               </button>
             </div>
 
-            {/* Quiet Capability Metadata Strip (Zero-Pill Unboxed Format) */}
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-2 font-space-mono text-[11px] text-zinc-400">
+            <div
+              className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 font-space-mono text-[11px]"
+              style={{ color: 'var(--hh-muted)' }}
+            >
               <span>Zero-Install Browser NLE</span>
-              <span aria-hidden="true" className="text-zinc-700">·</span>
+              <span aria-hidden="true">·</span>
               <span>.MOV / .MKV / .AVI Native</span>
-              <span aria-hidden="true" className="text-zinc-700">·</span>
-              <span lang="bn" className="bangla-text text-zinc-300">
+              <span aria-hidden="true">·</span>
+              <span lang="bn" className="bangla-text" style={{ color: 'var(--hh-accent-2)' }}>
                 বাংলা কাইনেটিক টাইপোগ্রাফি ও সাবটাইটেল
               </span>
-              <span aria-hidden="true" className="text-zinc-700">·</span>
-              <span>-14 LUFS Master</span>
+              <span aria-hidden="true">·</span>
+              <span>{t.handfilm.tapHint}</span>
             </div>
           </div>
 
-          {/* 5 Vertical 9:16 Showcase Cards Strip */}
-          <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {/* 5 Vertical 9:16 CapCut-Style Minimalist Hover-Reveal Cards */}
+          <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
             {VERTICAL_SHOWCASE_CARDS.map((card) => {
-              const isHovered = hoveredVerticalId === card.id;
+              const isExpanded = expandedVerticalId === card.id;
               return (
-                <a
+                <div
                   key={card.id}
-                  href={card.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={() => {
-                    setHoveredVerticalId(card.id);
-                    onSetCursorLabel?.(`OPEN ${card.title.toUpperCase()} ↗`);
+                  onMouseEnter={() => onSetCursorLabel?.(`OPEN ${card.title.toUpperCase()} ↗`)}
+                  onClick={() => setExpandedVerticalId(isExpanded ? null : card.id)}
+                  className={`group relative min-h-[380px] aspect-[9/16] rounded-[20px] overflow-hidden border bg-gradient-to-b ${card.fallbackGradient} transition-all duration-300 ease-out hover:-translate-y-1 cursor-pointer`}
+                  style={{
+                    borderColor: 'var(--hh-border)',
+                    boxShadow: 'var(--hh-card-shadow)',
                   }}
-                  onMouseLeave={() => setHoveredVerticalId(null)}
-                  onClick={() => trackStoryboardLaunch(`vertical_card_${card.id}`, card.href)}
-                  className={`group relative aspect-[9/16] rounded-xl overflow-hidden border border-white/12 hover:border-[#e11d48]/80 bg-gradient-to-b ${card.fallbackGradient} flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-xl`}
                 >
-                  {/* Fallback Texture & Icon Underlay */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 flex items-center justify-center opacity-20"
-                  >
-                    <Film className="w-12 h-12 text-white/30" />
-                  </div>
-
-                  {/* Generated 9:16 Poster Asset */}
                   <img
                     src={card.imageUrl}
                     alt={`${card.title} workflow preview in HandFilm Studio`}
                     referrerPolicy="no-referrer"
-                    className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-95 group-hover:scale-[1.04] transition-all duration-300"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
                   />
 
-                  {/* Measured Contrast Scrim */}
                   <div
                     aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/45 to-[#09090b]/35"
+                    className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/35"
                   />
 
-                  {/* Top Metadata Bar */}
-                  <div className="relative z-10 p-4 flex items-center justify-between gap-2 font-space-mono text-[10px] tracking-wider">
-                    <span className="text-[#C8A96A] font-bold uppercase">{card.kicker}</span>
-                    <span className="text-zinc-300 tabular-nums">{card.ratio} · {card.duration}</span>
-                  </div>
-
-                  {/* Center Hover Play Affordance */}
-                  <div className="relative z-10 flex items-center justify-center">
-                    <span
-                      className={`w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-200 ${
-                        isHovered
-                          ? 'bg-[#e11d48] border-[#e11d48] text-white scale-110 shadow-[0_0_24px_rgba(225,29,72,0.55)]'
-                          : 'bg-[#09090b]/70 border-white/25 text-white/90'
-                      }`}
-                    >
-                      <Play className="w-4 h-4 fill-current ml-0.5" />
+                  {/* Resting Minimal Badge Only */}
+                  <div className="relative z-10 p-4 flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-1 rounded-full bg-black/55 backdrop-blur-md border border-white/15 font-space-mono text-[10px] font-bold uppercase tracking-wider text-[#06b6d4]">
+                      {card.kicker}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-black/45 backdrop-blur-md font-space-mono text-[9.5px] text-zinc-200 tabular-nums">
+                      {card.ratio}
                     </span>
                   </div>
 
-                  {/* Bottom Title & Action Copy */}
-                  <div className="relative z-10 p-4 space-y-1.5">
-                    {card.banglaTag && (
-                      <div lang="bn" className="bangla-text text-xs text-[#C8A96A]">
-                        {card.banglaTag}
-                      </div>
-                    )}
+                  {/* Resting Minimal 2-Word Title Only */}
+                  <div
+                    className={`absolute bottom-0 left-0 right-0 z-10 p-5 transition-all duration-300 ease-out ${
+                      isExpanded
+                        ? 'opacity-0 translate-y-4 pointer-events-none'
+                        : 'group-hover:opacity-0 group-hover:translate-y-4'
+                    }`}
+                  >
+                    <h2 className="text-2xl font-bold tracking-tight text-white leading-tight">
+                      {card.title}
+                    </h2>
+                  </div>
+
+                  {/* Hover / Tap Glassmorphic Detail Reveal Drawer */}
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className={`absolute inset-x-2.5 bottom-2.5 z-20 rounded-2xl p-4 backdrop-blur-xl bg-black/78 border border-white/20 text-white transition-all duration-300 ease-out space-y-2.5 ${
+                      isExpanded
+                        ? 'opacity-100 translate-y-0 pointer-events-auto'
+                        : 'opacity-0 translate-y-8 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto'
+                    }`}
+                  >
                     <div className="flex items-center justify-between gap-2">
-                      <h2 className="font-bebas text-2xl tracking-wide text-white leading-none">
-                        {card.title}
-                      </h2>
-                      <ArrowUpRight className="w-4 h-4 text-zinc-300 group-hover:text-[#e11d48] transition-colors shrink-0" />
+                      <span className="text-base font-bold text-white leading-tight">{card.title}</span>
+                      <span className="font-space-mono text-[9.5px] text-[#06b6d4]">{card.duration}</span>
                     </div>
-                    <p className="text-xs text-zinc-300/90 leading-snug line-clamp-2">
+
+                    <p className="text-[11.5px] text-zinc-200 leading-snug line-clamp-2">
                       {card.description}
                     </p>
-                    <div className="pt-1 font-space-mono text-[10px] text-zinc-400 group-hover:text-white transition-colors">
-                      {card.queryTag}
+
+                    <div className="flex flex-wrap gap-1">
+                      {card.chips.map((chip) => (
+                        <span
+                          key={chip}
+                          className="px-2 py-0.5 rounded bg-white/10 font-space-mono text-[9px] text-zinc-200"
+                        >
+                          {chip}
+                        </span>
+                      ))}
                     </div>
+
+                    <a
+                      href={card.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackStoryboardLaunch(`vertical_card_${card.id}`, card.href)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors"
+                      style={{
+                        backgroundColor: 'var(--hh-accent)',
+                        color: 'var(--hh-accent-ink)',
+                      }}
+                    >
+                      <span>{t.handfilm.launchStoryboard}</span>
+                    </a>
                   </div>
-                </a>
+                </div>
               );
             })}
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════════════════════
-            C. INTERACTIVE "FIND THE RIGHT MODEL. SWITCH IN A CLICK." GRID
+            C. INTERACTIVE MODEL GRID (CAPCUT MINIMALIST + HOVER-REVEAL BIG CARDS)
         ════════════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="handfilm-models-heading" className="py-14 border-b border-white/10">
+        <section
+          aria-labelledby="handfilm-models-heading"
+          className="py-14 border-b"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
             <div className="space-y-2 max-w-2xl">
-              <div className="font-space-mono text-[11px] uppercase tracking-[0.2em] text-[#e11d48]">
-                CORE AI &amp; EDITING ARCHITECTURE
+              <div
+                className="font-space-mono text-[11px] uppercase tracking-[0.2em] font-semibold"
+                style={{ color: 'var(--hh-accent)' }}
+              >
+                {t.handfilm.modelsEyebrow}
               </div>
               <h2
                 id="handfilm-models-heading"
-                className="font-bebas text-4xl sm:text-5xl tracking-wide text-white leading-none"
-                style={{ textWrap: 'balance' }}
+                className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight"
+                style={{ textWrap: 'balance', color: 'var(--hh-text)' }}
               >
-                Find the Right Model. Switch in a Click.
+                {t.handfilm.modelsTitle}
               </h2>
-              <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
-                Select any specialized HandFilm engine below and launch directly into Storyboard with its workspace pre-armed.
+              <p className="text-sm sm:text-base leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
+                {t.handfilm.modelsSub}
               </p>
             </div>
 
-            {/* Interactive Segmented Filter Control */}
+            {/* Segmented Filter Tabs */}
             <div
               role="tablist"
               aria-label="Filter HandFilm Models"
-              className="inline-flex items-center gap-1 p-1 rounded-lg bg-[#131317] border border-white/10 self-start lg:self-auto"
+              className="inline-flex items-center gap-1 p-1.5 rounded-2xl border self-start lg:self-auto"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+              }}
             >
               {(
                 [
-                  { id: 'all', label: 'All Models (6)' },
-                  { id: 'editor', label: 'NLE Modes' },
-                  { id: 'ai', label: 'Vision & Reframe' },
-                  { id: 'commerce', label: 'AD Studio' },
+                  { id: 'all', label: t.handfilm.filterAll },
+                  { id: 'editor', label: t.handfilm.filterEditor },
+                  { id: 'ai', label: t.handfilm.filterAi },
+                  { id: 'commerce', label: t.handfilm.filterCommerce },
                 ] as const
               ).map((tab) => {
                 const isActive = activeModelFilter === tab.id;
@@ -1142,11 +1294,11 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                     role="tab"
                     aria-selected={isActive}
                     onClick={() => setActiveModelFilter(tab.id)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                      isActive
-                        ? 'bg-[#e11d48] text-white'
-                        : 'text-zinc-400 hover:text-white hover:bg-white/5'
-                    }`}
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    style={{
+                      backgroundColor: isActive ? 'var(--hh-accent)' : 'transparent',
+                      color: isActive ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
+                    }}
                   >
                     {tab.label}
                   </button>
@@ -1155,68 +1307,125 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
             </div>
           </div>
 
-          {/* 6-Card Model Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* 6 Big Minimalist + Hover-Reveal Model Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredModels.map((model) => {
               const isSelected = selectedModelId === model.id;
+              const isExpanded = expandedModelId === model.id;
               return (
                 <article
                   key={model.id}
-                  onClick={() => setSelectedModelId(model.id)}
-                  className={`group rounded-xl border p-6 flex flex-col justify-between gap-6 transition-all duration-200 cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#141419] border-[#e11d48]/80 shadow-[0_12px_36px_rgba(225,29,72,0.12)]'
-                      : 'bg-[#101014] border-white/10 hover:border-white/25'
-                  }`}
+                  onClick={() => {
+                    setSelectedModelId(model.id);
+                    setExpandedModelId(isExpanded ? null : model.id);
+                  }}
+                  className={`group relative min-h-[340px] rounded-[20px] overflow-hidden border bg-gradient-to-br ${model.gradientClass} transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between p-6`}
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: isSelected ? 'var(--hh-accent)' : 'var(--hh-border)',
+                    boxShadow: 'var(--hh-card-shadow)',
+                  }}
                 >
-                  <div className="space-y-4">
-                    {/* Header Metadata */}
-                    <div className="flex items-center justify-between gap-2 font-space-mono text-[11px]">
-                      <span style={{ color: model.accentHex }} className="font-bold">
-                        {model.kicker}
-                      </span>
-                      <span className="text-zinc-400 tabular-nums">
-                        {model.badge} · {model.latency}
-                      </span>
-                    </div>
+                  {/* Abstract Airy Studio Visual Wave Backdrop */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-12 -top-12 w-48 h-48 rounded-full blur-3xl opacity-35 transition-transform duration-500 group-hover:scale-125"
+                    style={{ backgroundColor: model.accentHex }}
+                  />
 
-                    {/* Title & Description */}
-                    <div className="space-y-2">
-                      <h3 className="font-bebas text-3xl tracking-wide text-white leading-none">
-                        {model.name}
-                      </h3>
-                      <p className="text-sm text-zinc-400 leading-relaxed">{model.description}</p>
-                    </div>
-
-                    {/* Concrete Spec List */}
-                    <ul className="space-y-1.5 pt-2 border-t border-white/5">
-                      {model.highlights.map((item) => (
-                        <li key={item} className="flex items-center gap-2 text-xs text-zinc-300">
-                          <Check className="w-3.5 h-3.5 text-[#e11d48] shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {/* Resting Minimal Badge Only */}
+                  <div className="relative z-10 flex items-center justify-between gap-2">
+                    <span
+                      className="px-3 py-1 rounded-full border font-space-mono text-[10px] font-bold uppercase tracking-wider"
+                      style={{
+                        backgroundColor: 'var(--hh-bg)',
+                        borderColor: 'var(--hh-border)',
+                        color: model.accentHex,
+                      }}
+                    >
+                      {model.badge}
+                    </span>
+                    <span
+                      className="font-space-mono text-[10.5px] tabular-nums"
+                      style={{ color: 'var(--hh-muted)' }}
+                    >
+                      {model.latency}
+                    </span>
                   </div>
 
-                  {/* Card Footer CTA */}
-                  <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
-                    <span className="font-space-mono text-[11px] text-zinc-500">
-                      {model.query}
-                    </span>
+                  {/* Resting Minimal Bold 2-3 Word Title */}
+                  <div
+                    className={`relative z-10 mt-auto pt-16 transition-all duration-300 ease-out ${
+                      isExpanded
+                        ? 'opacity-0 translate-y-4 pointer-events-none'
+                        : 'group-hover:opacity-0 group-hover:translate-y-4'
+                    }`}
+                  >
+                    <h3
+                      className="text-3xl font-bold tracking-tight leading-none"
+                      style={{ color: 'var(--hh-text)' }}
+                    >
+                      {model.name}
+                    </h3>
+                  </div>
+
+                  {/* Smooth Hover-Reveal Glassmorphic Detail Panel */}
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className={`absolute inset-x-3 bottom-3 z-20 rounded-2xl p-5 backdrop-blur-xl border transition-all duration-300 ease-out space-y-3 ${
+                      isExpanded
+                        ? 'opacity-100 translate-y-0 pointer-events-auto'
+                        : 'opacity-0 translate-y-8 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto'
+                    }`}
+                    style={{
+                      backgroundColor: 'var(--hh-glass-bg)',
+                      borderColor: 'var(--hh-border)',
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-lg font-bold" style={{ color: 'var(--hh-text)' }}>
+                        {model.name}
+                      </h3>
+                      <span
+                        className="font-space-mono text-[10px]"
+                        style={{ color: 'var(--hh-muted)' }}
+                      >
+                        {model.query}
+                      </span>
+                    </div>
+
+                    <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--hh-muted)' }}>
+                      {model.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {model.highlights.map((item) => (
+                        <span
+                          key={item}
+                          className="px-2 py-0.5 rounded-lg border font-space-mono text-[10px]"
+                          style={{
+                            backgroundColor: 'var(--hh-bg)',
+                            borderColor: 'var(--hh-border)',
+                            color: 'var(--hh-text)',
+                          }}
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
 
                     <a
                       href={model.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        trackStoryboardLaunch(`model_grid_${model.id}`, model.href);
+                      onClick={() => trackStoryboardLaunch(`model_grid_${model.id}`, model.href)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-transform hover:scale-[1.01]"
+                      style={{
+                        backgroundColor: 'var(--hh-accent)',
+                        color: 'var(--hh-accent-ink)',
                       }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#e11d48] hover:bg-[#f43f5e] text-xs font-semibold text-white transition-colors whitespace-nowrap shrink-0"
                     >
-                      <span>Launch in Storyboard</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
+                      <span>{t.handfilm.launchStoryboard}</span>
                     </a>
                   </div>
                 </article>
@@ -1228,16 +1437,24 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
         {/* ════════════════════════════════════════════════════════════════════════
             D. 3-STEP INTERACTIVE WORKFLOW & LIVE STUDIO PREVIEW
         ════════════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="handfilm-workflow-heading" className="py-14 border-b border-white/10">
+        <section
+          aria-labelledby="handfilm-workflow-heading"
+          className="py-14 border-b"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           <div className="space-y-2 mb-8">
-            <div className="font-space-mono text-[11px] uppercase tracking-[0.2em] text-[#C8A96A]">
-              THREE-STAGE PIPELINE
+            <div
+              className="font-space-mono text-[11px] uppercase tracking-[0.2em] font-semibold"
+              style={{ color: 'var(--hh-accent-2)' }}
+            >
+              {t.handfilm.workflowEyebrow}
             </div>
             <h2
               id="handfilm-workflow-heading"
-              className="font-bebas text-4xl sm:text-5xl tracking-wide text-white leading-none"
+              className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight"
+              style={{ color: 'var(--hh-text)' }}
             >
-              From Raw Idea to Master Cut in Minutes
+              {t.handfilm.workflowTitle}
             </h2>
           </div>
 
@@ -1251,30 +1468,32 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                     key={step.number}
                     type="button"
                     onClick={() => setActiveStepIndex(idx)}
-                    className={`text-left p-5 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col gap-2 ${
-                      isActive
-                        ? 'bg-[#141419] border-[#e11d48] shadow-[0_8px_28px_rgba(225,29,72,0.14)]'
-                        : 'bg-[#101014] border-white/10 hover:border-white/25'
-                    }`}
+                    className="text-left p-5 rounded-[20px] border transition-all duration-200 cursor-pointer flex flex-col gap-2"
+                    style={{
+                      backgroundColor: isActive ? 'var(--hh-surface-2)' : 'var(--hh-surface)',
+                      borderColor: isActive ? 'var(--hh-accent)' : 'var(--hh-border)',
+                      boxShadow: isActive ? 'var(--hh-card-shadow)' : 'none',
+                    }}
                   >
                     <div className="flex items-center justify-between gap-2 font-space-mono text-[11px]">
-                      <span className={isActive ? 'text-[#e11d48] font-bold' : 'text-zinc-500'}>
+                      <span
+                        className="font-bold"
+                        style={{ color: isActive ? 'var(--hh-accent)' : 'var(--hh-muted)' }}
+                      >
                         STEP {step.number}
                       </span>
-                      <span className="text-zinc-500">?{step.storyboardQuery}</span>
+                      <span style={{ color: 'var(--hh-muted)' }}>?{step.storyboardQuery}</span>
                     </div>
 
-                    <h3 className="font-bebas text-2xl sm:text-3xl tracking-wide text-white leading-none">
-                      {step.number} {step.title}
+                    <h3 className="text-xl font-bold tracking-tight" style={{ color: 'var(--hh-text)' }}>
+                      {step.number} · {step.title}
                     </h3>
 
-                    <p className="text-xs sm:text-sm font-medium text-[#C8A96A]">
+                    <p className="text-xs font-medium" style={{ color: 'var(--hh-accent-2)' }}>
                       {step.subtitle}
                     </p>
 
-                    <p className="text-xs text-zinc-400 leading-relaxed">{step.description}</p>
-
-                    <div lang="bn" className="bangla-text text-xs text-zinc-300 pt-1">
+                    <div lang="bn" className="bangla-text text-xs pt-1" style={{ color: 'var(--hh-muted)' }}>
                       {step.banglaCaption}
                     </div>
                   </button>
@@ -1282,15 +1501,26 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
               })}
             </div>
 
-            {/* Right Interactive Live Studio Mockup Card */}
-            <div className="lg:col-span-7 bg-[#111116] border border-white/12 rounded-xl p-5 sm:p-6 flex flex-col justify-between gap-6">
-              {/* Mockup Chrome Header */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/10">
+            {/* Right Interactive Live Studio Canvas */}
+            <div
+              className="lg:col-span-7 border rounded-[20px] p-5 sm:p-6 flex flex-col justify-between gap-6"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                boxShadow: 'var(--hh-card-shadow)',
+              }}
+            >
+              <div
+                className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b"
+                style={{ borderColor: 'var(--hh-border)' }}
+              >
                 <div className="flex items-center gap-2.5 font-space-mono text-[11px]">
-                  <Terminal className="w-4 h-4 text-[#e11d48]" />
-                  <span className="text-white font-bold">{activeStep.previewHeader}</span>
+                  <Terminal className="w-4 h-4" style={{ color: 'var(--hh-accent)' }} />
+                  <span className="font-bold" style={{ color: 'var(--hh-text)' }}>
+                    {activeStep.previewHeader}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 font-space-mono text-[10px] text-zinc-400">
+                <div className="flex items-center gap-2 font-space-mono text-[10px]" style={{ color: 'var(--hh-muted)' }}>
                   {activeStep.previewSpecs.map((spec, sIdx) => (
                     <React.Fragment key={spec}>
                       {sIdx > 0 && <span aria-hidden="true">·</span>}
@@ -1300,107 +1530,145 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 </div>
               </div>
 
-              {/* Dynamic Mockup Canvas per Active Step */}
               <div className="flex-1 flex flex-col justify-between gap-5">
                 {activeStepIndex === 0 && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="p-4 rounded-lg bg-[#09090b] border border-white/10 space-y-1.5">
-                        <div className="font-space-mono text-[10px] text-[#e11d48]">01. SOURCE INGEST</div>
-                        <div className="text-sm font-semibold text-white">RAW_JACKET_4K.MOV</div>
-                        <div className="font-space-mono text-[11px] text-zinc-400 tabular-nums">
-                          3840×2160 · 60fps · Decoded in Browser
+                      <div
+                        className="p-4 rounded-2xl border space-y-1.5"
+                        style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}
+                      >
+                        <div className="font-space-mono text-[10px] font-bold" style={{ color: 'var(--hh-accent)' }}>
+                          01. INGEST
+                        </div>
+                        <div className="text-sm font-semibold" style={{ color: 'var(--hh-text)' }}>
+                          RAW_JACKET_4K.MOV
+                        </div>
+                        <div className="font-space-mono text-[11px] tabular-nums" style={{ color: 'var(--hh-muted)' }}>
+                          3840×2160 · 60fps
                         </div>
                       </div>
-                      <div className="p-4 rounded-lg bg-[#09090b] border border-white/10 space-y-1.5">
-                        <div className="font-space-mono text-[10px] text-[#C8A96A]">02. SKU BRIEF</div>
-                        <div className="text-sm font-semibold text-white">300 GSM Heavyweight</div>
-                        <div className="font-space-mono text-[11px] text-zinc-400">
-                          Synced from b2b.handsandhead.com
+                      <div
+                        className="p-4 rounded-2xl border space-y-1.5"
+                        style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}
+                      >
+                        <div className="font-space-mono text-[10px] font-bold" style={{ color: 'var(--hh-accent-2)' }}>
+                          02. SKU BRIEF
+                        </div>
+                        <div className="text-sm font-semibold" style={{ color: 'var(--hh-text)' }}>
+                          300 GSM Cotton
+                        </div>
+                        <div className="font-space-mono text-[11px]" style={{ color: 'var(--hh-muted)' }}>
+                          b2b.handsandhead.com
                         </div>
                       </div>
-                      <div className="p-4 rounded-lg bg-[#09090b] border border-white/10 space-y-1.5">
-                        <div className="font-space-mono text-[10px] text-white">03. 100-SHOT PLAN</div>
-                        <div className="text-sm font-semibold text-white">15s Reel Blueprint</div>
-                        <div className="font-space-mono text-[11px] text-zinc-400 tabular-nums">
-                          18 Beat Cuts · 9:16 Safe-Zone
+                      <div
+                        className="p-4 rounded-2xl border space-y-1.5"
+                        style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}
+                      >
+                        <div className="font-space-mono text-[10px] font-bold" style={{ color: 'var(--hh-text)' }}>
+                          03. 100-SHOT
+                        </div>
+                        <div className="text-sm font-semibold" style={{ color: 'var(--hh-text)' }}>
+                          15s Reel Cut
+                        </div>
+                        <div className="font-space-mono text-[11px] tabular-nums" style={{ color: 'var(--hh-muted)' }}>
+                          18 Cuts · 9:16
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-[#09090b] border border-white/10 space-y-2">
-                      <div className="flex items-center justify-between font-space-mono text-[11px] text-zinc-400">
-                        <span>GENERATED BILINGUAL HOOK</span>
+                    <div
+                      className="p-4 rounded-2xl border space-y-2"
+                      style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}
+                    >
+                      <div
+                        className="flex items-center justify-between font-space-mono text-[11px]"
+                        style={{ color: 'var(--hh-muted)' }}
+                      >
+                        <span>BILINGUAL HOOK</span>
                         <span>BANGLA + EN READY</span>
                       </div>
-                      <p className="text-sm text-white font-medium">
+                      <p className="text-sm font-medium" style={{ color: 'var(--hh-text)' }}>
                         &ldquo;Direct-from-source Dhaka Distressed Leather — engineered for 10-year wear.&rdquo;
                       </p>
-                      <p lang="bn" className="bangla-text text-sm text-[#C8A96A]">
-                        &ldquo;সরাসরি ঢাকা ফ্যাক্টরি থেকে প্রিমিয়াম লেদার ও ৩০০ জিএসএম স্ট্রিটওয়্যার — এখন আপনার ব্র্যান্ডের জন্য।&rdquo;
+                      <p lang="bn" className="bangla-text text-sm" style={{ color: 'var(--hh-accent-2)' }}>
+                        &ldquo;সরাসরি ঢাকা ফ্যাক্টরি থেকে প্রিমিয়াম লেদার ও ৩০০ জিএসএম স্ট্রিটওয়্যার।&rdquo;
                       </p>
                     </div>
                   </div>
                 )}
 
                 {activeStepIndex === 1 && (
-                  <div className="space-y-4">
-                    {/* Multi-Track NLE Timeline Preview */}
-                    <div className="p-4 rounded-lg bg-[#09090b] border border-white/10 space-y-3">
-                      <div className="flex items-center justify-between font-space-mono text-[10px] text-zinc-400 tabular-nums">
-                        <span>TIMELINE · 00:00:00:00 → 00:00:15:00</span>
-                        <span className="text-[#e11d48]">BEAT-SYNC LOCKED (128 BPM)</span>
-                      </div>
+                  <div
+                    className="p-4 rounded-2xl border space-y-3"
+                    style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}
+                  >
+                    <div className="flex items-center justify-between font-space-mono text-[10px] tabular-nums">
+                      <span style={{ color: 'var(--hh-muted)' }}>TIMELINE · 00:00 → 00:15</span>
+                      <span className="font-bold" style={{ color: 'var(--hh-accent)' }}>
+                        128 BPM SYNC
+                      </span>
+                    </div>
 
-                      {/* Track V2: Kinetic Typography */}
-                      <div className="space-y-1">
-                        <div className="font-space-mono text-[10px] text-zinc-500">V2 · KINETIC TITLES</div>
-                        <div className="grid grid-cols-12 gap-1.5 h-8">
-                          <div className="col-span-4 rounded bg-[#C8A96A]/20 border border-[#C8A96A]/50 px-2 flex items-center text-[11px] text-[#f3efe6] truncate">
-                            <span lang="bn" className="bangla-text">প্রিমিয়াম কালেকশন</span>
-                          </div>
-                          <div className="col-span-5 rounded bg-[#e11d48]/20 border border-[#e11d48]/50 px-2 flex items-center text-[11px] text-white font-space-mono truncate">
-                            SMART-EYE ZOOM 1.15x
-                          </div>
-                          <div className="col-span-3 rounded bg-white/10 border border-white/20 px-2 flex items-center text-[11px] text-zinc-200 font-space-mono truncate">
-                            CTA SLATE
-                          </div>
+                    <div className="space-y-1">
+                      <div className="font-space-mono text-[10px]" style={{ color: 'var(--hh-muted)' }}>
+                        V2 · KINETIC TITLES
+                      </div>
+                      <div className="grid grid-cols-12 gap-1.5 h-8">
+                        <div
+                          className="col-span-4 rounded-lg border px-2 flex items-center text-[11px] truncate"
+                          style={{
+                            backgroundColor: 'var(--hh-surface-2)',
+                            borderColor: 'var(--hh-accent-2)',
+                            color: 'var(--hh-text)',
+                          }}
+                        >
+                          <span lang="bn" className="bangla-text">প্রিমিয়াম কালেকশন</span>
+                        </div>
+                        <div
+                          className="col-span-5 rounded-lg border px-2 flex items-center text-[11px] font-space-mono truncate"
+                          style={{
+                            backgroundColor: 'var(--hh-surface-2)',
+                            borderColor: 'var(--hh-accent)',
+                            color: 'var(--hh-text)',
+                          }}
+                        >
+                          SMART-EYE 1.15x
+                        </div>
+                        <div
+                          className="col-span-3 rounded-lg border px-2 flex items-center text-[11px] font-space-mono truncate"
+                          style={{
+                            backgroundColor: 'var(--hh-surface)',
+                            borderColor: 'var(--hh-border)',
+                            color: 'var(--hh-muted)',
+                          }}
+                        >
+                          CTA SLATE
                         </div>
                       </div>
+                    </div>
 
-                      {/* Track V1: Video Cuts */}
-                      <div className="space-y-1">
-                        <div className="font-space-mono text-[10px] text-zinc-500">V1 · BEAST VIDEO TRACK</div>
-                        <div className="grid grid-cols-12 gap-1 h-10">
-                          <div className="col-span-3 rounded bg-zinc-800 border border-white/15 px-2 flex items-center font-space-mono text-[10px] text-zinc-200 truncate">
-                            SHOT 01
-                          </div>
-                          <div className="col-span-2 rounded bg-zinc-800 border border-[#e11d48]/50 px-2 flex items-center font-space-mono text-[10px] text-zinc-200 truncate">
-                            SHOT 02
-                          </div>
-                          <div className="col-span-4 rounded bg-zinc-800 border border-white/15 px-2 flex items-center font-space-mono text-[10px] text-zinc-200 truncate">
-                            SHOT 03 (CUT)
-                          </div>
-                          <div className="col-span-3 rounded bg-zinc-800 border border-[#C8A96A]/50 px-2 flex items-center font-space-mono text-[10px] text-zinc-200 truncate">
-                            HERO PACK
-                          </div>
-                        </div>
+                    <div className="space-y-1">
+                      <div className="font-space-mono text-[10px]" style={{ color: 'var(--hh-muted)' }}>
+                        A1 · BEAT STEMS (-14 LUFS)
                       </div>
-
-                      {/* Track A1: Beat Waveform */}
-                      <div className="space-y-1">
-                        <div className="font-space-mono text-[10px] text-zinc-500">A1 · BEAT STEMS (-14 LUFS)</div>
-                        <div className="h-8 rounded bg-[#141418] border border-white/10 px-2 flex items-center gap-1 overflow-hidden">
-                          {[38, 72, 52, 90, 44, 66, 85, 48, 78, 95, 40, 62, 88, 54, 74, 82, 46, 68, 92, 50, 64, 76, 42, 84].map(
-                            (heightPct, idx) => (
-                              <span
-                                key={idx}
-                                className={`flex-1 rounded-sm ${idx % 4 === 3 ? 'bg-[#e11d48]' : 'bg-[#C8A96A]/65'}`}
-                                style={{ height: `${Math.round(heightPct * 0.24)}px` }}
-                              />
-                            )
-                          )}
-                        </div>
+                      <div
+                        className="h-9 rounded-lg border px-2 flex items-center gap-1 overflow-hidden"
+                        style={{ backgroundColor: 'var(--hh-surface)', borderColor: 'var(--hh-border)' }}
+                      >
+                        {[38, 72, 52, 90, 44, 66, 85, 48, 78, 95, 40, 62, 88, 54, 74, 82, 46, 68, 92, 50].map(
+                          (heightPct, idx) => (
+                            <span
+                              key={idx}
+                              className="flex-1 rounded-sm"
+                              style={{
+                                height: `${Math.round(heightPct * 0.24)}px`,
+                                backgroundColor: idx % 4 === 3 ? 'var(--hh-accent)' : 'var(--hh-accent-2)',
+                              }}
+                            />
+                          )
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1409,10 +1677,13 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 {activeStepIndex === 2 && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Interactive 2D Mood-Pad */}
-                    <div className="p-4 rounded-lg bg-[#09090b] border border-white/10 space-y-3">
-                      <div className="flex items-center justify-between font-space-mono text-[10px] text-zinc-400">
-                        <span>INTERACTIVE 2D MOOD-PAD</span>
-                        <span className="text-[#C8A96A] tabular-nums">
+                    <div
+                      className="p-4 rounded-2xl border space-y-3"
+                      style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}
+                    >
+                      <div className="flex items-center justify-between font-space-mono text-[10px]">
+                        <span style={{ color: 'var(--hh-muted)' }}>2D MOOD-PAD</span>
+                        <span className="tabular-nums font-bold" style={{ color: 'var(--hh-accent)' }}>
                           X:{moodPadPos.x} · Y:{moodPadPos.y}
                         </span>
                       </div>
@@ -1422,48 +1693,50 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                         aria-valuenow={moodPadPos.x}
                         tabIndex={0}
                         onClick={handleMoodPadInteract}
-                        className="relative h-36 rounded-lg border border-white/15 cursor-crosshair overflow-hidden"
+                        className="relative h-36 rounded-xl border border-white/15 cursor-crosshair overflow-hidden"
                         style={{
                           background:
-                            'radial-gradient(circle at 20% 20%, rgba(225,29,72,0.45), transparent 55%), radial-gradient(circle at 80% 25%, rgba(200,169,106,0.45), transparent 55%), radial-gradient(circle at 50% 90%, rgba(30,64,175,0.4), transparent 60%), #121216',
+                            'radial-gradient(circle at 20% 20%, rgba(6,182,212,0.5), transparent 55%), radial-gradient(circle at 80% 25%, rgba(139,92,246,0.5), transparent 55%), radial-gradient(circle at 50% 90%, rgba(14,165,233,0.4), transparent 60%), #0f172a',
                         }}
                       >
-                        <div className="absolute inset-0 grid grid-cols-4 grid-rows-4 pointer-events-none">
-                          {Array.from({ length: 16 }).map((_, cellIdx) => (
-                            <div key={cellIdx} className="border border-white/[0.04]" />
-                          ))}
-                        </div>
                         <span
-                          className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full bg-white border-2 border-[#e11d48] shadow-[0_0_16px_rgba(225,29,72,0.8)] pointer-events-none transition-all duration-100"
+                          className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full bg-white border-2 border-[#06b6d4] shadow-lg pointer-events-none transition-all duration-100"
                           style={{ left: `${moodPadPos.x}%`, top: `${moodPadPos.y}%` }}
                         />
                       </div>
-                      <div className="font-space-mono text-[10px] text-zinc-500">
-                        Click anywhere on the pad to shift WebGL2 LUT warmth &amp; crimson contrast.
-                      </div>
                     </div>
 
-                    {/* 1->5 Omnichannel Export Matrix */}
-                    <div className="p-4 rounded-lg bg-[#09090b] border border-white/10 space-y-3 flex flex-col justify-between">
-                      <div className="flex items-center justify-between font-space-mono text-[10px] text-zinc-400">
-                        <span>1→5 OMNICHANNEL OUTPUT</span>
-                        <span className="text-emerald-400">-14.0 LUFS LOCKED</span>
+                    {/* 1->5 Export Matrix */}
+                    <div
+                      className="p-4 rounded-2xl border space-y-2.5 flex flex-col justify-between"
+                      style={{ backgroundColor: 'var(--hh-bg)', borderColor: 'var(--hh-border)' }}
+                    >
+                      <div className="flex items-center justify-between font-space-mono text-[10px]">
+                        <span style={{ color: 'var(--hh-muted)' }}>1→5 OUTPUT</span>
+                        <span className="text-emerald-500 font-semibold">-14 LUFS</span>
                       </div>
 
-                      <div className="space-y-2 font-space-mono text-[11px]">
+                      <div className="space-y-1.5 font-space-mono text-[11px]">
                         {[
-                          { ratio: '9:16', target: 'Reels / Shorts / TikTok', status: 'Safe-Zone Verified' },
-                          { ratio: '16:9', target: 'YouTube Creator Studio', status: 'OAuth Upload Ready' },
-                          { ratio: '4:5', target: 'F-Commerce Feed Ad', status: 'Auto-Reframed' },
-                          { ratio: '1:1', target: 'Catalog Square Card', status: 'R2 Edge Cached' },
+                          { ratio: '9:16', target: 'Reels / Shorts', status: 'Safe-Zone' },
+                          { ratio: '16:9', target: 'YouTube Studio', status: 'OAuth Ready' },
+                          { ratio: '4:5', target: 'F-Commerce Ad', status: 'Auto-Crop' },
+                          { ratio: '1:1', target: 'Catalog Card', status: 'R2 Cached' },
                         ].map((out) => (
                           <div
                             key={out.ratio}
-                            className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded bg-[#141418] border border-white/5"
+                            className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg border"
+                            style={{ backgroundColor: 'var(--hh-surface)', borderColor: 'var(--hh-border)' }}
                           >
-                            <span className="text-white font-bold tabular-nums">{out.ratio}</span>
-                            <span className="text-zinc-300 truncate flex-1">{out.target}</span>
-                            <span className="text-[#C8A96A] text-[10px] shrink-0">{out.status}</span>
+                            <span className="font-bold tabular-nums" style={{ color: 'var(--hh-text)' }}>
+                              {out.ratio}
+                            </span>
+                            <span className="truncate flex-1" style={{ color: 'var(--hh-muted)' }}>
+                              {out.target}
+                            </span>
+                            <span className="text-[10px] shrink-0 font-semibold" style={{ color: 'var(--hh-accent)' }}>
+                              {out.status}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -1471,13 +1744,12 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                   </div>
                 )}
 
-                {/* Mockup Footer Action */}
-                <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-                  <div className="font-space-mono text-xs text-zinc-400">
-                    Connects on-demand to{' '}
-                    <span className="text-zinc-200">
-                      storyboard.handsandhead.com/?{activeStep.storyboardQuery}
-                    </span>
+                <div
+                  className="pt-4 border-t flex flex-wrap items-center justify-between gap-3"
+                  style={{ borderColor: 'var(--hh-border)' }}
+                >
+                  <div className="font-space-mono text-xs" style={{ color: 'var(--hh-muted)' }}>
+                    storyboard.handsandhead.com/?{activeStep.storyboardQuery}
                   </div>
                   <a
                     href={buildStoryboardUrl(activeStep.storyboardQuery)}
@@ -1489,7 +1761,11 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                         buildStoryboardUrl(activeStep.storyboardQuery)
                       )
                     }
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#e11d48] hover:bg-[#f43f5e] text-xs font-semibold text-white transition-colors whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
+                    style={{
+                      backgroundColor: 'var(--hh-accent)',
+                      color: 'var(--hh-accent-ink)',
+                    }}
                   >
                     <span>{activeStep.ctaLabel}</span>
                   </a>
@@ -1500,19 +1776,28 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
         </section>
 
         {/* ════════════════════════════════════════════════════════════════════════
-            DISCOVER SECTION (TEMPLATES & TUTORIALS ANCHOR)
+            DISCOVER SECTION (CAPCUT-STYLE MINIMALIST + HOVER-REVEAL BIG CARDS)
         ════════════════════════════════════════════════════════════════════════ */}
-        <section id="handfilm-discover" aria-labelledby="handfilm-discover-heading" className="py-14 border-b border-white/10 scroll-mt-32">
+        <section
+          id="handfilm-discover"
+          aria-labelledby="handfilm-discover-heading"
+          className="py-14 border-b scroll-mt-32"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div className="space-y-1.5">
-              <div className="font-space-mono text-[11px] uppercase tracking-[0.2em] text-[#e11d48]">
-                DISCOVER · TEMPLATES &amp; TUTORIALS
+              <div
+                className="font-space-mono text-[11px] uppercase tracking-[0.2em] font-semibold"
+                style={{ color: 'var(--hh-accent)' }}
+              >
+                {t.handfilm.discoverEyebrow}
               </div>
               <h2
                 id="handfilm-discover-heading"
-                className="font-bebas text-4xl sm:text-5xl tracking-wide text-white leading-none"
+                className="text-3xl sm:text-4xl font-bold tracking-tight"
+                style={{ color: 'var(--hh-text)' }}
               >
-                Ready-to-Edit Storyboard Blueprints
+                {t.handfilm.discoverTitle}
               </h2>
             </div>
             <a
@@ -1520,111 +1805,172 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackStoryboardLaunch('discover_all', buildStoryboardUrl('tool=100shots'))}
-              className="inline-flex items-center gap-1.5 font-space-mono text-xs text-[#C8A96A] hover:text-white transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 font-space-mono text-xs font-semibold hover:underline whitespace-nowrap"
+              style={{ color: 'var(--hh-accent)' }}
             >
-              <span>Browse Full Template Vault</span>
+              <span>Template Vault</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
                 id: 'disc-100shots',
-                kicker: 'TEMPLATE · 100-SHOT REEL',
-                title: 'Factory-to-Runway 100-Shot Sequence',
-                desc: 'Rapidly sequence stitching, tannery grain, and final lookbook frames synced to a 128 BPM industrial score.',
-                bangla: 'গার্মেন্টস ও লেদার প্রোডাকশন রিল টেমপ্লেট',
+                badge: '100-SHOT REEL',
+                title: 'Factory to Runway',
+                desc: 'Sequence stitching, tannery grain, and lookbook cuts synced to a 128 BPM industrial score.',
+                chips: ['128 BPM', 'Lookbook', 'Auto-Beat'],
+                bangla: 'গার্মেন্টস ও লেদার প্রোডাকশন রিল',
+                image: studioProjectsImg,
                 href: buildStoryboardUrl('tool=100shots'),
               },
               {
                 id: 'disc-bangla-kinetic',
-                kicker: 'TUTORIAL · KINETIC TYPE',
-                title: 'Bangla-EN Karaoke & Price Callouts',
-                desc: 'Step-by-step preset pairing zero-broken-ligature Bangla titles with crisp F-Commerce price & WhatsApp overlays.',
-                bangla: 'নিখুঁত বাংলা টাইপোগ্রাফি ও সাবটাইটেল গাইড',
+                badge: 'KINETIC TYPE',
+                title: 'Bangla Karaoke Hooks',
+                desc: 'Pair intact-ligature Bangla kinetic titles with crisp F-Commerce price & WhatsApp callouts.',
+                chips: ['Bangla Lock', 'F-Commerce', 'Subtitles'],
+                bangla: 'নিখুঁত বাংলা টাইপোগ্রাফি গাইড',
+                image: socialTrendsImg,
                 href: buildStoryboardUrl('tool=bangla-type'),
               },
               {
                 id: 'disc-youtube-pipeline',
-                kicker: 'WORKFLOW · CLOUDFLARE R2 + YOUTUBE',
-                title: 'One-Click Dual Master Publish',
-                desc: 'Archive your 4K master in Cloudflare R2 while pushing timestamped chapters directly to YouTube Creator Studio.',
-                bangla: 'ইউটিউব ও ক্লাউডফ্লেয়ার আর২ ডাইরেক্ট পাবলিশ',
+                badge: 'EDGE PUBLISH',
+                title: 'R2 + YouTube Master',
+                desc: 'Archive your 4K master in Cloudflare R2 while pushing timestamped chapters to YouTube Studio.',
+                chips: ['Cloudflare R2', 'YouTube OAuth', '4K HDR'],
+                bangla: 'ইউটিউব ও আর২ ডাইরেক্ট পাবলিশ',
+                image: brandAssetsImg,
                 href: buildStoryboardUrl('integration=youtube-studio'),
               },
-            ].map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackStoryboardLaunch(item.id, item.href)}
-                className="group p-6 rounded-xl bg-[#101014] hover:bg-[#15151b] border border-white/10 hover:border-[#e11d48]/70 transition-all flex flex-col justify-between gap-4"
-              >
-                <div className="space-y-2.5">
-                  <div className="font-space-mono text-[10.5px] text-[#C8A96A]">{item.kicker}</div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-[#e11d48] transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
-                </div>
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
-                  <span lang="bn" className="bangla-text text-xs text-zinc-300">
-                    {item.bangla}
-                  </span>
-                  <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-white shrink-0" />
-                </div>
-              </a>
-            ))}
+            ].map((item) => {
+              const isExpanded = expandedDiscoverId === item.id;
+              return (
+                <article
+                  key={item.id}
+                  onClick={() => setExpandedDiscoverId(isExpanded ? null : item.id)}
+                  className="group relative min-h-[340px] rounded-[20px] overflow-hidden border transition-all duration-300 ease-out cursor-pointer"
+                  style={{
+                    borderColor: 'var(--hh-border)',
+                    boxShadow: 'var(--hh-card-shadow)',
+                  }}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/40"
+                  />
+
+                  {/* Minimalist Pill Badge Only */}
+                  <div className="relative z-10 p-5 flex items-center justify-between">
+                    <span className="px-3 py-1 rounded-full bg-black/55 backdrop-blur-md border border-white/15 font-space-mono text-[10px] font-bold uppercase tracking-wider text-[#06b6d4]">
+                      {item.badge}
+                    </span>
+                  </div>
+
+                  {/* Minimalist Title Only */}
+                  <div
+                    className={`absolute bottom-0 left-0 right-0 z-10 p-6 transition-all duration-300 ease-out ${
+                      isExpanded
+                        ? 'opacity-0 translate-y-4 pointer-events-none'
+                        : 'group-hover:opacity-0 group-hover:translate-y-4'
+                    }`}
+                  >
+                    <h3 className="text-2xl font-bold text-white tracking-tight">{item.title}</h3>
+                  </div>
+
+                  {/* Hover / Tap Reveal Glassmorphic Panel */}
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className={`absolute inset-x-3 bottom-3 z-20 rounded-2xl p-5 backdrop-blur-xl bg-black/78 border border-white/20 text-white transition-all duration-300 ease-out space-y-2.5 ${
+                      isExpanded
+                        ? 'opacity-100 translate-y-0 pointer-events-auto'
+                        : 'opacity-0 translate-y-8 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto'
+                    }`}
+                  >
+                    <h3 className="text-lg font-bold text-white">{item.title}</h3>
+                    <p className="text-xs text-zinc-200 leading-relaxed line-clamp-2">{item.desc}</p>
+                    <div lang="bn" className="bangla-text text-[11px] text-[#06b6d4]">
+                      {item.bangla}
+                    </div>
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackStoryboardLaunch(item.id, item.href)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold"
+                      style={{
+                        backgroundColor: 'var(--hh-accent)',
+                        color: 'var(--hh-accent-ink)',
+                      }}
+                    >
+                      <span>{t.handfilm.launchStoryboard}</span>
+                    </a>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════════════════════
-            PRICING SECTION (FREE WEB STUDIO / DESKTOP PRO / ENTERPRISE SUITE)
+            PRICING SECTION
         ════════════════════════════════════════════════════════════════════════ */}
         <section id="handfilm-pricing" aria-labelledby="handfilm-pricing-heading" className="py-14 scroll-mt-32">
           <div className="space-y-1.5 mb-8">
-            <div className="font-space-mono text-[11px] uppercase tracking-[0.2em] text-[#C8A96A]">
-              TRANSPARENT EDITIONS
+            <div
+              className="font-space-mono text-[11px] uppercase tracking-[0.2em] font-semibold"
+              style={{ color: 'var(--hh-accent-2)' }}
+            >
+              {t.handfilm.pricingEyebrow}
             </div>
             <h2
               id="handfilm-pricing-heading"
-              className="font-bebas text-4xl sm:text-5xl tracking-wide text-white leading-none"
+              className="text-3xl sm:text-4xl font-bold tracking-tight"
+              style={{ color: 'var(--hh-text)' }}
             >
-              Start Free in the Browser. Scale to Workstation &amp; Studio.
+              {t.handfilm.pricingTitle}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* Tier 1: Free Web Studio */}
-            <div className="rounded-xl bg-[#101014] border border-white/10 p-6 flex flex-col justify-between gap-6">
+            {/* Tier 1 */}
+            <div
+              className="rounded-[20px] border p-6 flex flex-col justify-between gap-6"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                boxShadow: 'var(--hh-card-shadow)',
+              }}
+            >
               <div className="space-y-4">
-                <div className="flex items-center justify-between font-space-mono text-[11px] text-zinc-400">
+                <div className="flex items-center justify-between font-space-mono text-[11px]" style={{ color: 'var(--hh-muted)' }}>
                   <span>WEB STUDIO</span>
                   <span>BROWSER WEBGL2</span>
                 </div>
                 <div>
-                  <h3 className="font-bebas text-3xl text-white">Free Web Studio</h3>
-                  <div className="mt-1 font-space-mono text-2xl font-bold text-white tabular-nums">
-                    $0 <span className="text-xs font-normal text-zinc-400">/ forever in browser</span>
+                  <h3 className="text-2xl font-bold" style={{ color: 'var(--hh-text)' }}>
+                    Free Web Studio
+                  </h3>
+                  <div className="mt-1 font-space-mono text-2xl font-bold tabular-nums" style={{ color: 'var(--hh-text)' }}>
+                    $0 <span className="text-xs font-normal" style={{ color: 'var(--hh-muted)' }}>/ browser forever</span>
                   </div>
                 </div>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  Full access to Easy Mode, CapCut Rapid, Smart-Eye framing, and 1080p/4K WebGL2 exports directly inside storyboard.handsandhead.com.
-                </p>
-                <ul className="space-y-2 text-xs text-zinc-300 pt-2 border-t border-white/10">
+                <ul className="space-y-2 text-xs pt-2 border-t" style={{ borderColor: 'var(--hh-border)', color: 'var(--hh-text)' }}>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#e11d48]" />
-                    <span>Zero install · Instant browser boot</span>
+                    <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
+                    <span>Zero install · Instant WebGL2 boot</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#e11d48]" />
+                    <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
                     <span>Bangla-EN subtitles &amp; kinetic titles</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#e11d48]" />
-                    <span>Reels 9:16 Safe-Zone preview</span>
                   </li>
                 </ul>
               </div>
@@ -1633,41 +1979,50 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackStoryboardLaunch('pricing_free_web', buildStoryboardUrl('mode=easy'))}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-xs font-semibold transition-colors"
+                style={{
+                  backgroundColor: 'var(--hh-surface-2)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               >
-                <span>Try online for free</span>
+                <span>{t.handfilm.tryOnline}</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </a>
             </div>
 
-            {/* Tier 2: Desktop Pro */}
-            <div className="rounded-xl bg-[#14141a] border border-[#e11d48]/70 p-6 flex flex-col justify-between gap-6 shadow-[0_12px_40px_rgba(225,29,72,0.12)]">
+            {/* Tier 2 */}
+            <div
+              className="rounded-[20px] border-2 p-6 flex flex-col justify-between gap-6"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-accent)',
+                boxShadow: 'var(--hh-card-shadow)',
+              }}
+            >
               <div className="space-y-4">
                 <div className="flex items-center justify-between font-space-mono text-[11px]">
-                  <span className="text-[#e11d48] font-bold">DESKTOP &amp; MOBILE PRO</span>
-                  <span className="text-zinc-400">TAURI / ELECTRON / APK</span>
+                  <span className="font-bold" style={{ color: 'var(--hh-accent)' }}>
+                    DESKTOP &amp; MOBILE PRO
+                  </span>
+                  <span style={{ color: 'var(--hh-muted)' }}>TAURI / APK</span>
                 </div>
                 <div>
-                  <h3 className="font-bebas text-3xl text-white">Desktop Pro</h3>
-                  <div className="mt-1 font-space-mono text-2xl font-bold text-white tabular-nums">
-                    $19 <span className="text-xs font-normal text-zinc-400">/ month · creator suite</span>
+                  <h3 className="text-2xl font-bold" style={{ color: 'var(--hh-text)' }}>
+                    Desktop Pro
+                  </h3>
+                  <div className="mt-1 font-space-mono text-2xl font-bold tabular-nums" style={{ color: 'var(--hh-text)' }}>
+                    $19 <span className="text-xs font-normal" style={{ color: 'var(--hh-muted)' }}>/ month</span>
                   </div>
                 </div>
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  Unlocks Beast Mode multi-track hardware FFmpeg encoding, 1→5 batch omnichannel exports, and offline Tauri/Electron workstation builds.
-                </p>
-                <ul className="space-y-2 text-xs text-zinc-200 pt-2 border-t border-white/10">
+                <ul className="space-y-2 text-xs pt-2 border-t" style={{ borderColor: 'var(--hh-border)', color: 'var(--hh-text)' }}>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#e11d48]" />
-                    <span>Windows .exe (25MB Tauri &amp; Electron) + Android .apk</span>
+                    <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
+                    <span>Windows .exe (25MB Tauri) &amp; Android .apk</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#e11d48]" />
-                    <span>Unlimited 4K Beast NLE tracks &amp; 2D Mood-Pad LUTs</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#e11d48]" />
-                    <span>YouTube Creator Studio OAuth direct publish</span>
+                    <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
+                    <span>Unlimited 4K Beast NLE + 2D Mood-Pad LUTs</span>
                   </li>
                 </ul>
               </div>
@@ -1677,41 +2032,49 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                   setIsDownloadModalOpen(true);
                   trackEvent('HANDFILM_OPEN_DOWNLOAD_MODAL', { source: 'pricing_pro' });
                 }}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md bg-[#e11d48] hover:bg-[#f43f5e] text-xs font-semibold text-white transition-colors cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold transition-transform hover:scale-[1.01] cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--hh-accent)',
+                  color: 'var(--hh-accent-ink)',
+                }}
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download Desktop / Android</span>
+                <span>{t.handfilm.downloadBtn}</span>
               </button>
             </div>
 
-            {/* Tier 3: Enterprise Suite */}
-            <div className="rounded-xl bg-[#101014] border border-white/10 p-6 flex flex-col justify-between gap-6">
+            {/* Tier 3 */}
+            <div
+              className="rounded-[20px] border p-6 flex flex-col justify-between gap-6"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                boxShadow: 'var(--hh-card-shadow)',
+              }}
+            >
               <div className="space-y-4">
                 <div className="flex items-center justify-between font-space-mono text-[11px]">
-                  <span className="text-[#C8A96A] font-bold">ENTERPRISE SUITE</span>
-                  <span className="text-zinc-400">B2B &amp; AGENCIES</span>
+                  <span className="font-bold" style={{ color: 'var(--hh-accent-2)' }}>
+                    ENTERPRISE SUITE
+                  </span>
+                  <span style={{ color: 'var(--hh-muted)' }}>B2B &amp; AGENCIES</span>
                 </div>
                 <div>
-                  <h3 className="font-bebas text-3xl text-white">Enterprise Suite</h3>
-                  <div className="mt-1 font-space-mono text-2xl font-bold text-white tabular-nums">
-                    Custom <span className="text-xs font-normal text-zinc-400">/ team &amp; R2 vault</span>
+                  <h3 className="text-2xl font-bold" style={{ color: 'var(--hh-text)' }}>
+                    Enterprise Suite
+                  </h3>
+                  <div className="mt-1 font-space-mono text-2xl font-bold tabular-nums" style={{ color: 'var(--hh-text)' }}>
+                    Custom <span className="text-xs font-normal" style={{ color: 'var(--hh-muted)' }}>/ R2 vault</span>
                   </div>
                 </div>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  Built for RMG &amp; Leather export houses, multi-brand D2C teams, and creative agencies needing dedicated Cloudflare R2 storage &amp; B2B SKU sync.
-                </p>
-                <ul className="space-y-2 text-xs text-zinc-300 pt-2 border-t border-white/10">
+                <ul className="space-y-2 text-xs pt-2 border-t" style={{ borderColor: 'var(--hh-border)', color: 'var(--hh-text)' }}>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#C8A96A]" />
-                    <span>Direct b2b.handsandhead.com catalog ingestion</span>
+                    <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent-2)' }} />
+                    <span>Direct b2b.handsandhead.com SKU ingestion</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#C8A96A]" />
-                    <span>Zero-egress Cloudflare R2 team asset vaults</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#C8A96A]" />
-                    <span>Custom AD Studio brand kits &amp; Bangla fonts</span>
+                    <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent-2)' }} />
+                    <span>Zero-egress Cloudflare R2 team vaults</span>
                   </li>
                 </ul>
               </div>
@@ -1720,28 +2083,32 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackStoryboardLaunch('pricing_enterprise', buildStoryboardUrl('solution=agencies'))}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md bg-[#C8A96A] hover:bg-[#dfc286] text-xs font-bold text-[#09090b] transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-bold text-white transition-colors"
+                style={{ backgroundColor: 'var(--hh-accent-2)' }}
               >
-                <span>Launch Enterprise Workspace</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
+                <span>{t.handfilm.launchStoryboard}</span>
               </a>
             </div>
           </div>
         </section>
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════════
-          FLOATING BOTTOM PILL BAR (GLASSMORPHIC STICKY BAR)
-      ════════════════════════════════════════════════════════════════════════ */}
+      {/* FLOATING BOTTOM PILL BAR */}
       <div className="fixed bottom-14 sm:bottom-16 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1.5rem)] max-w-xl pointer-events-auto">
-        <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-full bg-[#111116]/85 backdrop-blur-xl border border-white/15 shadow-[0_12px_40px_rgba(0,0,0,0.65)]">
+        <div
+          className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-full backdrop-blur-xl border shadow-2xl"
+          style={{
+            backgroundColor: 'var(--hh-glass-bg)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
           <div className="flex items-center gap-2.5 min-w-0 pl-1">
-            <span className="font-space-mono text-[11px] font-bold tracking-wider text-white shrink-0">
+            <span className="font-space-mono text-[11px] font-bold tracking-wider shrink-0" style={{ color: 'var(--hh-text)' }}>
               HANDFILM
             </span>
-            <span aria-hidden="true" className="text-zinc-600 hidden sm:inline">—</span>
-            <span className="text-xs text-zinc-300 truncate hidden sm:inline">
-              Edit smarter, create faster
+            <span aria-hidden="true" className="hidden sm:inline" style={{ color: 'var(--hh-muted)' }}>—</span>
+            <span className="text-xs truncate hidden sm:inline" style={{ color: 'var(--hh-muted)' }}>
+              {t.handfilm.stickySlogan}
             </span>
           </div>
 
@@ -1750,43 +2117,56 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackStoryboardLaunch('floating_bottom_pill', buildStoryboardUrl(''))}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#e11d48] hover:bg-[#f43f5e] text-xs font-semibold text-white transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
+            style={{
+              backgroundColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent-ink)',
+            }}
           >
-            <span>Try online for free</span>
+            <span>{t.handfilm.tryOnline}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════════
-          MULTI-PLATFORM DOWNLOAD MODAL (WINDOWS .EXE TAURI/ELECTRON & ANDROID .APK)
-      ════════════════════════════════════════════════════════════════════════ */}
+      {/* MULTI-PLATFORM DOWNLOAD MODAL */}
       {isDownloadModalOpen && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="handfilm-download-modal-title"
           onClick={() => setIsDownloadModalOpen(false)}
-          className="fixed inset-0 z-[130] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-[130] bg-black/65 backdrop-blur-md flex items-center justify-center p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0e0e12] border border-white/15 shadow-2xl"
+            className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[20px] border shadow-2xl"
+            style={{
+              backgroundColor: 'var(--hh-surface)',
+              borderColor: 'var(--hh-border)',
+              color: 'var(--hh-text)',
+            }}
           >
-            {/* Modal Header */}
-            <div className="flex items-start justify-between gap-4 p-6 border-b border-white/10">
+            <div
+              className="flex items-start justify-between gap-4 p-6 border-b"
+              style={{ borderColor: 'var(--hh-border)' }}
+            >
               <div className="space-y-1">
-                <div className="font-space-mono text-[11px] uppercase tracking-[0.18em] text-[#e11d48]">
+                <div
+                  className="font-space-mono text-[11px] uppercase tracking-[0.18em] font-semibold"
+                  style={{ color: 'var(--hh-accent)' }}
+                >
                   MULTI-PLATFORM INSTALLERS
                 </div>
                 <h2
                   id="handfilm-download-modal-title"
-                  className="font-bebas text-3xl sm:text-4xl tracking-wide text-white leading-none"
+                  className="text-2xl sm:text-3xl font-bold tracking-tight"
+                  style={{ color: 'var(--hh-text)' }}
                 >
                   Download HandFilm Studio
                 </h2>
-                <p className="text-xs sm:text-sm text-zinc-400">
-                  Choose between lightweight Windows Tauri (25 MB), full offline Electron Workstation, or Android Studio APK.
+                <p className="text-xs sm:text-sm" style={{ color: 'var(--hh-muted)' }}>
+                  Choose lightweight Windows Tauri (25 MB), full offline Electron Workstation, or Android APK.
                 </p>
               </div>
 
@@ -1794,54 +2174,64 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                 type="button"
                 aria-label="Close download modal"
                 onClick={() => setIsDownloadModalOpen(false)}
-                className="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-zinc-300 hover:text-white transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl border transition-colors cursor-pointer shrink-0"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Platform Cards Grid */}
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
               {DOWNLOAD_ARTIFACTS.map((artifact) => (
                 <div
                   key={artifact.id}
-                  className={`rounded-xl border p-5 flex flex-col justify-between gap-5 ${
-                    artifact.recommended
-                      ? 'bg-[#15151c] border-[#e11d48]/75'
-                      : 'bg-[#111116] border-white/10'
-                  }`}
+                  className="rounded-2xl border p-5 flex flex-col justify-between gap-5"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: artifact.recommended ? 'var(--hh-accent)' : 'var(--hh-border)',
+                  }}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2 font-space-mono text-[10.5px]">
-                      <span className="inline-flex items-center gap-1.5 text-zinc-200 font-bold uppercase">
+                      <span className="inline-flex items-center gap-1.5 font-bold uppercase" style={{ color: 'var(--hh-text)' }}>
                         {artifact.platform === 'windows' ? (
-                          <Monitor className="w-3.5 h-3.5 text-[#C8A96A]" />
+                          <Monitor className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />
                         ) : (
-                          <Smartphone className="w-3.5 h-3.5 text-[#e11d48]" />
+                          <Smartphone className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent-2)' }} />
                         )}
                         <span>{artifact.platform === 'windows' ? 'Windows .exe' : 'Android .apk'}</span>
                       </span>
-                      <span className="text-[#C8A96A] font-bold tabular-nums">{artifact.size}</span>
+                      <span className="font-bold tabular-nums" style={{ color: 'var(--hh-accent)' }}>
+                        {artifact.size}
+                      </span>
                     </div>
 
                     <div>
-                      <h3 className="text-base font-bold text-white leading-snug">{artifact.name}</h3>
-                      <div className="font-space-mono text-[10px] text-zinc-400 mt-1">
+                      <h3 className="text-base font-bold leading-snug" style={{ color: 'var(--hh-text)' }}>
+                        {artifact.name}
+                      </h3>
+                      <div className="font-space-mono text-[10px] mt-1" style={{ color: 'var(--hh-muted)' }}>
                         {artifact.architecture}
                       </div>
                     </div>
 
-                    <div className="font-space-mono text-[10.5px] text-zinc-300 flex items-center gap-1.5">
-                      <HardDrive className="w-3 h-3 text-zinc-500 shrink-0" />
+                    <div className="font-space-mono text-[10.5px] flex items-center gap-1.5" style={{ color: 'var(--hh-muted)' }}>
+                      <HardDrive className="w-3 h-3 shrink-0" />
                       <span>{artifact.engine}</span>
                     </div>
 
-                    <p className="text-xs text-zinc-400 leading-relaxed">{artifact.description}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
+                      {artifact.description}
+                    </p>
 
-                    <ul className="space-y-1.5 pt-2 border-t border-white/10">
+                    <ul className="space-y-1.5 pt-2 border-t" style={{ borderColor: 'var(--hh-border)' }}>
                       {artifact.features.map((feat) => (
-                        <li key={feat} className="flex items-center gap-2 text-xs text-zinc-300">
-                          <Check className="w-3 h-3 text-[#e11d48] shrink-0" />
+                        <li key={feat} className="flex items-center gap-2 text-xs" style={{ color: 'var(--hh-text)' }}>
+                          <Check className="w-3 h-3 shrink-0" style={{ color: 'var(--hh-accent)' }} />
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -1853,34 +2243,17 @@ export default function HandFilmHubView({ onSetCursorLabel }: HandFilmHubViewPro
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackStoryboardLaunch(`download_${artifact.id}`, artifact.actionUrl)}
-                    className={`w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap ${
-                      artifact.recommended
-                        ? 'bg-[#e11d48] hover:bg-[#f43f5e] text-white'
-                        : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100'
-                    }`}
+                    className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors whitespace-nowrap"
+                    style={{
+                      backgroundColor: artifact.recommended ? 'var(--hh-accent)' : 'var(--hh-surface)',
+                      color: artifact.recommended ? 'var(--hh-accent-ink)' : 'var(--hh-text)',
+                    }}
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>{artifact.ctaLabel}</span>
                   </a>
                 </div>
               ))}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-white/10 bg-[#09090b]/80 flex flex-wrap items-center justify-between gap-3">
-              <div className="font-space-mono text-[11px] text-zinc-400">
-                Prefer zero-install? All WebGL2 editing modes run natively in your browser.
-              </div>
-              <a
-                href={buildStoryboardUrl('')}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackStoryboardLaunch('download_modal_web_fallback', buildStoryboardUrl(''))}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C8A96A] hover:text-white transition-colors"
-              >
-                <span>Launch Web Studio Instead</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </a>
             </div>
           </div>
         </div>

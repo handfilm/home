@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { SectionItem, ActiveTab, ColorGrade } from '../types';
-import { Search, CornerDownLeft, Sparkles, CheckSquare, Layers, Volume2, Globe, Download, Smartphone, SlidersHorizontal, Home, Film, Factory } from 'lucide-react';
-import { Language, TranslationDictionary } from '../i18n/translations';
+import { SectionItem, ActiveTab } from '../types';
+import { Search, CornerDownLeft, Sparkles, CheckSquare, Layers, Volume2, Globe, Download, Smartphone, SlidersHorizontal, Home, Film, Factory, Sun, Moon } from 'lucide-react';
+import { Language, LANGUAGE_OPTIONS, TranslationDictionary } from '../i18n/translations';
 import { trackEvent } from '../services/analytics';
+import { ColorMode } from '../context/ThemeContext';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -14,7 +15,9 @@ interface CommandPaletteProps {
   onToggleSound: () => void;
   isSoundEnabled: boolean;
   language: Language;
-  onToggleLanguage: () => void;
+  onSelectLanguage: (lang: Language) => void;
+  colorMode: ColorMode;
+  onToggleTheme: () => void;
   onCycleGrade: () => void;
   onOpenSyncModal: () => void;
   onOpenSpeedConsole: () => void;
@@ -39,12 +42,13 @@ export default function CommandPalette({
   onClose,
   sections,
   onSelectSection,
-  activeTab,
   setActiveTab,
   onToggleSound,
   isSoundEnabled,
   language,
-  onToggleLanguage,
+  onSelectLanguage,
+  colorMode,
+  onToggleTheme,
   onCycleGrade,
   onOpenSyncModal,
   onOpenSpeedConsole,
@@ -98,14 +102,14 @@ export default function CommandPalette({
       });
     });
 
-    // 2. View Switches (3-Tab Top-Level Shell + Tasks Hub)
+    // 2. View Switches
     list.push({
       id: 'view-home',
       category: 'views',
-      title: 'Home — Enterprise Overview',
+      title: 'HOME — Enterprise Overview',
       subtitle: 'HANDS & HEAD Main Hub, 3 Core Pillars & Live Telemetry',
       shortcut: 'Key 1',
-      icon: <Home className="w-3.5 h-3.5 text-[#E50914]" />,
+      icon: <Home className="w-3.5 h-3.5 text-[#e11d48]" />,
       keywords: ['home', 'main', 'hub', 'overview', 'landing', 'pillars'],
       action: () => {
         setActiveTab('home');
@@ -116,10 +120,10 @@ export default function CommandPalette({
     list.push({
       id: 'view-handfilm',
       category: 'views',
-      title: 'HandFilm Studio — Product & AI Model Hub',
+      title: 'HANDFILM — Product & AI Model Hub',
       subtitle: 'Easy, Beast, CapCut & AD Studio showcase connected to Storyboard',
       shortcut: 'Key 5',
-      icon: <Film className="w-3.5 h-3.5 text-[#e11d48]" />,
+      icon: <Film className="w-3.5 h-3.5 text-[#06b6d4]" />,
       keywords: ['handfilm', 'capcut', 'beast', 'easy', 'ad studio', 'storyboard', 'ai', 'editor'],
       action: () => {
         setActiveTab('handfilm');
@@ -130,10 +134,10 @@ export default function CommandPalette({
     list.push({
       id: 'view-stage',
       category: 'views',
-      title: 'Apps — 24-Section Stage Slider',
+      title: 'APPS — 24-Section Stage Slider',
       subtitle: 'Primary full-screen 24-module ecosystem showcase',
       shortcut: 'Key 2',
-      icon: <Layers className="w-3.5 h-3.5 text-[#c8b89a]" />,
+      icon: <Layers className="w-3.5 h-3.5 text-emerald-400" />,
       keywords: ['apps', 'stage', 'slider', 'ecosystem', '24', 'portal'],
       action: () => {
         setActiveTab('ecosystem');
@@ -144,10 +148,10 @@ export default function CommandPalette({
     list.push({
       id: 'view-rawx',
       category: 'views',
-      title: 'RAWx — Flagship Brand & 19-Drop Lookbook Studio',
-      subtitle: 'Hide, 316L Steel & Heavyweight Apparel Storefront + 19 Slider Engines',
+      title: 'RAWx — Hide, Steel & 19-Drop Studio',
+      subtitle: 'Standalone RAWx Brand Storefront + 19 Interactive Slider Engines',
       shortcut: 'Key 3',
-      icon: <Sparkles className="w-3.5 h-3.5 text-amber-400" />,
+      icon: <Sparkles className="w-3.5 h-3.5 text-amber-500" />,
       keywords: ['rawx', 'hide', 'steel', '316l', 'apparel', 'sliders', '19', 'lookbook', 'drops', 'showcase'],
       action: () => {
         setActiveTab('rawx-showcase');
@@ -175,7 +179,7 @@ export default function CommandPalette({
       title: 'Handfilm & Storyboard (WebGL2 AI Video)',
       subtitle: 'storyboard.handsandhead.com — NLE Editor, Player & Cloudflare Host',
       shortcut: 'External ↗',
-      icon: <Film className="w-3.5 h-3.5 text-[#E50914]" />,
+      icon: <Film className="w-3.5 h-3.5 text-[#e11d48]" />,
       keywords: ['handfilm', 'storyboard', 'webgl2', 'video', 'nle', 'cinema', 'ai'],
       action: () => {
         window.open('https://storyboard.handsandhead.com/', '_blank', 'noopener,noreferrer');
@@ -189,7 +193,7 @@ export default function CommandPalette({
       title: 'B2B & Industrial Wings',
       subtitle: 'b2b.handsandhead.com — RMG, Streetwear, Leather, Jackets & 316L/516SS',
       shortcut: 'External ↗',
-      icon: <Factory className="w-3.5 h-3.5 text-[#C8A96A]" />,
+      icon: <Factory className="w-3.5 h-3.5 text-amber-500" />,
       keywords: ['b2b', 'industrial', 'rmg', 'streetwear', 'leather', 'jackets', '316l', '516ss', 'hardware'],
       action: () => {
         window.open('https://b2b.handsandhead.com/', '_blank', 'noopener,noreferrer');
@@ -199,12 +203,26 @@ export default function CommandPalette({
 
     // 3. Workspace Controls & Settings
     list.push({
+      id: 'control-theme',
+      category: 'controls',
+      title: colorMode === 'dark' ? t.theme.switchToLight : t.theme.switchToDark,
+      subtitle: 'Adapt all 4 OS tabs cleanly between Dark and Light palettes',
+      shortcut: colorMode === 'dark' ? 'Light' : 'Dark',
+      icon: colorMode === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-sky-500" />,
+      keywords: ['theme', 'light', 'dark', 'mode', 'appearance'],
+      action: () => {
+        onToggleTheme();
+        onClose();
+      },
+    });
+
+    list.push({
       id: 'control-sound',
       category: 'controls',
       title: isSoundEnabled ? 'Disable Ambient Audio Layer' : 'Enable Ambient Audio Layer (Web Audio)',
       subtitle: isSoundEnabled ? 'Currently playing procedural soundscape' : 'Off by default · Generates organic synthesized drones',
       shortcut: 'Audio',
-      icon: <Volume2 className={`w-3.5 h-3.5 ${isSoundEnabled ? 'text-emerald-400' : 'text-[#f3efe6]/60'}`} />,
+      icon: <Volume2 className={`w-3.5 h-3.5 ${isSoundEnabled ? 'text-emerald-400' : 'opacity-60'}`} />,
       keywords: ['sound', 'audio', 'music', 'drone', 'ambient', 'synth', 'mute', 'unmute'],
       action: () => {
         onToggleSound();
@@ -212,18 +230,20 @@ export default function CommandPalette({
       },
     });
 
-    list.push({
-      id: 'control-language',
-      category: 'controls',
-      title: language === 'en' ? 'Switch to Bengali (বাংলা)' : 'Switch to English (EN)',
-      subtitle: 'Toggle master UI dictionary and section translations',
-      shortcut: language === 'en' ? 'বাংলা' : 'EN',
-      icon: <Globe className="w-3.5 h-3.5 text-cyan-400" />,
-      keywords: ['language', 'translate', 'bengali', 'bangla', 'english', 'i18n', 'ভাষা'],
-      action: () => {
-        onToggleLanguage();
-        onClose();
-      },
+    LANGUAGE_OPTIONS.forEach((opt) => {
+      list.push({
+        id: `control-lang-${opt.code}`,
+        category: 'controls',
+        title: `Language: ${opt.nativeLabel} (${opt.shortLabel})`,
+        subtitle: `Switch Master OS interface to ${opt.englishName}`,
+        shortcut: language === opt.code ? 'ACTIVE' : opt.shortLabel,
+        icon: <Globe className="w-3.5 h-3.5 text-cyan-400" />,
+        keywords: ['language', 'translate', opt.code, opt.englishName.toLowerCase(), opt.nativeLabel.toLowerCase(), 'i18n'],
+        action: () => {
+          onSelectLanguage(opt.code);
+          onClose();
+        },
+      });
     });
 
     list.push({
@@ -232,7 +252,7 @@ export default function CommandPalette({
       title: 'Cycle Color Grading LUT',
       subtitle: 'Teal & Steel · Amber Pulse · Deep Noir · Bleach Bypass',
       shortcut: 'Key G',
-      icon: <span className="font-mono text-xs text-amber-300">◈</span>,
+      icon: <span className="font-mono text-xs text-amber-400">◈</span>,
       keywords: ['grade', 'color', 'lut', 'filter', 'teal', 'amber', 'noir'],
       action: () => {
         onCycleGrade();
@@ -246,7 +266,7 @@ export default function CommandPalette({
       title: 'Transition Speed & Easing Console',
       subtitle: 'Adjust cubic bezier timing curves and duration',
       shortcut: 'Speed',
-      icon: <SlidersHorizontal className="w-3.5 h-3.5 text-[#f3efe6]/60" />,
+      icon: <SlidersHorizontal className="w-3.5 h-3.5 opacity-70" />,
       keywords: ['speed', 'easing', 'timing', 'duration', 'console'],
       action: () => {
         onOpenSpeedConsole();
@@ -292,7 +312,11 @@ export default function CommandPalette({
     isSoundEnabled,
     onToggleSound,
     language,
-    onToggleLanguage,
+    onSelectLanguage,
+    colorMode,
+    onToggleTheme,
+    t.theme.switchToDark,
+    t.theme.switchToLight,
     onCycleGrade,
     onOpenSpeedConsole,
     onOpenSyncModal,
@@ -347,16 +371,31 @@ export default function CommandPalette({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[120] bg-[#0e0d0b]/85 backdrop-blur-md flex items-start justify-center pt-16 sm:pt-24 px-4 p-6 animate-fadeIn"
+      className="fixed inset-0 z-[120] backdrop-blur-md flex items-start justify-center pt-16 sm:pt-24 px-4 p-6 animate-fadeIn"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.55)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl bg-[#141310] border border-[#f3efe6]/20 rounded-xl shadow-2xl overflow-hidden font-mono flex flex-col max-h-[80vh]"
+        className={`w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden font-mono flex flex-col max-h-[80vh] border hh-theme-transition ${
+          language === 'bn' ? 'bangla-text' : ''
+        }`}
+        style={{
+          backgroundColor: 'var(--hh-surface)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+          boxShadow: 'var(--hh-card-shadow)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Header */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#f3efe6]/15 bg-[#181714]">
-          <Search className="w-4 h-4 text-[#c8b89a]" />
+        <div
+          className="flex items-center gap-3 px-4 py-3.5 border-b"
+          style={{
+            borderColor: 'var(--hh-border)',
+            backgroundColor: 'var(--hh-surface-2)',
+          }}
+        >
+          <Search className="w-4 h-4 shrink-0" style={{ color: 'var(--hh-accent)' }} />
           <input
             ref={inputRef}
             type="text"
@@ -366,25 +405,39 @@ export default function CommandPalette({
               setSelectedIndex(0);
             }}
             placeholder={t.command.placeholder}
-            className="flex-1 bg-transparent text-[#f3efe6] text-sm placeholder-[#f3efe6]/40 outline-none"
+            className="flex-1 bg-transparent text-sm outline-none"
+            style={{ color: 'var(--hh-text)' }}
           />
           {query && (
             <button
+              type="button"
               onClick={() => setQuery('')}
-              className="text-xs text-[#f3efe6]/50 hover:text-[#f3efe6] px-1.5 py-0.5 rounded bg-[#f3efe6]/5 cursor-pointer"
+              className="text-xs px-1.5 py-0.5 rounded cursor-pointer border"
+              style={{
+                color: 'var(--hh-muted)',
+                borderColor: 'var(--hh-border)',
+                backgroundColor: 'var(--hh-surface)',
+              }}
             >
               Clear
             </button>
           )}
-          <span className="text-[10px] uppercase tracking-wider text-[#f3efe6]/40 px-2 py-1 rounded bg-[#f3efe6]/5 border border-[#f3efe6]/10">
+          <span
+            className="text-[10px] uppercase tracking-wider px-2 py-1 rounded border"
+            style={{
+              color: 'var(--hh-muted)',
+              borderColor: 'var(--hh-border)',
+              backgroundColor: 'var(--hh-surface)',
+            }}
+          >
             ESC
           </span>
         </div>
 
         {/* Command Results List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-[#f3efe6]/5 p-2 space-y-1">
+        <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {filteredCommands.length === 0 ? (
-            <div className="py-12 text-center text-xs text-[#f3efe6]/50 font-mono">
+            <div className="py-12 text-center text-xs font-mono" style={{ color: 'var(--hh-muted)' }}>
               {t.command.noResults} &quot;{query}&quot;
             </div>
           ) : (
@@ -398,29 +451,50 @@ export default function CommandPalette({
                     cmd.action();
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-                    isSelected ? 'bg-[#f3efe6]/10 text-[#f3efe6] border border-[#f3efe6]/20' : 'text-[#f3efe6]/70 hover:bg-[#f3efe6]/5'
-                  }`}
+                  className="flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all border"
+                  style={{
+                    backgroundColor: isSelected ? 'var(--hh-surface-2)' : 'transparent',
+                    borderColor: isSelected ? 'var(--hh-accent)' : 'transparent',
+                    color: isSelected ? 'var(--hh-text)' : 'var(--hh-muted)',
+                  }}
                 >
                   <div className="flex items-center gap-3.5 overflow-hidden">
-                    <div className="w-7 h-7 rounded bg-[#1f1e1a] border border-[#f3efe6]/10 flex items-center justify-center flex-shrink-0">
+                    <div
+                      className="w-8 h-8 rounded-lg border flex items-center justify-center flex-shrink-0"
+                      style={{
+                        backgroundColor: 'var(--hh-bg)',
+                        borderColor: 'var(--hh-border)',
+                      }}
+                    >
                       {cmd.icon}
                     </div>
                     <div className="truncate">
-                      <div className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#f3efe6]">
+                      <div
+                        className="text-xs sm:text-sm font-semibold uppercase tracking-wider truncate"
+                        style={{ color: 'var(--hh-text)' }}
+                      >
                         {cmd.title}
                       </div>
-                      <div className="text-[10px] text-[#f3efe6]/50 truncate">{cmd.subtitle}</div>
+                      <div className="text-[10px] truncate" style={{ color: 'var(--hh-muted)' }}>
+                        {cmd.subtitle}
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0 pl-2">
                     {cmd.shortcut && (
-                      <span className="text-[9.5px] uppercase tracking-wider text-[#c8b89a] px-2 py-0.5 rounded bg-[#c8b89a]/10 border border-[#c8b89a]/20">
+                      <span
+                        className="text-[9.5px] uppercase tracking-wider px-2 py-0.5 rounded border font-semibold"
+                        style={{
+                          color: 'var(--hh-accent)',
+                          borderColor: 'var(--hh-border)',
+                          backgroundColor: 'var(--hh-bg)',
+                        }}
+                      >
                         {cmd.shortcut}
                       </span>
                     )}
-                    {isSelected && <CornerDownLeft className="w-3.5 h-3.5 text-[#f3efe6]/60" />}
+                    {isSelected && <CornerDownLeft className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent)' }} />}
                   </div>
                 </div>
               );
@@ -429,7 +503,14 @@ export default function CommandPalette({
         </div>
 
         {/* Footer Guidance */}
-        <div className="px-4 py-2.5 bg-[#0e0d0b] border-t border-[#f3efe6]/10 flex items-center justify-between text-[10px] text-[#f3efe6]/40 uppercase">
+        <div
+          className="px-4 py-2.5 border-t flex items-center justify-between text-[10px] uppercase"
+          style={{
+            backgroundColor: 'var(--hh-surface-2)',
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-muted)',
+          }}
+        >
           <div className="flex items-center gap-3">
             <span>↑↓ Navigate</span>
             <span>↵ Select</span>

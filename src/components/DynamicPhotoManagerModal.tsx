@@ -526,24 +526,49 @@ export default function DynamicPhotoManagerModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 select-none font-mono"
+      className="fixed inset-0 z-[150] bg-black/75 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 select-none font-mono"
     >
-      <div className="relative w-full max-w-5xl max-h-[92vh] bg-[#0c0b09] border border-[#f3efe6]/15 rounded-lg shadow-2xl flex flex-col overflow-hidden text-[#f3efe6]">
+      <div
+        className="relative w-full max-w-5xl max-h-[92vh] border rounded-lg shadow-2xl flex flex-col overflow-hidden hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-bg)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+        }}
+      >
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#f3efe6]/10 bg-[#141310]">
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-[#c8b89a]/15 text-[#c8b89a] flex items-center justify-center">
+            <div
+              className="w-8 h-8 rounded flex items-center justify-center"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                color: 'var(--hh-accent)',
+              }}
+            >
               <ImageIcon className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-bold tracking-wider uppercase text-white flex items-center gap-2">
-                <span className="normal-case text-[#e11d48]">RAWx</span>
+              <h2 className="text-sm sm:text-base font-bold tracking-wider uppercase flex items-center gap-2" style={{ color: 'var(--hh-text)' }}>
+                <span className="normal-case" style={{ color: 'var(--hh-accent)' }}>RAWx</span>
                 <span>PHOTO &amp; DROP STUDIO MANAGER</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-[#c8b89a]/20 text-[#c8b89a] font-normal">
+                <span
+                  className="text-[10px] px-2 py-0.5 rounded font-bold"
+                  style={{
+                    backgroundColor: 'var(--hh-accent)',
+                    color: 'var(--hh-accent-ink)',
+                  }}
+                >
                   19 DROPS
                 </span>
               </h2>
-              <p className="text-[10px] text-[#f3efe6]/50">
+              <p className="text-[10px]" style={{ color: 'var(--hh-muted)' }}>
                 Edit drop product specs, swap lookbook photos, upload local frames, or import/export JSON across all 19 drops
               </p>
             </div>
@@ -554,7 +579,12 @@ export default function DynamicPhotoManagerModal({
               type="button"
               onClick={handleExportConfig}
               title="Export all custom RAWx photos & drop metadata as JSON"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#1a1916] border border-[#f3efe6]/10 text-[10px] text-[#f3efe6]/70 hover:text-white cursor-pointer transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded border text-[10px] cursor-pointer transition-colors"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export JSON</span>
@@ -564,7 +594,12 @@ export default function DynamicPhotoManagerModal({
               type="button"
               onClick={() => jsonFileInputRef.current?.click()}
               title="Import JSON drop configuration"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#1a1916] border border-[#f3efe6]/10 text-[10px] text-[#f3efe6]/70 hover:text-white cursor-pointer transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded border text-[10px] cursor-pointer transition-colors"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             >
               <FileCode className="w-3.5 h-3.5" />
               <span>Import JSON</span>
@@ -593,7 +628,12 @@ export default function DynamicPhotoManagerModal({
                 <button
                   type="button"
                   onClick={() => setConfirmReset(false)}
-                  className="px-2 py-1.5 rounded bg-[#1f1e1a] text-[#f3efe6]/70 text-[10px] cursor-pointer"
+                  className="px-2 py-1.5 rounded border text-[10px] cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-muted)',
+                  }}
                 >
                   Cancel
                 </button>
@@ -603,7 +643,7 @@ export default function DynamicPhotoManagerModal({
                 type="button"
                 onClick={() => setConfirmReset(true)}
                 title="Reset to factory photography and drops"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-950/40 border border-red-500/20 text-[10px] text-red-400 hover:text-red-300 cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-500/15 border border-red-500/30 text-[10px] text-red-500 hover:bg-red-500/25 cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset</span>
@@ -613,7 +653,12 @@ export default function DynamicPhotoManagerModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded bg-[#1f1e1a] hover:bg-[#2d2c26] text-[#f3efe6]/60 hover:text-white cursor-pointer transition-colors ml-2"
+              className="p-1.5 rounded border cursor-pointer transition-colors ml-2"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -623,8 +668,14 @@ export default function DynamicPhotoManagerModal({
 
         {/* Toast alert */}
         {saveToast && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded bg-[#c8b89a] text-black font-bold text-xs tracking-wider flex items-center gap-2 shadow-xl">
-            <Check className="w-4 h-4 text-black" />
+          <div
+            className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded font-bold text-xs tracking-wider flex items-center gap-2 shadow-xl"
+            style={{
+              backgroundColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent-ink)',
+            }}
+          >
+            <Check className="w-4 h-4" />
             <span>{saveToast}</span>
           </div>
         )}
@@ -633,41 +684,42 @@ export default function DynamicPhotoManagerModal({
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {/* Section Picker Pills */}
           <div>
-            <label className="text-[10px] tracking-[0.2em] uppercase text-[#888888] block mb-2 font-semibold">
+            <label className="text-[10px] tracking-[0.2em] uppercase block mb-2 font-semibold" style={{ color: 'var(--hh-muted)' }}>
               1. CHOOSE SLIDER / DROP SECTION TO CUSTOMIZE:
             </label>
             <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-thin">
-              {SECTION_OPTIONS.map((sec) => (
-                <button
-                  key={sec.key}
-                  type="button"
-                  onClick={() => {
-                    setSelectedSection(sec.key);
-                    setSelectedSlideIndex(0);
-                  }}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded text-[11px] font-mono tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
-                    selectedSection === sec.key
-                      ? 'bg-[#c8b89a] text-black font-bold shadow-md scale-[1.02]'
-                      : 'bg-[#181714] text-[#f3efe6]/60 hover:text-[#f3efe6] hover:bg-[#22211d] border border-[#f3efe6]/10'
-                  }`}
-                >
-                  <span>{sec.label}</span>
-                  <span
-                    className={`text-[9px] px-1 rounded ${
-                      selectedSection === sec.key ? 'bg-black/20 text-black' : 'bg-white/10 text-white/60'
-                    }`}
+              {SECTION_OPTIONS.map((sec) => {
+                const isSelected = selectedSection === sec.key;
+                return (
+                  <button
+                    key={sec.key}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSection(sec.key);
+                      setSelectedSlideIndex(0);
+                    }}
+                    className="flex-shrink-0 px-3 py-1.5 rounded text-[11px] font-mono tracking-wider transition-all cursor-pointer flex items-center gap-2 border"
+                    style={{
+                      backgroundColor: isSelected ? 'var(--hh-accent)' : 'var(--hh-surface)',
+                      borderColor: isSelected ? 'var(--hh-accent)' : 'var(--hh-border)',
+                      color: isSelected ? 'var(--hh-accent-ink)' : 'var(--hh-text)',
+                      fontWeight: isSelected ? 700 : 500,
+                    }}
                   >
-                    {sec.ratio}
-                  </span>
-                </button>
-              ))}
+                    <span>{sec.label}</span>
+                    <span className="text-[9px] px-1 rounded bg-black/15">
+                      {sec.ratio}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Slide Selector Carousel for this section */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-[10px] tracking-[0.2em] uppercase text-[#888888] font-semibold">
+              <label className="text-[10px] tracking-[0.2em] uppercase font-semibold" style={{ color: 'var(--hh-muted)' }}>
                 2. SELECT SLIDE / FRAME ({slideList.length} Slides Available):
               </label>
 
@@ -675,7 +727,8 @@ export default function DynamicPhotoManagerModal({
                 <button
                   type="button"
                   onClick={handleAddSlide}
-                  className="flex items-center gap-1 text-[10px] text-[#c8b89a] hover:underline cursor-pointer"
+                  className="flex items-center gap-1 text-[10px] hover:underline cursor-pointer"
+                  style={{ color: 'var(--hh-accent)' }}
                 >
                   <Plus className="w-3 h-3" />
                   <span>Add New Slide</span>
@@ -689,11 +742,13 @@ export default function DynamicPhotoManagerModal({
                   key={slide.id}
                   type="button"
                   onClick={() => setSelectedSlideIndex(idx)}
-                  className={`relative aspect-[4/3] rounded overflow-hidden border-2 transition-all cursor-pointer group bg-[#161512] ${
-                    selectedSlideIndex === idx
-                      ? 'border-[#c8b89a] ring-2 ring-[#c8b89a]/30 shadow-lg scale-105'
-                      : 'border-transparent opacity-60 hover:opacity-100 hover:border-white/30'
+                  className={`relative aspect-[4/3] rounded overflow-hidden border-2 transition-all cursor-pointer group ${
+                    selectedSlideIndex === idx ? 'shadow-lg scale-105' : 'opacity-70 hover:opacity-100'
                   }`}
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: selectedSlideIndex === idx ? 'var(--hh-accent)' : 'var(--hh-border)',
+                  }}
                 >
                   <div
                     className="w-full h-full bg-cover bg-center"
@@ -711,20 +766,26 @@ export default function DynamicPhotoManagerModal({
           </div>
 
           {/* Slide Editor Panel */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-[#141310] border border-[#f3efe6]/10 p-5 rounded-lg">
+          <div
+            className="grid grid-cols-1 lg:grid-cols-12 gap-6 border p-5 rounded-lg"
+            style={{
+              backgroundColor: 'var(--hh-surface)',
+              borderColor: 'var(--hh-border)',
+            }}
+          >
             {/* Left: Live Preview */}
             <div className="lg:col-span-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] tracking-widest uppercase text-[#c8b89a] flex items-center gap-1.5 font-bold">
+                <span className="text-[10px] tracking-widest uppercase flex items-center gap-1.5 font-bold" style={{ color: 'var(--hh-accent)' }}>
                   <Eye className="w-3.5 h-3.5" />
                   <span>Live Frame Preview</span>
                 </span>
-                <span className="text-[9px] text-[#f3efe6]/40">
+                <span className="text-[9px]" style={{ color: 'var(--hh-muted)' }}>
                   Slide {selectedSlideIndex + 1} of {slideList.length}
                 </span>
               </div>
 
-              <div className="relative aspect-[16/10] rounded bg-[#050505] overflow-hidden border border-[#f3efe6]/15 shadow-inner group">
+              <div className="relative aspect-[16/10] rounded bg-[#050505] overflow-hidden border shadow-inner group" style={{ borderColor: 'var(--hh-border)' }}>
                 <div
                   className="w-full h-full bg-cover bg-center transition-all duration-300"
                   style={{ backgroundImage: `url('${currentSlide.url}')` }}
@@ -742,7 +803,7 @@ export default function DynamicPhotoManagerModal({
                     {currentSlide.title || 'Slide Title'}
                   </h3>
                   {currentSlide.sub && (
-                    <p className="text-[9px] text-[#f3efe6]/60 uppercase tracking-wider truncate">
+                    <p className="text-[9px] text-[#f3efe6]/70 uppercase tracking-wider truncate">
                       {currentSlide.sub}
                     </p>
                   )}
@@ -761,7 +822,12 @@ export default function DynamicPhotoManagerModal({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full py-2.5 px-4 rounded bg-[#1e1d19] hover:bg-[#2a2924] border border-[#f3efe6]/15 hover:border-[#c8b89a] text-xs text-[#c8b89a] flex items-center justify-center gap-2 cursor-pointer transition-all font-bold"
+                  className="w-full py-2.5 px-4 rounded border text-xs flex items-center justify-center gap-2 cursor-pointer transition-all font-bold"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-accent)',
+                  }}
                 >
                   <Upload className="w-4 h-4" />
                   <span>Upload Local Photo from Device</span>
@@ -773,7 +839,7 @@ export default function DynamicPhotoManagerModal({
             <div className="lg:col-span-7 space-y-4">
               {/* Image URL Input */}
               <div className="space-y-1.5">
-                <label className="text-[10px] tracking-widest uppercase text-[#888888] font-bold block">
+                <label className="text-[10px] tracking-widest uppercase font-bold block" style={{ color: 'var(--hh-muted)' }}>
                   Image Source URL:
                 </label>
                 <div className="flex gap-2">
@@ -782,12 +848,21 @@ export default function DynamicPhotoManagerModal({
                     value={currentSlide.url}
                     onChange={(e) => applyImageUrl(e.target.value)}
                     placeholder="https://example.com/image.jpg"
-                    className="flex-1 bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-2 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                    className="flex-1 border rounded px-3 py-2 text-xs font-mono focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-text)',
+                    }}
                   />
                   <button
                     type="button"
                     onClick={() => triggerToast('Image URL Applied!')}
-                    className="px-3 py-2 bg-[#c8b89a] text-black font-bold text-xs rounded hover:bg-white cursor-pointer transition-colors"
+                    className="px-3 py-2 font-bold text-xs rounded cursor-pointer transition-colors"
+                    style={{
+                      backgroundColor: 'var(--hh-accent)',
+                      color: 'var(--hh-accent-ink)',
+                    }}
                   >
                     Apply
                   </button>
@@ -797,7 +872,7 @@ export default function DynamicPhotoManagerModal({
               {/* Metadata Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                     Tag / Category Label:
                   </label>
                   <input
@@ -805,12 +880,17 @@ export default function DynamicPhotoManagerModal({
                     value={currentSlide.tag}
                     onChange={(e) => handleUpdateSlideMeta('tag', e.target.value)}
                     placeholder="e.g. Master OS, Drop 01"
-                    className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                    className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-text)',
+                    }}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                  <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                     Slide Headline / Title:
                   </label>
                   <input
@@ -818,13 +898,18 @@ export default function DynamicPhotoManagerModal({
                     value={currentSlide.title}
                     onChange={(e) => handleUpdateSlideMeta('title', e.target.value)}
                     placeholder="e.g. Cinematic Grading"
-                    className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                    className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-text)',
+                    }}
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                   Subtitle / Technical Spec Description:
                 </label>
                 <input
@@ -832,13 +917,18 @@ export default function DynamicPhotoManagerModal({
                   value={currentSlide.sub}
                   onChange={(e) => handleUpdateSlideMeta('sub', e.target.value)}
                   placeholder="e.g. System Architecture v3.0 · 8K Pipeline"
-                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                  className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               {/* Quick Preset Swatches */}
-              <div className="space-y-2 pt-2 border-t border-[#f3efe6]/10">
-                <label className="text-[9px] tracking-widest uppercase text-[#c8b89a] flex items-center gap-1 font-bold">
+              <div className="space-y-2 pt-2 border-t" style={{ borderColor: 'var(--hh-border)' }}>
+                <label className="text-[9px] tracking-widest uppercase flex items-center gap-1 font-bold" style={{ color: 'var(--hh-accent)' }}>
                   <Sparkles className="w-3 h-3" />
                   <span>One-Click Curated Presets:</span>
                 </label>
@@ -851,13 +941,17 @@ export default function DynamicPhotoManagerModal({
                         applyImageUrl(preset.url);
                         triggerToast(`Applied "${preset.name}"`);
                       }}
-                      className="text-left p-1 rounded bg-[#090807] border border-[#f3efe6]/10 hover:border-[#c8b89a] transition-all cursor-pointer group"
+                      className="text-left p-1 rounded border transition-all cursor-pointer group"
+                      style={{
+                        backgroundColor: 'var(--hh-bg)',
+                        borderColor: 'var(--hh-border)',
+                      }}
                     >
                       <div
                         className="w-full h-10 bg-cover bg-center rounded-sm mb-1"
                         style={{ backgroundImage: `url('${preset.url}')` }}
                       />
-                      <span className="text-[8px] text-[#f3efe6]/70 group-hover:text-white truncate block">
+                      <span className="text-[8px] truncate block" style={{ color: 'var(--hh-text)' }}>
                         {preset.name}
                       </span>
                     </button>
@@ -871,7 +965,7 @@ export default function DynamicPhotoManagerModal({
                   <button
                     type="button"
                     onClick={() => handleDeleteSlide(selectedSlideIndex)}
-                    className="text-[10px] text-red-400 hover:text-red-300 flex items-center gap-1.5 cursor-pointer"
+                    className="text-[10px] text-red-500 hover:underline flex items-center gap-1.5 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Remove This Slide from Section</span>
@@ -882,19 +976,26 @@ export default function DynamicPhotoManagerModal({
           </div>
 
           {/* 3. RAWx Drop & Brand Product Metadata Editor */}
-          <div className="bg-[#141310] border border-[#f3efe6]/10 p-5 rounded-lg space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f3efe6]/10 pb-3">
+          <div
+            className="border p-5 rounded-lg space-y-4"
+            style={{
+              backgroundColor: 'var(--hh-surface)',
+              borderColor: 'var(--hh-border)',
+            }}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style={{ borderColor: 'var(--hh-border)' }}>
               <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-[#e11d48]" />
-                <span className="text-[11px] tracking-[0.18em] uppercase font-bold text-white">
-                  3. <span className="normal-case text-[#e11d48]">RAWx</span> DROP &amp; PRODUCT METADATA (
+                <Tag className="w-4 h-4" style={{ color: 'var(--hh-accent)' }} />
+                <span className="text-[11px] tracking-[0.18em] uppercase font-bold" style={{ color: 'var(--hh-text)' }}>
+                  3. <span className="normal-case" style={{ color: 'var(--hh-accent)' }}>RAWx</span> DROP &amp; PRODUCT METADATA (
                   {currentDropMeta.dropId.toUpperCase()})
                 </span>
               </div>
               <button
                 type="button"
                 onClick={handleResetSingleDropMeta}
-                className="text-[10px] text-[#c8b89a] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-[10px] hover:underline flex items-center gap-1 cursor-pointer"
+                style={{ color: 'var(--hh-accent)' }}
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Reset Drop Meta</span>
@@ -903,19 +1004,24 @@ export default function DynamicPhotoManagerModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div className="space-y-1">
-                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                   Drop Code
                 </label>
                 <input
                   type="text"
                   value={currentDropMeta.dropCode}
                   onChange={(e) => handleUpdateDropMeta('dropCode', e.target.value)}
-                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                  className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                   Collection Category
                 </label>
                 <select
@@ -923,7 +1029,12 @@ export default function DynamicPhotoManagerModal({
                   onChange={(e) =>
                     handleUpdateDropMeta('collection', e.target.value as RawxCollectionCategory)
                   }
-                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                  className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 >
                   {COLLECTION_OPTIONS.map((cat) => (
                     <option key={cat} value={cat}>
@@ -934,77 +1045,112 @@ export default function DynamicPhotoManagerModal({
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                   Product / Campaign Title
                 </label>
                 <input
                   type="text"
                   value={currentDropMeta.title}
                   onChange={(e) => handleUpdateDropMeta('title', e.target.value)}
-                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                  className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                   Material Spec Pill
                 </label>
                 <input
                   type="text"
                   value={currentDropMeta.materialSpec}
                   onChange={(e) => handleUpdateDropMeta('materialSpec', e.target.value)}
-                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                  className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                   Price Estimate
                 </label>
                 <input
                   type="text"
                   value={currentDropMeta.priceDisplay}
                   onChange={(e) => handleUpdateDropMeta('priceDisplay', e.target.value)}
-                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                  className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+                <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                   JIT Pre-Order Window
                 </label>
                 <input
                   type="text"
                   value={currentDropMeta.preorderWindow}
                   onChange={(e) => handleUpdateDropMeta('preorderWindow', e.target.value)}
-                  className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-1.5 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none"
+                  className="w-full border rounded px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[9px] tracking-widest uppercase text-[#888888] block">
+              <label className="text-[9px] tracking-widest uppercase block" style={{ color: 'var(--hh-muted)' }}>
                 Editorial Story Caption
               </label>
               <textarea
                 rows={2}
                 value={currentDropMeta.storyCaption}
                 onChange={(e) => handleUpdateDropMeta('storyCaption', e.target.value)}
-                className="w-full bg-[#090807] border border-[#f3efe6]/15 rounded px-3 py-2 text-xs font-mono text-[#f3efe6] focus:border-[#c8b89a] focus:outline-none resize-none"
+                className="w-full border rounded px-3 py-2 text-xs font-mono focus:outline-none resize-none"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               />
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-[#f3efe6]/10 bg-[#141310] text-[11px]">
-          <span className="text-[#888888] hidden sm:inline">
+        <div
+          className="flex items-center justify-between px-6 py-3 border-t text-[11px]"
+          style={{
+            backgroundColor: 'var(--hh-surface)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
+          <span className="hidden sm:inline" style={{ color: 'var(--hh-muted)' }}>
             Changes are saved in real-time to your browser&apos;s persistent storage.
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2 rounded bg-[#c8b89a] text-black font-bold tracking-wider uppercase hover:bg-white transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-6 py-2 rounded font-bold tracking-wider uppercase transition-colors cursor-pointer"
+            style={{
+              backgroundColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent-ink)',
+            }}
           >
             Done &amp; Return to <span className="normal-case">RAWx</span>
           </button>

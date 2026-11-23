@@ -169,14 +169,24 @@ export default function StageSlider({
     };
   };
 
+  const isBn = language === 'bn';
+
   return (
     <div
       onMouseMove={handleMouseMove}
-      className="relative w-full h-[calc(100vh-65px)] mt-[65px] overflow-hidden bg-[#0e0d0b]"
+      className={`relative w-full h-[calc(100vh-65px)] mt-[65px] overflow-hidden hh-theme-transition ${isBn ? 'bangla-text' : ''}`}
+      style={{
+        backgroundColor: 'var(--hh-bg)',
+        color: 'var(--hh-text)',
+      }}
     >
       {/* Side Navigation Rail */}
       <nav
-        className="fixed right-4 sm:right-8 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-1.5 sm:gap-2 items-end font-mono text-[9.5px] sm:text-[10px] tracking-[0.14em] uppercase max-h-[84vh] overflow-y-auto no-scrollbar py-2 pr-1"
+        className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-1 sm:gap-1.5 items-end font-mono text-[9.5px] sm:text-[10px] tracking-[0.14em] uppercase max-h-[80vh] overflow-y-auto no-scrollbar py-2.5 px-3 rounded-2xl border backdrop-blur-md shadow-xl hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-glass-bg)',
+          borderColor: 'var(--hh-border)',
+        }}
         aria-label="Section Navigation Rail"
       >
         {sections.map((s, idx) => {
@@ -189,24 +199,32 @@ export default function StageSlider({
               key={s.id}
               onClick={() => goTo(idx)}
               onMouseEnter={() => onSetCursorLabel(`${t.actions.view} ${display.title}`)}
-              className={`flex items-center gap-2.5 py-0.5 cursor-pointer transition-all duration-200 group ${
-                isActive ? 'text-[#f3efe6] font-bold translate-x-0' : 'text-[#f3efe6]/40 hover:text-[#f3efe6] hover:translate-x-[-2px]'
-              }`}
+              className="flex items-center gap-2 py-0.5 cursor-pointer transition-all duration-200 group"
+              style={{
+                color: isActive ? 'var(--hh-text)' : 'var(--hh-muted)',
+                fontWeight: isActive ? 700 : 500,
+              }}
             >
               {pendingCount > 0 && (
-                <span className="text-[8px] bg-[#b14a26] text-white px-1.5 py-0.2 rounded-full">
+                <span
+                  className="text-[8px] px-1.5 py-0.2 rounded-full font-bold"
+                  style={{
+                    backgroundColor: 'var(--hh-accent)',
+                    color: 'var(--hh-accent-ink)',
+                  }}
+                >
                   {pendingCount}
                 </span>
               )}
-              <span className="text-[8.5px] text-[#f3efe6]/30 font-mono group-hover:text-[#f3efe6]/60">
+              <span className="text-[8.5px] font-mono opacity-60 tabular-nums">
                 {String(idx + 1).padStart(2, '0')}
               </span>
-              <span>{display.title}</span>
+              <span className="group-hover:underline">{display.title}</span>
               <span
-                className="h-[1.5px] transition-all duration-300 rounded-full"
+                className="h-[2px] transition-all duration-300 rounded-full"
                 style={{
-                  width: isActive ? '28px' : '10px',
-                  backgroundColor: isActive ? (s.accent || '#b14a26') : 'rgba(243,239,230,0.2)',
+                  width: isActive ? '24px' : '10px',
+                  backgroundColor: isActive ? (s.accent || 'var(--hh-accent)') : 'var(--hh-border)',
                 }}
               />
             </button>
@@ -215,19 +233,21 @@ export default function StageSlider({
         <button
           onClick={onOpenSectionManager}
           title={t.nav.addSite}
-          className="flex items-center gap-2 py-1 mt-1 text-[#f3efe6]/40 hover:text-emerald-400 cursor-pointer text-[9px]"
+          className="flex items-center gap-2 py-1 mt-1 cursor-pointer text-[9px] transition-colors"
+          style={{ color: 'var(--hh-accent)' }}
         >
           <span>{t.nav.addSite}</span>
-          <span className="w-2.5 h-[1px] bg-[#f3efe6]/20" />
+          <span className="w-2.5 h-[1px]" style={{ backgroundColor: 'var(--hh-accent)' }} />
         </button>
         {onOpenSliders && (
           <button
             onClick={onOpenSliders}
-            title="Open RAWx Master OS Ultra 16-Slider System"
-            className="flex items-center gap-1.5 py-1 text-amber-400 hover:text-amber-300 font-bold cursor-pointer text-[9px] border-t border-amber-500/20 pt-1.5"
+            title="Open RAWx Master OS 19-Slider System"
+            className="flex items-center gap-1.5 py-1 text-amber-500 hover:text-amber-400 font-bold cursor-pointer text-[9px] border-t pt-1.5"
+            style={{ borderColor: 'var(--hh-border)' }}
           >
-            <Sparkles className="w-2.5 h-2.5 text-amber-400 animate-pulse" />
-            <span>16 SLIDERS ↗</span>
+            <Sparkles className="w-2.5 h-2.5 text-amber-500 animate-pulse" />
+            <span>19 SLIDERS ↗</span>
           </button>
         )}
       </nav>
@@ -235,7 +255,12 @@ export default function StageSlider({
       {/* Prev / Next Floating Arrows */}
       <button
         onClick={() => goTo(currentSectionIndex - 1)}
-        className="fixed left-4 top-1/2 -translate-y-1/2 z-30 hidden sm:flex w-12 h-12 items-center justify-center rounded-full bg-[#0e0d0b]/70 border border-[#f3efe6]/15 hover:border-[#f3efe6] text-[#f3efe6]/70 hover:text-[#f3efe6] backdrop-blur-md transition-all cursor-pointer shadow-lg group"
+        className="fixed left-4 top-1/2 -translate-y-1/2 z-30 hidden sm:flex w-12 h-12 items-center justify-center rounded-full border backdrop-blur-md transition-all cursor-pointer shadow-lg group"
+        style={{
+          backgroundColor: 'var(--hh-glass-bg)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+        }}
         aria-label="Previous Section"
       >
         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
@@ -243,7 +268,12 @@ export default function StageSlider({
 
       <button
         onClick={() => goTo(currentSectionIndex + 1)}
-        className="fixed right-4 sm:right-28 top-1/2 -translate-y-1/2 z-30 hidden sm:flex w-12 h-12 items-center justify-center rounded-full bg-[#0e0d0b]/70 border border-[#f3efe6]/15 hover:border-[#f3efe6] text-[#f3efe6]/70 hover:text-[#f3efe6] backdrop-blur-md transition-all cursor-pointer shadow-lg group"
+        className="fixed right-4 sm:right-52 top-1/2 -translate-y-1/2 z-30 hidden sm:flex w-12 h-12 items-center justify-center rounded-full border backdrop-blur-md transition-all cursor-pointer shadow-lg group"
+        style={{
+          backgroundColor: 'var(--hh-glass-bg)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+        }}
         aria-label="Next Section"
       >
         <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
@@ -512,26 +542,48 @@ export default function StageSlider({
       </div>
 
       {/* Footer Status Strip */}
-      <footer className="fixed bottom-8 sm:bottom-8 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-12 py-2 bg-[#0e0d0b]/80 border-t border-[#f3efe6]/10 backdrop-blur-sm font-mono text-[10px] text-[#f3efe6]/50">
+      <footer
+        className="fixed bottom-8 sm:bottom-8 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-12 py-2 border-t backdrop-blur-md font-mono text-[10px] hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-header-bg)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-muted)',
+        }}
+      >
         {/* Left: Counter */}
-        <div className="flex items-center gap-2 tracking-widest text-[#f3efe6]">
+        <div className="flex items-center gap-2 tracking-widest tabular-nums" style={{ color: 'var(--hh-text)' }}>
           <span className="font-bold text-[12px]">{String(currentSectionIndex + 1).padStart(2, '0')}</span>
-          <span className="text-[#f3efe6]/40">/ {String(sections.length).padStart(2, '0')} SECTIONS</span>
+          <span style={{ color: 'var(--hh-muted)' }}>/ {String(sections.length).padStart(2, '0')} SECTIONS</span>
         </div>
 
-        {/* Center: Navigation Keyboard Hint & 16 Sliders Quick Trigger */}
-        <div className="hidden md:flex items-center gap-3 text-[10px] tracking-wider uppercase text-[#f3efe6]/50">
-          <span className="border border-[#f3efe6]/20 px-1.5 py-0.5 rounded text-[#f3efe6]">←</span>
-          <span className="border border-[#f3efe6]/20 px-1.5 py-0.5 rounded text-[#f3efe6]">→</span>
+        {/* Center: Navigation Keyboard Hint & 19 Sliders Quick Trigger */}
+        <div className="hidden md:flex items-center gap-3 text-[10px] tracking-wider uppercase" style={{ color: 'var(--hh-muted)' }}>
+          <span
+            className="border px-1.5 py-0.5 rounded"
+            style={{ borderColor: 'var(--hh-border)', color: 'var(--hh-text)' }}
+          >
+            ←
+          </span>
+          <span
+            className="border px-1.5 py-0.5 rounded"
+            style={{ borderColor: 'var(--hh-border)', color: 'var(--hh-text)' }}
+          >
+            →
+          </span>
           <span>NAVIGATE</span>
-          <span className="mx-2 text-[#f3efe6]/20">|</span>
+          <span className="mx-2 opacity-30">|</span>
           {onOpenSliders && (
             <button
               onClick={onOpenSliders}
-              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors font-bold cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded border transition-colors font-bold cursor-pointer"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-accent)',
+                color: 'var(--hh-accent)',
+              }}
             >
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <span>16 ULTRA SLIDERS</span>
+              <Sparkles className="w-3 h-3" />
+              <span>RAWx 19 SLIDERS</span>
             </button>
           )}
         </div>
@@ -547,11 +599,13 @@ export default function StageSlider({
               <button
                 key={cat.key}
                 onClick={() => goTo(firstIdx)}
-                className={`px-2 py-0.5 rounded transition-all cursor-pointer whitespace-nowrap text-[9px] sm:text-[10px] ${
-                  isCatActive
-                    ? 'bg-[#f3efe6]/15 text-[#f3efe6] font-bold border border-[#f3efe6]/30'
-                    : 'text-[#f3efe6]/40 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
-                }`}
+                className="px-2 py-0.5 rounded transition-all cursor-pointer whitespace-nowrap text-[9px] sm:text-[10px] border"
+                style={{
+                  backgroundColor: isCatActive ? 'var(--hh-accent)' : 'transparent',
+                  borderColor: isCatActive ? 'var(--hh-accent)' : 'transparent',
+                  color: isCatActive ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
+                  fontWeight: isCatActive ? 700 : 500,
+                }}
               >
                 {cat.label.split('/')[1]?.trim() || cat.label}
               </button>

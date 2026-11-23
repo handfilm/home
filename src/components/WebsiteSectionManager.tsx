@@ -84,26 +84,37 @@ export default function WebsiteSectionManager({
   };
 
   return (
-    <div className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#141310] border border-[#f3efe6]/20 rounded-2xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[120] bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+      <div
+        className="border rounded-2xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-surface)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#f3efe6]/10 pb-4">
+        <div
+          className="flex items-center justify-between border-b pb-4"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-indigo-950/60 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <div className="w-10 h-10 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-500">
               <Globe className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono tracking-[0.2em] text-indigo-400 uppercase">
+              <span className="text-[10px] font-mono tracking-[0.2em] text-indigo-500 uppercase">
                 Modular Ecosystem Architecture
               </span>
-              <h3 className="text-xl font-bold uppercase font-mono text-[#f3efe6]">
+              <h3 className="text-xl font-bold uppercase font-mono" style={{ color: 'var(--hh-text)' }}>
                 Ecosystem Sections &amp; Websites
               </h3>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[#f3efe6]/60 hover:text-[#f3efe6] font-mono text-sm cursor-pointer p-1"
+            className="opacity-70 hover:opacity-100 font-mono text-sm cursor-pointer p-1"
+            style={{ color: 'var(--hh-text)' }}
           >
             ✕
           </button>
@@ -111,14 +122,18 @@ export default function WebsiteSectionManager({
 
         {/* Existing Sections List */}
         <div className="space-y-3 font-mono text-xs">
-          <span className="text-[#f3efe6]/70 uppercase font-bold text-[10px] tracking-wider block">
+          <span className="uppercase font-bold text-[10px] tracking-wider block" style={{ color: 'var(--hh-muted)' }}>
             Current Websites / Sections ({sections.length})
           </span>
           <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
             {sections.map((sec) => (
               <div
                 key={sec.id}
-                className="flex items-center justify-between p-3 bg-[#1a1815] border border-[#f3efe6]/10 rounded-lg"
+                className="flex items-center justify-between p-3 border rounded-lg"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-border)',
+                }}
               >
                 <div className="flex items-center gap-3">
                   <span
@@ -126,8 +141,8 @@ export default function WebsiteSectionManager({
                     style={{ backgroundColor: sec.accent }}
                   />
                   <div>
-                    <span className="font-bold text-[#f3efe6] block">{sec.title}</span>
-                    <span className="text-[10px] text-[#f3efe6]/50">{sec.url}</span>
+                    <span className="font-bold block" style={{ color: 'var(--hh-text)' }}>{sec.title}</span>
+                    <span className="text-[10px]" style={{ color: 'var(--hh-muted)' }}>{sec.url}</span>
                   </div>
                 </div>
 
@@ -136,7 +151,7 @@ export default function WebsiteSectionManager({
                     href={sec.dest}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-1.5 hover:text-indigo-400 transition-colors"
+                    className="p-1.5 hover:text-indigo-500 transition-colors"
                     title="Open website"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -144,7 +159,7 @@ export default function WebsiteSectionManager({
                   {sec.isCustom && (
                     <button
                       onClick={() => onDeleteSection(sec.id)}
-                      className="p-1.5 hover:text-red-400 transition-colors cursor-pointer"
+                      className="p-1.5 hover:text-red-500 transition-colors cursor-pointer"
                       title="Remove section"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -157,8 +172,14 @@ export default function WebsiteSectionManager({
         </div>
 
         {/* Add New Section Form */}
-        <div className="p-5 bg-[#1a1815] border border-[#f3efe6]/15 rounded-xl space-y-4 font-mono text-xs">
-          <div className="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider text-[11px]">
+        <div
+          className="p-5 border rounded-xl space-y-4 font-mono text-xs"
+          style={{
+            backgroundColor: 'var(--hh-bg)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
+          <div className="flex items-center gap-2 text-indigo-500 font-bold uppercase tracking-wider text-[11px]">
             <Plus className="w-4 h-4" />
             <span>Add New Website / Section</span>
           </div>
@@ -166,7 +187,7 @@ export default function WebsiteSectionManager({
           <form onSubmit={handleSubmit} className="space-y-3.5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[#f3efe6]/60 uppercase text-[10px] mb-1">
+                <label className="block uppercase text-[10px] mb-1" style={{ color: 'var(--hh-muted)' }}>
                   Website Name *
                 </label>
                 <input
@@ -175,12 +196,17 @@ export default function WebsiteSectionManager({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., STUDIO LAB, BRAND PORTAL"
-                  className="w-full bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none focus:border-indigo-400 uppercase"
+                  className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 uppercase"
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block text-[#f3efe6]/60 uppercase text-[10px] mb-1">
+                <label className="block uppercase text-[10px] mb-1" style={{ color: 'var(--hh-muted)' }}>
                   Category Tag
                 </label>
                 <input
@@ -188,14 +214,19 @@ export default function WebsiteSectionManager({
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   placeholder="e.g., 04 / RESEARCH"
-                  className="w-full bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none focus:border-indigo-400 uppercase"
+                  className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 uppercase"
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[#f3efe6]/60 uppercase text-[10px] mb-1">
+                <label className="block uppercase text-[10px] mb-1" style={{ color: 'var(--hh-muted)' }}>
                   Website Destination URL *
                 </label>
                 <input
@@ -204,12 +235,17 @@ export default function WebsiteSectionManager({
                   value={dest}
                   onChange={(e) => setDest(e.target.value)}
                   placeholder="https://lab.handsandhead.com"
-                  className="w-full bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none focus:border-indigo-400"
+                  className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500"
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block text-[#f3efe6]/60 uppercase text-[10px] mb-1">
+                <label className="block uppercase text-[10px] mb-1" style={{ color: 'var(--hh-muted)' }}>
                   Display URL Domain
                 </label>
                 <input
@@ -217,13 +253,18 @@ export default function WebsiteSectionManager({
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="lab.handsandhead.com"
-                  className="w-full bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none focus:border-indigo-400"
+                  className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500"
+                  style={{
+                    backgroundColor: 'var(--hh-surface)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[#f3efe6]/60 uppercase text-[10px] mb-1">
+              <label className="block uppercase text-[10px] mb-1" style={{ color: 'var(--hh-muted)' }}>
                 Subtitle &amp; Mission
               </label>
               <input
@@ -231,12 +272,17 @@ export default function WebsiteSectionManager({
                 value={sub}
                 onChange={(e) => setSub(e.target.value)}
                 placeholder="e.g. Next-Generation Design & Experimental Prototypes"
-                className="w-full bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none focus:border-indigo-400"
+                className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               />
             </div>
 
             <div>
-              <label className="block text-[#f3efe6]/60 uppercase text-[10px] mb-1">
+              <label className="block uppercase text-[10px] mb-1" style={{ color: 'var(--hh-muted)' }}>
                 Description
               </label>
               <textarea
@@ -244,26 +290,37 @@ export default function WebsiteSectionManager({
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
                 placeholder="Brief summary of what this website section represents..."
-                className="w-full bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-xs text-[#f3efe6] focus:outline-none focus:border-indigo-400"
+                className="w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               />
             </div>
 
             {/* Live Embed Toggle Option */}
-            <div className="p-3 bg-[#0e0d0b] border border-[#f3efe6]/10 rounded-lg space-y-2">
+            <div
+              className="p-3 border rounded-lg space-y-2"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+              }}
+            >
               <label className="flex items-center gap-2.5 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isLiveEmbed}
                   onChange={(e) => setIsLiveEmbed(e.target.checked)}
-                  className="w-4 h-4 rounded bg-[#1a1815] border-[#f3efe6]/30 text-amber-500 focus:ring-0 cursor-pointer"
+                  className="w-4 h-4 rounded text-amber-500 focus:ring-0 cursor-pointer"
                 />
-                <span className="text-[11px] font-bold text-[#f3efe6] uppercase">
+                <span className="text-[11px] font-bold uppercase" style={{ color: 'var(--hh-text)' }}>
                   Enable Live Animated Portal Stream (Embed Mode)
                 </span>
               </label>
               {isLiveEmbed && (
                 <div className="pl-6 pt-1">
-                  <label className="block text-[#f3efe6]/60 uppercase text-[9px] mb-1">
+                  <label className="block uppercase text-[9px] mb-1" style={{ color: 'var(--hh-muted)' }}>
                     Live Stream Embed URL (defaults to Destination URL)
                   </label>
                   <input
@@ -271,9 +328,13 @@ export default function WebsiteSectionManager({
                     value={embedUrl}
                     onChange={(e) => setEmbedUrl(e.target.value)}
                     placeholder="https://handfilm.myshopify.com/"
-                    className="w-full bg-[#161512] border border-amber-500/30 rounded-lg px-3 py-1.5 text-xs text-[#f3efe6] focus:outline-none focus:border-amber-400"
+                    className="w-full border border-amber-500/40 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-amber-500"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      color: 'var(--hh-text)',
+                    }}
                   />
-                  <p className="text-[9px] text-[#f3efe6]/40 mt-1">
+                  <p className="text-[9px] mt-1" style={{ color: 'var(--hh-muted)' }}>
                     Renders an ambient live interactive/animated stream as the section backdrop with automatic fallback.
                   </p>
                 </div>
@@ -282,7 +343,7 @@ export default function WebsiteSectionManager({
 
             {/* Accent Color Picker */}
             <div>
-              <label className="block text-[#f3efe6]/60 uppercase text-[10px] mb-1.5">
+              <label className="block uppercase text-[10px] mb-1.5" style={{ color: 'var(--hh-muted)' }}>
                 Brand Accent Color
               </label>
               <div className="flex flex-wrap items-center gap-2">
@@ -294,7 +355,7 @@ export default function WebsiteSectionManager({
                     className="w-7 h-7 rounded-full border-2 transition-transform cursor-pointer flex items-center justify-center"
                     style={{
                       backgroundColor: col.hex,
-                      borderColor: accent === col.hex ? '#f3efe6' : 'transparent',
+                      borderColor: accent === col.hex ? 'var(--hh-text)' : 'transparent',
                       transform: accent === col.hex ? 'scale(1.15)' : 'scale(1)',
                     }}
                     title={col.name}
@@ -309,7 +370,12 @@ export default function WebsiteSectionManager({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-[#0e0d0b] hover:bg-[#1a1815] text-[#f3efe6]/80 rounded-lg cursor-pointer"
+                className="px-4 py-2 border rounded-lg cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-border)',
+                  color: 'var(--hh-text)',
+                }}
               >
                 Cancel
               </button>

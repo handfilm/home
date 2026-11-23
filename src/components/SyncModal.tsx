@@ -50,26 +50,37 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
   };
 
   return (
-    <div className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#141310] border border-[#f3efe6]/20 rounded-2xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[120] bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+      <div
+        className="border rounded-2xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-surface)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#f3efe6]/10 pb-4">
+        <div
+          className="flex items-center justify-between border-b pb-4"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500">
               <QrCode className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono tracking-[0.2em] text-emerald-400 uppercase">
+              <span className="text-[10px] font-mono tracking-[0.2em] text-emerald-500 uppercase">
                 Seamless Multi-Device Protocol
               </span>
-              <h3 className="text-xl font-bold uppercase font-mono text-[#f3efe6]">
+              <h3 className="text-xl font-bold uppercase font-mono" style={{ color: 'var(--hh-text)' }}>
                 Sync Across Multiple Devices
               </h3>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[#f3efe6]/60 hover:text-[#f3efe6] font-mono text-sm cursor-pointer p-1"
+            className="opacity-70 hover:opacity-100 font-mono text-sm cursor-pointer p-1"
+            style={{ color: 'var(--hh-text)' }}
           >
             ✕
           </button>
@@ -78,7 +89,13 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
         {/* QR Code and Quick Pairing Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           {/* Left: QR Code Display */}
-          <div className="flex flex-col items-center justify-center p-5 bg-[#1b1915] rounded-xl border border-[#f3efe6]/15 text-center">
+          <div
+            className="flex flex-col items-center justify-center p-5 rounded-xl border text-center"
+            style={{
+              backgroundColor: 'var(--hh-bg)',
+              borderColor: 'var(--hh-border)',
+            }}
+          >
             {qrDataUrl ? (
               <img
                 src={qrDataUrl}
@@ -86,24 +103,38 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
                 className="w-48 h-48 rounded-lg shadow-md border-2 border-[#f3efe6]"
               />
             ) : (
-              <div className="w-48 h-48 bg-[#0e0d0b] flex items-center justify-center text-xs font-mono text-[#f3efe6]/40">
+              <div
+                className="w-48 h-48 flex items-center justify-center text-xs font-mono"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  color: 'var(--hh-muted)',
+                }}
+              >
                 Generating QR...
               </div>
             )}
-            <p className="text-[11px] font-mono text-[#f3efe6]/70 mt-3">
+            <p className="text-[11px] font-mono mt-3" style={{ color: 'var(--hh-muted)' }}>
               Scan with your phone or tablet camera to pair instantly
             </p>
           </div>
 
           {/* Right: Room ID & Copy Link */}
           <div className="space-y-4 font-mono text-xs">
-            <div className="p-4 bg-[#1b1915] rounded-xl border border-[#f3efe6]/15 space-y-2">
-              <span className="text-[#f3efe6]/50 uppercase text-[10px]">Active Sync Room</span>
-              <div className="text-2xl font-bold text-emerald-400 tracking-widest flex items-center justify-between">
+            <div
+              className="p-4 rounded-xl border space-y-2"
+              style={{
+                backgroundColor: 'var(--hh-bg)',
+                borderColor: 'var(--hh-border)',
+              }}
+            >
+              <span className="uppercase text-[10px]" style={{ color: 'var(--hh-muted)' }}>
+                Active Sync Room
+              </span>
+              <div className="text-2xl font-bold text-emerald-500 tracking-widest flex items-center justify-between">
                 <span>{syncState.roomId}</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <p className="text-[11px] text-[#f3efe6]/60 leading-relaxed">
+              <p className="text-[11px] leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
                 All tasks, checklists, and ecosystem updates sync instantaneously across any devices
                 joined to this room.
               </p>
@@ -111,7 +142,7 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
 
             {/* Share Link Button */}
             <div className="space-y-1.5">
-              <label className="block text-[#f3efe6]/60 uppercase text-[10px]">
+              <label className="block uppercase text-[10px]" style={{ color: 'var(--hh-muted)' }}>
                 Shareable Pairing Link
               </label>
               <div className="flex items-center gap-2">
@@ -119,15 +150,24 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
                   type="text"
                   readOnly
                   value={syncUrl}
-                  className="flex-1 bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3 py-2 text-[11px] text-[#f3efe6]/80 select-all font-mono"
+                  className="flex-1 border rounded-lg px-3 py-2 text-[11px] select-all font-mono"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                    color: 'var(--hh-text)',
+                  }}
                 />
                 <button
                   onClick={handleCopy}
-                  className="px-3.5 py-2 bg-[#f3efe6] hover:bg-white text-[#0e0d0b] font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shadow"
+                  className="px-3.5 py-2 font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shadow"
+                  style={{
+                    backgroundColor: 'var(--hh-accent)',
+                    color: 'var(--hh-accent-ink)',
+                  }}
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-700" />
+                      <Check className="w-3.5 h-3.5" />
                       <span>Copied</span>
                     </>
                   ) : (
@@ -143,8 +183,14 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
         </div>
 
         {/* Join Other Room Section */}
-        <div className="p-4 bg-[#181613] rounded-xl border border-[#f3efe6]/10 space-y-3 font-mono text-xs">
-          <span className="text-[#f3efe6]/70 uppercase font-bold text-[10px] tracking-wider block">
+        <div
+          className="p-4 rounded-xl border space-y-3 font-mono text-xs"
+          style={{
+            backgroundColor: 'var(--hh-bg)',
+            borderColor: 'var(--hh-border)',
+          }}
+        >
+          <span className="uppercase font-bold text-[10px] tracking-wider block" style={{ color: 'var(--hh-muted)' }}>
             Join or Create Another Sync Room
           </span>
           <form onSubmit={handleJoinSubmit} className="flex items-center gap-2">
@@ -153,11 +199,16 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
               value={inputRoomId}
               onChange={(e) => setInputRoomId(e.target.value)}
               placeholder="Enter Room Code (e.g. WORKSPACE-01, SYNC-8492)..."
-              className="flex-1 bg-[#0e0d0b] border border-[#f3efe6]/15 rounded-lg px-3.5 py-2 text-xs text-[#f3efe6] uppercase tracking-wider focus:outline-none focus:border-emerald-400"
+              className="flex-1 border rounded-lg px-3.5 py-2 text-xs uppercase tracking-wider focus:outline-none"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-[#0e0d0b] font-bold rounded-lg cursor-pointer flex items-center gap-1 shadow"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg cursor-pointer flex items-center gap-1 shadow"
             >
               <span>Connect</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -168,10 +219,10 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
         {/* Connected Devices List */}
         <div className="space-y-3 font-mono text-xs">
           <div className="flex items-center justify-between">
-            <span className="text-[#f3efe6]/70 uppercase font-bold text-[10px] tracking-wider">
+            <span className="uppercase font-bold text-[10px] tracking-wider" style={{ color: 'var(--hh-muted)' }}>
               Connected Devices ({syncState.connectedDevices.length || 1})
             </span>
-            <span className="text-[10px] text-emerald-400">● 0ms Real-Time Latency</span>
+            <span className="text-[10px] text-emerald-500">● 0ms Real-Time Latency</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -179,39 +230,55 @@ export default function SyncModal({ isOpen, onClose, syncState, onJoinRoom }: Sy
               syncState.connectedDevices.map((dev) => (
                 <div
                   key={dev.id}
-                  className="flex items-center justify-between p-3 bg-[#181613] border border-[#f3efe6]/10 rounded-lg"
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                  style={{
+                    backgroundColor: 'var(--hh-bg)',
+                    borderColor: 'var(--hh-border)',
+                  }}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Laptop className="w-4 h-4 text-emerald-400" />
+                    <Laptop className="w-4 h-4 text-emerald-500" />
                     <div>
-                      <span className="text-[#f3efe6] font-medium block text-[11px]">
+                      <span className="font-medium block text-[11px]" style={{ color: 'var(--hh-text)' }}>
                         {dev.name} {dev.isCurrent && '(This Device)'}
                       </span>
-                      <span className="text-[#f3efe6]/40 text-[9px]">
+                      <span className="text-[9px]" style={{ color: 'var(--hh-muted)' }}>
                         {dev.isCurrent ? 'Active Now' : 'Synced'}
                       </span>
                     </div>
                   </div>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
               ))
             ) : (
-              <div className="flex items-center justify-between p-3 bg-[#181613] border border-[#f3efe6]/10 rounded-lg sm:col-span-2">
+              <div
+                className="flex items-center justify-between p-3 border rounded-lg sm:col-span-2"
+                style={{
+                  backgroundColor: 'var(--hh-bg)',
+                  borderColor: 'var(--hh-border)',
+                }}
+              >
                 <div className="flex items-center gap-2.5">
-                  <Laptop className="w-4 h-4 text-emerald-400" />
-                  <span className="text-[#f3efe6] font-medium text-[11px]">
+                  <Laptop className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium text-[11px]" style={{ color: 'var(--hh-text)' }}>
                     Current Master Device (Active)
                   </span>
                 </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
               </div>
             )}
           </div>
         </div>
 
         {/* Security & Reliability Footer Note */}
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[#f3efe6]/50 pt-3 border-t border-[#f3efe6]/10">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+        <div
+          className="flex items-center gap-2 text-[10px] font-mono pt-3 border-t"
+          style={{
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-muted)',
+          }}
+        >
+          <ShieldCheck className="w-4 h-4 text-emerald-500 flex-shrink-0" />
           <span>
             End-to-end synchronized using high-speed server event stream with offline client-first local caching.
           </span>

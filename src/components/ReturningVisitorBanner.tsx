@@ -45,17 +45,24 @@ export default function ReturningVisitorBanner({
       aria-live="polite"
       className="fixed bottom-14 left-4 sm:left-8 z-40 max-w-sm font-mono animate-slideUp pointer-events-auto"
     >
-      <div className="p-3.5 rounded-xl bg-[#181613]/95 backdrop-blur-md border border-[#c8b89a]/40 shadow-2xl flex items-center justify-between gap-3 text-xs">
+      <div
+        className="p-3.5 rounded-xl backdrop-blur-md border shadow-2xl flex items-center justify-between gap-3 text-xs hh-theme-transition"
+        style={{
+          backgroundColor: 'var(--hh-glass-bg)',
+          borderColor: 'var(--hh-border)',
+          color: 'var(--hh-text)',
+        }}
+      >
         <div className="flex items-center gap-2.5 overflow-hidden">
           <span
             className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: targetPortal.section.accent || '#c8b89a' }}
+            style={{ backgroundColor: targetPortal.section.accent || 'var(--hh-accent)' }}
           />
           <div className="truncate">
-            <div className="text-[10px] text-[#c8b89a] uppercase font-bold tracking-wider">
+            <div className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--hh-accent)' }}>
               {t.returning.welcomeBack}
             </div>
-            <div className="text-[#f3efe6] font-semibold truncate">
+            <div className="font-semibold truncate" style={{ color: 'var(--hh-text)' }}>
               {t.returning.continueTo} <span className="underline">{targetPortal.section.title}</span>
             </div>
           </div>
@@ -67,7 +74,11 @@ export default function ReturningVisitorBanner({
               onSelectSection(targetPortal.index);
               setIsVisible(false);
             }}
-            className="px-2.5 py-1 bg-[#f3efe6] text-[#0e0d0b] hover:bg-[#c8b89a] text-[10px] font-bold uppercase tracking-wider rounded transition-all cursor-pointer flex items-center gap-1"
+            className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded transition-all cursor-pointer flex items-center gap-1"
+            style={{
+              backgroundColor: 'var(--hh-accent)',
+              color: 'var(--hh-accent-ink)',
+            }}
           >
             <span>JUMP</span>
             <ArrowRight className="w-3 h-3" />
@@ -75,7 +86,8 @@ export default function ReturningVisitorBanner({
 
           <button
             onClick={() => setIsVisible(false)}
-            className="p-1 text-[#f3efe6]/40 hover:text-[#f3efe6] transition-colors cursor-pointer"
+            className="p-1 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+            style={{ color: 'var(--hh-text)' }}
             aria-label="Dismiss banner"
           >
             <X className="w-3.5 h-3.5" />

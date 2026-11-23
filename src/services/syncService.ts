@@ -51,6 +51,23 @@ export function getStoredRoomId(): string {
   return generated;
 }
 
+interface RawDevicePayload {
+  id: string;
+  name: string;
+  lastSeen: number | string;
+}
+
+function normalizeLastSeen(val: number | string | undefined): number {
+  if (typeof val === 'number' && Number.isFinite(val)) return val;
+  if (typeof val === 'string') {
+    const num = Number(val);
+    if (Number.isFinite(num)) return num;
+    const parsed = Date.parse(val);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  return Date.now();
+}
+
 export class MultiDeviceSyncEngine {
   private roomId: string;
   private deviceId: string;
@@ -58,7 +75,7 @@ export class MultiDeviceSyncEngine {
   private eventSource: EventSource | null = null;
   private onDataCallback: ((tasks: TaskItem[], sections: SectionItem[], devices: ConnectedDevice[], source?: string) => void) | null = null;
   private onStatusCallback: ((isConnected: boolean, deviceCount: number) => void) | null = null;
-  private retryTimeout: any = null;
+  private retryTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     initialRoomId: string,
@@ -106,12 +123,18 @@ export class MultiDeviceSyncEngine {
 
       this.eventSource.onmessage = (event) => {
         try {
-          const payload = JSON.parse(event.data);
+          const payload = JSON.parse(event.data) as {
+            tasks?: TaskItem[];
+            sections?: SectionItem[];
+            connectedDevices?: RawDevicePayload[];
+            deviceCount?: number;
+            sourceDevice?: string;
+          };
           if (payload.tasks && payload.sections && this.onDataCallback) {
-            const devices: ConnectedDevice[] = (payload.connectedDevices || []).map((d: any) => ({
+            const devices: ConnectedDevice[] = (payload.connectedDevices || []).map((d) => ({
               id: d.id,
               name: d.name,
-              lastSeen: d.lastSeen,
+              lastSeen: normalizeLastSeen(d.lastSeen),
               isCurrent: d.id === this.deviceId,
             }));
             this.onDataCallback(payload.tasks, payload.sections, devices, payload.sourceDevice);
@@ -132,7 +155,9 @@ export class MultiDeviceSyncEngine {
         this.eventSource = null;
 
         // Auto retry connecting after 5 seconds
-        clearTimeout(this.retryTimeout);
+        if (this.retryTimeout !== null) {
+          clearTimeout(this.retryTimeout);
+        }
         this.retryTimeout = setTimeout(() => {
           this.connect();
         }, 5000);
@@ -147,12 +172,17 @@ export class MultiDeviceSyncEngine {
     try {
       const res = await fetch(`/api/sync/room/${encodeURIComponent(this.roomId)}?deviceId=${encodeURIComponent(this.deviceId)}&deviceName=${encodeURIComponent(this.deviceName)}`);
       if (res.ok) {
-        const data = await res.json();
+        const data = (await res.json()) as {
+          tasks?: TaskItem[];
+          sections?: SectionItem[];
+          connectedDevices?: RawDevicePayload[];
+          deviceCount?: number;
+        };
         if (data.tasks && data.sections && this.onDataCallback) {
-          const devices = (data.connectedDevices || []).map((d: any) => ({
+          const devices: ConnectedDevice[] = (data.connectedDevices || []).map((d) => ({
             id: d.id,
             name: d.name,
-            lastSeen: d.lastSeen,
+            lastSeen: normalizeLastSeen(d.lastSeen),
             isCurrent: d.id === this.deviceId,
           }));
           this.onDataCallback(data.tasks, data.sections, devices, 'Remote Server');
@@ -161,7 +191,7 @@ export class MultiDeviceSyncEngine {
           }
         }
       }
-    } catch (err) {
+    } catch {
       // Non-fatal on static/standalone hosting
     }
   }
@@ -192,7 +222,10 @@ export class MultiDeviceSyncEngine {
   }
 
   public disconnect() {
-    clearTimeout(this.retryTimeout);
+    if (this.retryTimeout !== null) {
+      clearTimeout(this.retryTimeout);
+      this.retryTimeout = null;
+    }
     if (this.eventSource) {
       this.eventSource.close();
       this.eventSource = null;

@@ -42,12 +42,17 @@ export default function IndexOverlay({
       id="indexOverlay"
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[110] bg-[#0e0d0b]/98 backdrop-blur-lg flex items-center justify-center p-4 sm:p-6 transition-all duration-500 overflow-y-auto"
+      className="fixed inset-0 z-[110] backdrop-blur-lg flex items-center justify-center p-4 sm:p-6 transition-all duration-500 overflow-y-auto hh-theme-transition"
+      style={{
+        backgroundColor: 'var(--hh-header-bg)',
+        color: 'var(--hh-text)',
+      }}
     >
       {/* Close Button */}
       <button
         onClick={onClose}
-        className="absolute top-6 sm:top-8 right-6 sm:right-10 text-[#f3efe6] font-mono text-[11px] tracking-[0.14em] uppercase flex items-center gap-2 hover:opacity-75 transition-opacity cursor-pointer z-20"
+        className="absolute top-6 sm:top-8 right-6 sm:right-10 font-mono text-[11px] tracking-[0.14em] uppercase flex items-center gap-2 hover:opacity-75 transition-opacity cursor-pointer z-20"
+        style={{ color: 'var(--hh-text)' }}
       >
         <span>{t.actions.close}</span>
         <span>✕</span>
@@ -56,26 +61,35 @@ export default function IndexOverlay({
       {/* Index Content Container */}
       <div className="w-full max-w-4xl space-y-6 my-auto pt-12 sm:pt-4">
         {/* Header bar with View Switcher */}
-        <div className="flex flex-wrap items-center justify-between border-b border-[#f3efe6]/15 pb-4 gap-3">
+        <div
+          className="flex flex-wrap items-center justify-between border-b pb-4 gap-3"
+          style={{ borderColor: 'var(--hh-border)' }}
+        >
           <div>
-            <div className="font-mono text-[11px] sm:text-[12px] text-[#f3efe6]/60 tracking-[0.2em] uppercase">
+            <div className="font-mono text-[11px] sm:text-[12px] tracking-[0.2em] uppercase" style={{ color: 'var(--hh-muted)' }}>
               {t.brand.name} · {t.brand.tagline}
             </div>
-            <h2 className="text-lg sm:text-xl font-bold uppercase text-[#f3efe6] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight" style={{ color: 'var(--hh-text)' }}>
               {viewMode === 'list' ? 'MASTER INDEX — ALL ECOSYSTEM SECTIONS' : t.map.title}
             </h2>
           </div>
 
           <div className="flex items-center gap-3 font-mono">
             {/* List / Map View Switcher */}
-            <div className="flex items-center p-0.5 rounded-lg bg-[#181613] border border-[#f3efe6]/15 text-xs">
+            <div
+              className="flex items-center p-0.5 rounded-lg border text-xs"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+              }}
+            >
               <button
                 onClick={() => handleToggleView('list')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-bold tracking-wider uppercase transition-colors cursor-pointer ${
-                  viewMode === 'list'
-                    ? 'bg-[#f3efe6] text-[#0e0d0b]'
-                    : 'text-[#f3efe6]/60 hover:text-[#f3efe6]'
-                }`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md font-bold tracking-wider uppercase transition-colors cursor-pointer"
+                style={{
+                  backgroundColor: viewMode === 'list' ? 'var(--hh-accent)' : 'transparent',
+                  color: viewMode === 'list' ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
+                }}
               >
                 <List className="w-3.5 h-3.5" />
                 <span>{t.map.listView}</span>
@@ -83,11 +97,11 @@ export default function IndexOverlay({
 
               <button
                 onClick={() => handleToggleView('map')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-bold tracking-wider uppercase transition-colors cursor-pointer ${
-                  viewMode === 'map'
-                    ? 'bg-[#c8b89a] text-[#0e0d0b]'
-                    : 'text-[#f3efe6]/60 hover:text-[#f3efe6]'
-                }`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md font-bold tracking-wider uppercase transition-colors cursor-pointer"
+                style={{
+                  backgroundColor: viewMode === 'map' ? 'var(--hh-accent)' : 'transparent',
+                  color: viewMode === 'map' ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
+                }}
               >
                 <Network className="w-3.5 h-3.5" />
                 <span>{t.map.mapView}</span>
@@ -96,7 +110,7 @@ export default function IndexOverlay({
 
             <button
               onClick={onOpenSectionManager}
-              className="text-[11px] font-mono text-emerald-400 hover:underline uppercase cursor-pointer hidden sm:inline"
+              className="text-[11px] font-mono text-emerald-500 hover:underline uppercase cursor-pointer hidden sm:inline"
             >
               {t.nav.addSite}
             </button>
@@ -123,37 +137,54 @@ export default function IndexOverlay({
         ) : (
           /* View Mode 2: Structured List Index */
           <div className="space-y-4">
-            {/* Featured RAWx 16 Sliders Engine Banner */}
+            {/* Featured RAWx 19 Sliders Engine Banner */}
             {onOpenSliders && (
               <div
                 onClick={() => {
                   onOpenSliders();
                   onClose();
                 }}
-                className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-amber-950/40 via-[#161512] to-amber-950/20 border border-amber-500/40 hover:border-amber-400 cursor-pointer group transition-all duration-300 shadow-lg flex items-center justify-between"
+                className="p-4 sm:p-5 rounded-xl border cursor-pointer group transition-all duration-300 shadow-lg flex items-center justify-between"
+                style={{
+                  backgroundColor: 'var(--hh-surface)',
+                  borderColor: 'var(--hh-accent)',
+                }}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                  <div
+                    className="w-10 h-10 rounded-lg border flex items-center justify-center group-hover:scale-110 transition-transform"
+                    style={{
+                      backgroundColor: 'var(--hh-bg)',
+                      borderColor: 'var(--hh-border)',
+                      color: 'var(--hh-accent)',
+                    }}
+                  >
                     <Sparkles className="w-5 h-5 animate-pulse" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono tracking-widest text-amber-400 uppercase font-bold">
+                      <span className="text-xs font-mono tracking-widest uppercase font-bold" style={{ color: 'var(--hh-accent)' }}>
                         FEATURED ENGINE
                       </span>
-                      <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-bold uppercase">
-                        16 Types
+                      <span
+                        className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase"
+                        style={{
+                          backgroundColor: 'var(--hh-accent)',
+                          color: 'var(--hh-accent-ink)',
+                        }}
+                      >
+                        19 Drops
                       </span>
                     </div>
-                    <h3 className="text-base sm:text-lg font-bold uppercase text-[#f3efe6] tracking-tight group-hover:text-amber-300 transition-colors">
-                      RAWx Master OS · Ultra Slider System v3.0
+                    <h3 className="text-base sm:text-lg font-bold uppercase tracking-tight transition-colors" style={{ color: 'var(--hh-text)' }}>
+                      <span className="normal-case">RAWx</span> Master OS · Ultra Slider System v3.0
                     </h3>
-                    <p className="text-xs text-[#f3efe6]/60 font-mono mt-0.5">
+                    <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--hh-muted)' }}>
                       21:9 Hero · Matrix · 32:9 Ultra · Zoom-Burst · Inertia · Countdown · Wipes
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-mono text-amber-400 font-bold group-hover:translate-x-1 transition-transform">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold group-hover:translate-x-1 transition-transform" style={{ color: 'var(--hh-accent)' }}>
                   <span>EXPLORE</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
@@ -167,11 +198,17 @@ export default function IndexOverlay({
 
                 return (
                   <div key={catGroup.key} className="space-y-2">
-                    <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-[#f3efe6]/40 uppercase px-2 pb-1 border-b border-[#f3efe6]/10">
+                    <div
+                      className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase px-2 pb-1 border-b"
+                      style={{
+                        color: 'var(--hh-muted)',
+                        borderColor: 'var(--hh-border)',
+                      }}
+                    >
                       {catGroup.label}
                     </div>
 
-                    <div className="space-y-1 divide-y divide-[#f3efe6]/5">
+                    <div className="space-y-1">
                       {groupSections.map((sec) => {
                         const globalIdx = sections.findIndex((s) => s.id === sec.id);
                         const isVisited = visitedPortals.includes(sec.id);
@@ -182,41 +219,45 @@ export default function IndexOverlay({
                               onSelectSection(globalIdx >= 0 ? globalIdx : 0);
                               onClose();
                             }}
-                            className="group flex items-center justify-between py-2.5 sm:py-3 px-2 hover:px-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-[#f3efe6]/5"
+                            className="group flex items-center justify-between py-2.5 sm:py-3 px-2 hover:px-3 rounded-lg cursor-pointer transition-all duration-200 border border-transparent hover:border-[var(--hh-border)]"
                           >
                             <div className="flex items-center gap-3 sm:gap-5">
-                              <span className="font-mono text-xs sm:text-sm text-[#f3efe6]/40 group-hover:text-[#f3efe6] transition-colors w-6 flex-shrink-0">
+                              <span className="font-mono text-xs sm:text-sm transition-colors w-6 flex-shrink-0 tabular-nums" style={{ color: 'var(--hh-muted)' }}>
                                 {String(globalIdx + 1).padStart(2, '0')}
                               </span>
                               {sec.imageUrl && (
                                 <div
-                                  className="w-10 h-7 rounded bg-cover bg-center border border-[#f3efe6]/20 group-hover:border-[#f3efe6]/60 transition-all flex-shrink-0"
-                                  style={{ backgroundImage: `url('${sec.imageUrl}')` }}
+                                  className="w-10 h-7 rounded bg-cover bg-center border transition-all flex-shrink-0"
+                                  style={{
+                                    backgroundImage: `url('${sec.imageUrl}')`,
+                                    borderColor: 'var(--hh-border)',
+                                  }}
                                 />
                               )}
                               <div className="flex flex-col">
                                 <div className="flex items-center gap-2">
                                   <span
-                                    className="text-base sm:text-xl font-bold uppercase tracking-tight text-[#f3efe6] group-hover:translate-x-1.5 transition-transform duration-200"
+                                    className="text-base sm:text-xl font-bold uppercase tracking-tight group-hover:translate-x-1.5 transition-transform duration-200"
+                                    style={{ color: 'var(--hh-text)' }}
                                   >
                                     {sec.title}
                                   </span>
                                   {isVisited && (
-                                    <span className="text-[8.5px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20 flex items-center gap-1">
+                                    <span className="text-[8.5px] text-emerald-500 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/25 flex items-center gap-1">
                                       <CheckCircle2 className="w-2.5 h-2.5" />
                                       <span className="hidden sm:inline">VISITED</span>
                                     </span>
                                   )}
                                 </div>
-                                <span className="text-[10px] sm:text-[11px] text-[#f3efe6]/50 truncate max-w-md hidden sm:block">
+                                <span className="text-[10px] sm:text-[11px] truncate max-w-md hidden sm:block" style={{ color: 'var(--hh-muted)' }}>
                                   {sec.sub}
                                 </span>
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-3 font-mono text-[10.5px] text-[#f3efe6]/50">
+                            <div className="flex items-center gap-3 font-mono text-[10.5px]" style={{ color: 'var(--hh-muted)' }}>
                               <span className="hidden md:inline-block">{sec.url}</span>
-                              <ArrowRight className="w-3.5 h-3.5 text-[#f3efe6]/40 group-hover:text-[#f3efe6] group-hover:translate-x-1 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-all" style={{ color: 'var(--hh-text)' }} />
                             </div>
                           </div>
                         );
@@ -233,7 +274,13 @@ export default function IndexOverlay({
         <NewsletterSignup t={t} />
 
         {/* Footer info */}
-        <div className="pt-3 border-t border-[#f3efe6]/10 flex flex-wrap items-center justify-between font-mono text-[10.5px] text-[#f3efe6]/40 uppercase">
+        <div
+          className="pt-3 border-t flex flex-wrap items-center justify-between font-mono text-[10.5px] uppercase"
+          style={{
+            borderColor: 'var(--hh-border)',
+            color: 'var(--hh-muted)',
+          }}
+        >
           <span>Hands &amp; Head Digital Platform · Master OS v3.2</span>
           <span>Press ESC or click outside to close</span>
         </div>
