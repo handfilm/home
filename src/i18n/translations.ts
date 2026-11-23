@@ -8,6 +8,7 @@ export interface TranslationDictionary {
   };
   nav: {
     home: string;
+    handfilm: string;
     apps: string;
     sliders: string;
     stage: string;
@@ -116,6 +117,7 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     },
     nav: {
       home: 'Home',
+      handfilm: 'HandFilm',
       apps: 'Apps',
       sliders: 'Sliders',
       stage: 'Stage',
@@ -406,6 +408,7 @@ export const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     },
     nav: {
       home: 'হোম',
+      handfilm: 'হ্যান্ডফিল্ম',
       apps: 'অ্যাপস',
       sliders: 'স্লাইডার্স',
       stage: 'স্টেজ',

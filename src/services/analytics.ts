@@ -20,7 +20,9 @@ export type MasterEventType =
   | 'HOME_QUICK_JUMP_SECTION'
   | 'HOME_WHATSAPP_CTA'
   | 'HOME_PILLAR_CLICK'
-  | 'HOME_PILLAR_CTA';
+  | 'HOME_PILLAR_CTA'
+  | 'HANDFILM_STORYBOARD_LAUNCH'
+  | 'HANDFILM_OPEN_DOWNLOAD_MODAL';
 
 export interface TelemetryPayload {
   [key: string]: string | number | boolean | null | undefined | object;

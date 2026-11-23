@@ -13,6 +13,7 @@ import {
   Globe,
   Download,
   Home,
+  Film,
 } from 'lucide-react';
 import { Language, TranslationDictionary } from '../i18n/translations';
 
@@ -80,7 +81,12 @@ export default function MasterHeader({
         >
           <span
             className="w-2.5 h-2.5 rounded-full transition-colors duration-300 group-hover:scale-125 shrink-0"
-            style={{ backgroundColor: activeTab === 'home' ? '#E50914' : (accentColor || '#C8A96A') }}
+            style={{
+              backgroundColor:
+                activeTab === 'home' || activeTab === 'handfilm'
+                  ? '#e11d48'
+                  : accentColor || '#C8A96A',
+            }}
           />
           <span className="truncate">{t.brand.name}</span>
           <span className="hidden xl:inline text-[9px] tracking-[0.2em] text-[#C8A96A]/70 font-mono pl-2 border-l border-[#f3efe6]/20">
@@ -127,7 +133,7 @@ export default function MasterHeader({
         </button>
       </div>
 
-      {/* Center: Hardware-Style 3-Tab Top-Level Switcher (HOME | APPS | SLIDERS) */}
+      {/* Center: Hardware-Style 4-Tab Top-Level Switcher (HOME | HANDFILM | APPS | SLIDERS) */}
       <nav
         aria-label="Primary Operating System Views"
         className="flex items-center gap-0.5 sm:gap-1 bg-[#14161A] p-1 rounded-lg border border-[#f3efe6]/15 font-mono text-[10.5px] sm:text-[11px] tracking-[0.14em] uppercase shadow-inner shrink-0"
@@ -138,12 +144,27 @@ export default function MasterHeader({
           aria-current={activeTab === 'home' ? 'page' : undefined}
           className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
             activeTab === 'home'
-              ? 'bg-[#E50914] text-white font-bold shadow-[0_0_16px_rgba(229,9,20,0.35)]'
+              ? 'bg-[#e11d48] text-white font-bold shadow-[0_0_16px_rgba(225,29,72,0.38)]'
               : 'text-[#f3efe6]/65 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
           }`}
         >
           <Home className="w-3.5 h-3.5" />
           <span>{t.nav.home}</span>
+        </a>
+
+        <a
+          href="#handfilm"
+          onClick={(e) => handleTabNav(e, 'handfilm')}
+          aria-current={activeTab === 'handfilm' ? 'page' : undefined}
+          title="HandFilm Studio — Product & AI Model Showcase"
+          className={`px-2.5 sm:px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+            activeTab === 'handfilm'
+              ? 'bg-[#e11d48] text-white font-bold shadow-[0_0_16px_rgba(225,29,72,0.4)]'
+              : 'text-[#f3efe6]/75 hover:text-[#f3efe6] hover:bg-[#f3efe6]/5'
+          }`}
+        >
+          <Film className="w-3.5 h-3.5" />
+          <span className={language === 'bn' ? 'bangla-text' : ''}>{t.nav.handfilm}</span>
         </a>
 
         <a

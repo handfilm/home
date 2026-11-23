@@ -14,6 +14,7 @@ import GrainCanvas from './components/GrainCanvas';
 import CustomCursor from './components/CustomCursor';
 import MasterHeader from './components/MasterHeader';
 import HomeLanding from './components/HomeLanding';
+import HandFilmHubView from './components/handfilm/HandFilmHubView';
 import StageSlider from './components/StageSlider';
 import RawxShowcase from './components/RawxShowcase';
 import TaskSyncHub from './components/TaskSyncHub';
@@ -57,7 +58,10 @@ export default function App() {
 
   const setActiveTab = useCallback((nextTab: ActiveTab) => {
     setActiveTabState(nextTab);
-    if (typeof window !== 'undefined' && (nextTab === 'home' || nextTab === 'rawx-showcase' || nextTab === 'tasks-hub')) {
+    if (
+      typeof window !== 'undefined' &&
+      (nextTab === 'home' || nextTab === 'handfilm' || nextTab === 'rawx-showcase' || nextTab === 'tasks-hub')
+    ) {
       window.scrollTo({ top: 0, behavior: 'auto' });
     }
   }, []);
@@ -298,6 +302,7 @@ export default function App() {
       if (e.key === '2') setActiveTab('ecosystem');
       if (e.key === '3') setActiveTab('rawx-showcase');
       if (e.key === '4') setActiveTab('tasks-hub');
+      if (e.key === '5') setActiveTab('handfilm');
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -418,7 +423,12 @@ export default function App() {
 
   const activeGradeObj = GRADES.find((g) => g.id === currentGrade);
   const currentSection = sections[currentSectionIndex] || sections[0];
-  const activeAccentColor = activeTab === 'home' ? '#E50914' : (currentSection?.accent || '#b14a26');
+  const activeAccentColor =
+    activeTab === 'home'
+      ? '#E50914'
+      : activeTab === 'handfilm'
+      ? '#e11d48'
+      : currentSection?.accent || '#b14a26';
 
   return (
     <div
@@ -432,7 +442,13 @@ export default function App() {
       {/* GPU Ambient Shader Canvas */}
       <AmbientShaderCanvas
         accentColor={activeAccentColor}
-        portalId={activeTab === 'home' ? 'home' : (currentSection?.id || 'd2c')}
+        portalId={
+          activeTab === 'home'
+            ? 'home'
+            : activeTab === 'handfilm'
+            ? 'studio'
+            : currentSection?.id || 'd2c'
+        }
       />
 
       {/* Custom Crosshair Desktop Cursor */}
@@ -496,6 +512,15 @@ export default function App() {
             onSetCursorLabel={setCursorLabel}
             t={t}
           />
+        </div>
+
+        {/* TAB 2: HANDFILM — CapCut-Grade Product & AI Model Showcase Hub */}
+        <div
+          id="panel-handfilm"
+          className={activeTab === 'handfilm' ? 'block' : 'hidden'}
+          aria-hidden={activeTab !== 'handfilm'}
+        >
+          <HandFilmHubView onSetCursorLabel={setCursorLabel} />
         </div>
 
         {/* TAB 2: APPS — Existing 24-Section Ultra-Fast Stage Slider Engine (100% Preserved) */}

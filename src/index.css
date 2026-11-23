@@ -52,6 +52,33 @@ body {
   font-family: 'Fraunces', Georgia, serif;
 }
 
+.font-bebas {
+  font-family: 'Bebas Neue', 'Space Grotesk', sans-serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-space-mono {
+  font-family: 'Space Mono', 'JetBrains Mono', monospace;
+}
+
+.font-inter {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Bangla Typography Lock: preserve natural conjunct ligatures & kerning */
+.bangla-text,
+[lang="bn"],
+:lang(bn) {
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  letter-spacing: 0 !important;
+  font-kerning: normal;
+  font-variant-ligatures: normal;
+  font-feature-settings: "kern" 1, "liga" 1, "clig" 1;
+}
+
 /* Textures */
 .tex-d2c {
   background-color: #1a100b;

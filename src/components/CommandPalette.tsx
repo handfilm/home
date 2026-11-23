@@ -114,6 +114,20 @@ export default function CommandPalette({
     });
 
     list.push({
+      id: 'view-handfilm',
+      category: 'views',
+      title: 'HandFilm Studio — Product & AI Model Hub',
+      subtitle: 'Easy, Beast, CapCut & AD Studio showcase connected to Storyboard',
+      shortcut: 'Key 5',
+      icon: <Film className="w-3.5 h-3.5 text-[#e11d48]" />,
+      keywords: ['handfilm', 'capcut', 'beast', 'easy', 'ad studio', 'storyboard', 'ai', 'editor'],
+      action: () => {
+        setActiveTab('handfilm');
+        onClose();
+      },
+    });
+
+    list.push({
       id: 'view-stage',
       category: 'views',
       title: 'Apps — 24-Section Stage Slider',

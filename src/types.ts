@@ -131,4 +131,4 @@ export interface EasingOption {
   css: string;
 }
 
-export type ActiveTab = 'home' | 'ecosystem' | 'rawx-showcase' | 'tasks-hub';
+export type ActiveTab = 'home' | 'handfilm' | 'ecosystem' | 'rawx-showcase' | 'tasks-hub';

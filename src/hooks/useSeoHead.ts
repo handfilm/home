@@ -215,6 +215,16 @@ function buildSeoConfig(
     };
   }
 
+  if (activeTab === 'handfilm') {
+    return {
+      title: `HandFilm Studio — AI-Powered Photo & Video Editor | ${BRAND_NAME}`,
+      description:
+        'HandFilm Studio by HANDS & HEAD — Launch Easy Mode, Beast Mode, CapCut Mode, or AD Studio straight into Storyboard WebGL2 AI Cinema Engine with zero latency.',
+      canonical: `${SITE_ORIGIN}/#handfilm`,
+      themeColor: '#09090b',
+    };
+  }
+
   if (activeTab === 'rawx-showcase') {
     return {
       title: `RAWx 16 Ultra Sliders — Interactive Web Architecture | ${BRAND_NAME}`,

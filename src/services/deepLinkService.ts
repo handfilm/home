@@ -15,7 +15,6 @@ const PORTAL_ALIASES: Record<string, string> = {
   articles: 'articles',
   art: 'articles',
   editorial: 'articles',
-  handfilm: 'studio',
   film: 'studio',
 };
 
@@ -24,15 +23,19 @@ export function getInitialRouteFromUrl(validSectionIds: string[] = []): Resolved
     return { tab: 'home', portalId: null };
   }
 
+  const pathname = window.location.pathname.replace(/\/+$/, '').toLowerCase();
   const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
   const params = new URLSearchParams(window.location.search);
   const tabParam = (params.get('tab') || params.get('view') || '').toLowerCase().trim();
   const portalParam = (params.get('portal') || params.get('sec') || '').toLowerCase().trim();
 
-  // 1. Explicit hash routing (#home, #apps, #sliders, #tasks, or #<portalId>)
+  // 1. Explicit hash routing (#home, #handfilm, #apps, #sliders, #tasks, or #<portalId>)
   if (hash) {
     if (hash === 'home' || hash === 'hub-home' || hash === 'overview') {
       return { tab: 'home', portalId: null };
+    }
+    if (hash === 'handfilm' || hash === 'handfilm-studio') {
+      return { tab: 'handfilm', portalId: null };
     }
     if (hash === 'apps' || hash === 'stage' || hash === 'ecosystem' || hash === 'sections') {
       return { tab: 'ecosystem', portalId: portalParam ? (PORTAL_ALIASES[portalParam] || portalParam) : null };
@@ -50,7 +53,7 @@ export function getInitialRouteFromUrl(validSectionIds: string[] = []): Resolved
     }
   }
 
-  // 2. Explicit query parameter routing (?tab=apps, ?view=sliders, ?portal=bloom)
+  // 2. Explicit query parameter routing (?tab=handfilm, ?tab=apps, ?view=sliders, ?portal=bloom)
   if (portalParam) {
     const mappedPortal = PORTAL_ALIASES[portalParam] || portalParam;
     return { tab: 'ecosystem', portalId: mappedPortal };
@@ -58,6 +61,9 @@ export function getInitialRouteFromUrl(validSectionIds: string[] = []): Resolved
 
   if (tabParam) {
     if (tabParam === 'home') return { tab: 'home', portalId: null };
+    if (tabParam === 'handfilm' || tabParam === 'handfilm-studio') {
+      return { tab: 'handfilm', portalId: null };
+    }
     if (tabParam === 'apps' || tabParam === 'stage' || tabParam === 'sections' || tabParam === 'ecosystem') {
       return { tab: 'ecosystem', portalId: null };
     }
@@ -69,7 +75,12 @@ export function getInitialRouteFromUrl(validSectionIds: string[] = []): Resolved
     }
   }
 
-  // 3. Default first screen: HOME
+  // 3. Direct pathname routing (/handfilm)
+  if (pathname === '/handfilm') {
+    return { tab: 'handfilm', portalId: null };
+  }
+
+  // 4. Default first screen: HOME
   return { tab: 'home', portalId: null };
 }
 
@@ -85,6 +96,8 @@ export function updateUrlForTab(tab: ActiveTab, portalId?: string): void {
 
   if (tab === 'home') {
     targetHash = '#home';
+  } else if (tab === 'handfilm') {
+    targetHash = '#handfilm';
   } else if (tab === 'ecosystem') {
     targetHash = portalId ? `#${portalId}` : '#apps';
   } else if (tab === 'rawx-showcase') {
