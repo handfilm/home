@@ -189,7 +189,7 @@ export default function HomeLanding({
 
   return (
     <div
-      className={`relative min-h-screen w-full pt-[65px] pb-28 hh-theme-transition ${
+      className={`relative min-h-screen w-full pt-[118px] md:pt-[70px] pb-28 hh-theme-transition ${
         isBangla ? 'bangla-text' : ''
       }`}
       style={{

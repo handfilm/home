@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SectionItem } from '../types';
-import { PORTAL_CATEGORIES } from '../data/initialData';
 import {
   ArrowLeft,
   ArrowRight,
@@ -174,7 +173,7 @@ export default function StageSlider({
   return (
     <div
       onMouseMove={handleMouseMove}
-      className={`relative w-full h-[calc(100vh-65px)] mt-[65px] overflow-hidden hh-theme-transition ${isBn ? 'bangla-text' : ''}`}
+      className={`relative w-full h-[calc(100vh-118px)] md:h-[calc(100vh-70px)] mt-[118px] md:mt-[70px] overflow-hidden hh-theme-transition ${isBn ? 'bangla-text' : ''}`}
       style={{
         backgroundColor: 'var(--hh-bg)',
         color: 'var(--hh-text)',
@@ -421,7 +420,7 @@ export default function StageSlider({
 
               {/* Main Content Area at Bottom */}
               <div
-                className="relative z-20 h-full flex flex-col justify-end px-6 sm:px-16 pb-20 sm:pb-24 max-w-4xl transition-transform duration-300"
+                className="relative z-20 h-full flex flex-col justify-end px-6 sm:px-16 pb-24 sm:pb-28 max-w-4xl transition-transform duration-300"
                 style={{
                   transform: isActive
                     ? `translate(${mouseOffset.x * -0.3}px, ${mouseOffset.y * -0.3}px)`
@@ -541,78 +540,6 @@ export default function StageSlider({
         })}
       </div>
 
-      {/* Footer Status Strip */}
-      <footer
-        className="fixed bottom-8 sm:bottom-8 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-12 py-2 border-t backdrop-blur-md font-mono text-[10px] hh-theme-transition"
-        style={{
-          backgroundColor: 'var(--hh-header-bg)',
-          borderColor: 'var(--hh-border)',
-          color: 'var(--hh-muted)',
-        }}
-      >
-        {/* Left: Counter */}
-        <div className="flex items-center gap-2 tracking-widest tabular-nums" style={{ color: 'var(--hh-text)' }}>
-          <span className="font-bold text-[12px]">{String(currentSectionIndex + 1).padStart(2, '0')}</span>
-          <span style={{ color: 'var(--hh-muted)' }}>/ {String(sections.length).padStart(2, '0')} SECTIONS</span>
-        </div>
-
-        {/* Center: Navigation Keyboard Hint & 19 Sliders Quick Trigger */}
-        <div className="hidden md:flex items-center gap-3 text-[10px] tracking-wider uppercase" style={{ color: 'var(--hh-muted)' }}>
-          <span
-            className="border px-1.5 py-0.5 rounded"
-            style={{ borderColor: 'var(--hh-border)', color: 'var(--hh-text)' }}
-          >
-            ←
-          </span>
-          <span
-            className="border px-1.5 py-0.5 rounded"
-            style={{ borderColor: 'var(--hh-border)', color: 'var(--hh-text)' }}
-          >
-            →
-          </span>
-          <span>NAVIGATE</span>
-          <span className="mx-2 opacity-30">|</span>
-          {onOpenSliders && (
-            <button
-              onClick={onOpenSliders}
-              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded border transition-colors font-bold cursor-pointer"
-              style={{
-                backgroundColor: 'var(--hh-surface)',
-                borderColor: 'var(--hh-accent)',
-                color: 'var(--hh-accent)',
-              }}
-            >
-              <Sparkles className="w-3 h-3" />
-              <span>RAWx 19 SLIDERS</span>
-            </button>
-          )}
-        </div>
-
-        {/* Right: Quick Jump / Category selector */}
-        <div className="flex items-center gap-2 sm:gap-3 text-[10px] tracking-wider uppercase overflow-x-auto max-w-[50vw] sm:max-w-none no-scrollbar">
-          {PORTAL_CATEGORIES.map((cat) => {
-            const firstIdx = sections.findIndex((s) => cat.sectionIds.includes(s.id));
-            if (firstIdx < 0) return null;
-            const isCatActive = cat.sectionIds.includes(sections[currentSectionIndex]?.id);
-
-            return (
-              <button
-                key={cat.key}
-                onClick={() => goTo(firstIdx)}
-                className="px-2 py-0.5 rounded transition-all cursor-pointer whitespace-nowrap text-[9px] sm:text-[10px] border"
-                style={{
-                  backgroundColor: isCatActive ? 'var(--hh-accent)' : 'transparent',
-                  borderColor: isCatActive ? 'var(--hh-accent)' : 'transparent',
-                  color: isCatActive ? 'var(--hh-accent-ink)' : 'var(--hh-muted)',
-                  fontWeight: isCatActive ? 700 : 500,
-                }}
-              >
-                {cat.label.split('/')[1]?.trim() || cat.label}
-              </button>
-            );
-          })}
-        </div>
-      </footer>
     </div>
   );
 }

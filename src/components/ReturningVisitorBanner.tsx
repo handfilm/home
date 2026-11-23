@@ -43,7 +43,7 @@ export default function ReturningVisitorBanner({
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-14 left-4 sm:left-8 z-40 max-w-sm font-mono animate-slideUp pointer-events-auto"
+      className="fixed bottom-22 left-4 sm:left-8 z-40 max-w-sm font-mono animate-slideUp pointer-events-auto"
     >
       <div
         className="p-3.5 rounded-xl backdrop-blur-md border shadow-2xl flex items-center justify-between gap-3 text-xs hh-theme-transition"

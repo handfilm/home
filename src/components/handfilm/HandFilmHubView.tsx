@@ -719,7 +719,7 @@ export default function HandFilmHubView({
 
   return (
     <div
-      className={`relative min-h-screen w-full pt-[58px] sm:pt-[62px] pb-36 font-inter hh-theme-transition ${
+      className={`relative min-h-screen w-full pt-[118px] md:pt-[70px] pb-40 font-inter hh-theme-transition ${
         language === 'bn' ? 'bangla-text' : ''
       }`}
       style={{
@@ -745,7 +745,7 @@ export default function HandFilmHubView({
       <div
         ref={navContainerRef}
         onMouseLeave={handleScheduleCloseMenu}
-        className="sticky top-[57px] sm:top-[61px] z-40 border-b backdrop-blur-xl hh-theme-transition"
+        className="sticky top-[117px] md:top-[69px] z-40 border-b backdrop-blur-xl hh-theme-transition"
         style={{
           borderColor: 'var(--hh-border)',
           backgroundColor: 'var(--hh-header-bg)',
@@ -2094,7 +2094,7 @@ export default function HandFilmHubView({
       </div>
 
       {/* FLOATING BOTTOM PILL BAR */}
-      <div className="fixed bottom-14 sm:bottom-16 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1.5rem)] max-w-xl pointer-events-auto">
+      <div className="fixed bottom-20 sm:bottom-22 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1.5rem)] max-w-xl pointer-events-auto">
         <div
           className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-full backdrop-blur-xl border shadow-2xl"
           style={{

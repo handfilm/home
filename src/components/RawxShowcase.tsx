@@ -778,7 +778,7 @@ export default function RawxShowcase({
       ref={rootRef}
       className={`w-full font-mono pb-32 space-y-12 overflow-y-auto hh-theme-transition ${
         language === 'bn' ? 'bangla-text' : ''
-      } ${isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-4' : 'mt-[65px]'}`}
+      } ${isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-4' : 'mt-[118px] md:mt-[70px]'}`}
       style={{
         backgroundColor: 'var(--hh-bg)',
         color: 'var(--hh-text)',

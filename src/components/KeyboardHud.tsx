@@ -27,7 +27,7 @@ export default function KeyboardHud() {
     <div
       id="rx-hud"
       aria-hidden="true"
-      className="fixed z-[99] bottom-20 left-1/2 -translate-x-1/2 border px-5 py-3 rounded-lg flex items-center gap-6 font-mono text-[10px] shadow-2xl backdrop-blur-md transition-opacity pointer-events-none hh-theme-transition"
+      className="fixed z-[99] bottom-24 left-1/2 -translate-x-1/2 border px-5 py-3 rounded-lg flex items-center gap-6 font-mono text-[10px] shadow-2xl backdrop-blur-md transition-opacity pointer-events-none hh-theme-transition"
       style={{
         backgroundColor: 'var(--hh-glass-bg)',
         borderColor: 'var(--hh-border)',

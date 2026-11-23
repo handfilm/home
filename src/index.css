@@ -378,6 +378,22 @@ html[lang="bn"] * {
 .hh-stagger-3 { animation: hh-stagger-enter 620ms var(--ease) 140ms both; }
 .hh-stagger-4 { animation: hh-stagger-enter 720ms var(--ease) 210ms both; }
 
+@keyframes hh-eq-bounce {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+
+.hh-eq-bar {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.hh-eq-bar-1 { animation: hh-eq-bounce 0.78s ease-in-out 0s infinite; }
+.hh-eq-bar-2 { animation: hh-eq-bounce 0.62s ease-in-out 0.16s infinite; }
+.hh-eq-bar-3 { animation: hh-eq-bounce 0.86s ease-in-out 0.32s infinite; }
+.hh-eq-bar-4 { animation: hh-eq-bounce 0.7s ease-in-out 0.48s infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .hh-icon-core-active,
   .hh-icon-iris-active,
@@ -391,7 +407,11 @@ html[lang="bn"] * {
   .hh-stagger-1,
   .hh-stagger-2,
   .hh-stagger-3,
-  .hh-stagger-4 {
+  .hh-stagger-4,
+  .hh-eq-bar-1,
+  .hh-eq-bar-2,
+  .hh-eq-bar-3,
+  .hh-eq-bar-4 {
     animation: none !important;
   }
   .group:hover .hh-icon-bracket-left,

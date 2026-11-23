@@ -13,7 +13,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 import GrainCanvas from './components/GrainCanvas';
 import CustomCursor from './components/CustomCursor';
-import MasterHeader from './components/MasterHeader';
+import TopCommandBar from './components/navigation/TopCommandBar';
 import HomeLanding from './components/HomeLanding';
 import HandFilmHubView from './components/handfilm/HandFilmHubView';
 import StageSlider from './components/StageSlider';
@@ -27,7 +27,7 @@ import KeyboardHud from './components/KeyboardHud';
 import LightboxModal, { LightboxItem } from './components/LightboxModal';
 import AmbientShaderCanvas from './components/AmbientShaderCanvas';
 import CommandPalette from './components/CommandPalette';
-import StatusTicker from './components/StatusTicker';
+import BottomCommandDock from './components/navigation/BottomCommandDock';
 import ReturningVisitorBanner from './components/ReturningVisitorBanner';
 
 const LANGUAGE_STORAGE_KEY = 'hh_master_language';
@@ -450,23 +450,15 @@ function AppShell({
         </div>
       </div>
 
-      {/* Top Universal Master Header */}
-      <MasterHeader
+      {/* Top Universal Command Bar */}
+      <TopCommandBar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        accentColor={activeAccentColor}
         syncState={syncState}
         onOpenSyncModal={() => setIsSyncModalOpen(true)}
         onOpenIndex={() => setIsIndexOpen(true)}
-        onOpenSectionManager={() => setIsSectionManagerOpen(true)}
-        currentGrade={currentGrade}
-        onCycleGrade={cycleGrade}
-        onToggleConsole={() => setIsConsoleOpen((prev) => !prev)}
-        isConsoleOpen={isConsoleOpen}
         tasksCount={tasksSummary}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        isSoundEnabled={isSoundEnabled}
-        onToggleSound={handleToggleSound}
         language={language}
         onSelectLanguage={handleSelectLanguage}
         canInstallPwa={canInstallPwa}
@@ -568,14 +560,20 @@ function AppShell({
         )}
       </main>
 
-      {/* Ecosystem Status Ticker (bottom ambient HUD bar) */}
-      <StatusTicker
+      {/* Floating Bottom Command Dock */}
+      <BottomCommandDock
         sections={sections}
+        currentSectionIndex={currentSectionIndex}
         onSelectSection={(idx) => {
           setCurrentSectionIndex(idx);
           setActiveTab('ecosystem');
         }}
-        currentSectionIndex={currentSectionIndex}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenIndex={() => setIsIndexOpen(true)}
+        isSoundEnabled={isSoundEnabled}
+        onToggleSound={handleToggleSound}
+        language={language}
         t={t}
       />
 
