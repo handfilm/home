@@ -1,6 +1,6 @@
 # HANDS & HEAD — Technical SEO & Generative Engine Optimization (GEO) Directives
 # Canonical Hub: https://handsandhead.com/
-# Generated: 2026-11-23
+# Generated: 2026-11-27
 
 User-agent: Googlebot
 Allow: /
@@ -36,9 +36,11 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-# Primary XML Sitemap
+# Primary & Video XML Sitemaps
 Sitemap: https://handsandhead.com/sitemap.xml
+Sitemap: https://handsandhead.com/sitemap-video.xml
 
 # AI / LLM Machine-Readable Knowledge Base
+# Live Context: https://api.handsandhead.com/llms.txt
 # Summary: https://handsandhead.com/llms.txt
 # Complete Reference: https://handsandhead.com/llms-full.txt

@@ -8,9 +8,15 @@
 - Flagship WebGL2 AI Video & Storyboard Platform: https://storyboard.handsandhead.com/
 - Founder & Systems Architect: Rakib Himon (Shaikh Rakibuzzaman Himon) — https://rakib.handsandhead.com/
 - Headquarters: Dhaka, Bangladesh
-- Last Updated: 2026-11-23
+- Official Public Email: sales@handsandhead.com
+- Executive / Admin Contact: himon@handsandhead.com
+- Official Universal WhatsApp: +8801974518600 (https://wa.me/8801974518600)
+- Core Product & Studio Suite: RAWx, HANDFILM, GapCut, GapShot, BumBit, GapToon, Deliver, Arutemika
+- Last Updated: 2026-11-27
+- Live AI Context Feed: https://api.handsandhead.com/llms.txt
 - Complete Fact-Sheet: https://handsandhead.com/llms-full.txt
 - XML Sitemap: https://handsandhead.com/sitemap.xml
+- Video XML Sitemap: https://handsandhead.com/sitemap-video.xml
 
 ## Three Core Ecosystem Pillars
 

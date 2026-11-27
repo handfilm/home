@@ -24,8 +24,72 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // server.ts
 var import_express = __toESM(require("express"), 1);
+var import_promises = __toESM(require("node:fs/promises"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_vite = require("vite");
+var import_genai = require("@google/genai");
+var UPSTREAM_LLMS_TXT_URL = "https://api.handsandhead.com/llms.txt";
+var UPSTREAM_SITEMAP_VIDEO_URL = "https://api.handsandhead.com/sitemap-video.xml";
+var UPSTREAM_SEO_PROXY_TIMEOUT_MS = 4e3;
+function buildFallbackVideoSitemapXml() {
+  const today = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://handsandhead.com/#handfilm</loc>
+    <lastmod>${today}</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://handsandhead.com/og-image.jpg</video:thumbnail_loc>
+      <video:title>HANDFILM Studio &amp; GapCut \u2014 WebGL2 AI Video &amp; Cinema Reel</video:title>
+      <video:description>Flagship browser-native WebGL2 cinema studio uniting HANDFILM, GapCut, GapShot, BumBit, and GapToon under HANDS &amp; HEAD.</video:description>
+      <video:player_loc>https://storyboard.handsandhead.com/</video:player_loc>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://handsandhead.com/#rawx</loc>
+    <lastmod>${today}</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://handsandhead.com/og-image.jpg</video:thumbnail_loc>
+      <video:title>RAWx \u2014 Hide, 316L Steel &amp; Heavyweight Apparel Showcase</video:title>
+      <video:description>Full-grain leather, 316L/516SS stainless steel hardware, and 320 GSM Dhaka combed cotton capsules by RAWx and HANDS &amp; HEAD.</video:description>
+      <video:player_loc>https://rawx.handsandhead.com/</video:player_loc>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://b2b.handsandhead.com/</loc>
+    <lastmod>${today}</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://handsandhead.com/og-image.jpg</video:thumbnail_loc>
+      <video:title>Arutemika &amp; HANDS &amp; HEAD B2B \u2014 7 Industrial Manufacturing &amp; Deliver Wings</video:title>
+      <video:description>Direct-from-source Dhaka manufacturing across Textile, RMG, Leather, Jacket, Jute, Lingerie, Bracelets, and Deliver export logistics.</video:description>
+      <video:player_loc>https://b2b.handsandhead.com/</video:player_loc>
+    </video:video>
+  </url>
+</urlset>
+`;
+}
+async function fetchUpstreamDiscoveryText(url, acceptHeader) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), UPSTREAM_SEO_PROXY_TIMEOUT_MS);
+  try {
+    const upstream = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: acceptHeader,
+        "User-Agent": "handsandhead-web-proxy/1.0"
+      },
+      signal: controller.signal
+    });
+    if (!upstream.ok) return null;
+    const text = await upstream.text();
+    return text.trim().length > 0 ? text : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 var rooms = /* @__PURE__ */ new Map();
 var sseClients = /* @__PURE__ */ new Map();
 var defaultSections = [
@@ -415,6 +479,61 @@ async function startServer() {
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", uptime: process.uptime(), timestamp: (/* @__PURE__ */ new Date()).toISOString() });
   });
+  app.get("/api/cinema/status", (_req, res) => {
+    const apiKey = process.env.GEMINI_API_KEY || "";
+    res.json({ available: apiKey.trim().length > 0 });
+  });
+  app.post("/api/cinema/hydrate-keyframe", async (req, res) => {
+    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
+    if (!apiKey) {
+      res.status(200).json({ hydrated: false, reason: "NO_SERVER_KEY" });
+      return;
+    }
+    const body = req.body;
+    const portalId = typeof body.portalId === "string" ? body.portalId.slice(0, 48) : "";
+    const categoryLabel = typeof body.categoryLabel === "string" ? body.categoryLabel.slice(0, 48) : "";
+    const portalTitle = typeof body.portalTitle === "string" ? body.portalTitle.slice(0, 64) : "";
+    const shotStyle = typeof body.shotStyle === "string" ? body.shotStyle.slice(0, 48) : "";
+    const baseDirective = typeof body.baseDirective === "string" ? body.baseDirective.slice(0, 220) : "";
+    if (!portalId || !portalTitle) {
+      res.status(400).json({ hydrated: false, error: "Invalid portal parameters" });
+      return;
+    }
+    try {
+      const ai = new import_genai.GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            "User-Agent": "aistudio-build"
+          }
+        }
+      });
+      const response = await ai.models.generateContent({
+        model: "gemini-4-hydrogen",
+        contents: `Return a concise cinematography HUD preset for the HANDS & HEAD portal "${portalTitle}" (${categoryLabel}, style: ${shotStyle}). Base direction: ${baseDirective}. Keep colors harmonized with #09090b Obsidian, #e11d48 Signal Crimson, #f59e0b Amber Gold, or emerald accents.`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: import_genai.Type.OBJECT,
+            properties: {
+              hudTag: { type: import_genai.Type.STRING, description: "Short uppercase camera HUD tag under 28 chars" },
+              lensSpec: { type: import_genai.Type.STRING, description: "Concise cinema lens & aperture spec under 26 chars" },
+              shotDirective: { type: import_genai.Type.STRING, description: "One crisp editorial cinematography line under 110 chars" },
+              primaryHex: { type: import_genai.Type.STRING, description: "Hex accent color like #e11d48 or #f59e0b" },
+              secondaryHex: { type: import_genai.Type.STRING, description: "Secondary hex accent color" }
+            },
+            required: ["hudTag", "lensSpec", "shotDirective", "primaryHex", "secondaryHex"]
+          }
+        }
+      });
+      const rawText = (response.text ?? "{}").trim();
+      const parsed = JSON.parse(rawText);
+      res.json({ hydrated: true, directive: parsed });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Keyframe hydration failed";
+      res.status(502).json({ hydrated: false, error: message });
+    }
+  });
   app.get("/api/sync/room/:roomId", (req, res) => {
     const { roomId, room } = getOrCreateRoom(req.params.roomId);
     const deviceId = req.query.deviceId;
@@ -547,6 +666,40 @@ async function startServer() {
 `);
       }
     });
+  });
+  app.get("/llms.txt", async (_req, res) => {
+    const liveBody = await fetchUpstreamDiscoveryText(
+      UPSTREAM_LLMS_TXT_URL,
+      "text/plain, text/markdown;q=0.9, */*;q=0.5"
+    );
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    res.setHeader("X-Robots-Tag", "all");
+    if (liveBody) {
+      res.status(200).send(liveBody);
+      return;
+    }
+    try {
+      const localPath = import_path.default.join(process.cwd(), "public", "llms.txt");
+      const fallbackText = await import_promises.default.readFile(localPath, "utf8");
+      res.status(200).send(fallbackText);
+    } catch {
+      res.redirect(302, UPSTREAM_LLMS_TXT_URL);
+    }
+  });
+  app.get("/sitemap-video.xml", async (_req, res) => {
+    const liveXml = await fetchUpstreamDiscoveryText(
+      UPSTREAM_SITEMAP_VIDEO_URL,
+      "application/xml, text/xml;q=0.9, */*;q=0.5"
+    );
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    res.setHeader("X-Robots-Tag", "all");
+    if (liveXml && liveXml.includes("<urlset")) {
+      res.status(200).send(liveXml);
+      return;
+    }
+    res.status(200).send(buildFallbackVideoSitemapXml());
   });
   if (process.env.NODE_ENV !== "production") {
     const vite = await (0, import_vite.createServer)({
