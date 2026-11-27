@@ -29,7 +29,9 @@ export type MasterEventType =
   | 'RAWX_STORYBOARD_REMIX'
   | 'RAWX_WHATSAPP_PREORDER'
   | 'RAWX_TOGGLE_SAVED_LOOKBOOK'
-  | 'RAWX_THEATER_MODE';
+  | 'RAWX_THEATER_MODE'
+  | 'HERO_CINEMA_SLIDE_CHANGE'
+  | 'HERO_CTA_CLICK';
 
 export interface TelemetryPayload {
   [key: string]: string | number | boolean | null | undefined | object;
@@ -73,3 +75,4 @@ export function trackEvent(event: MasterEventType, payload: TelemetryPayload = {
     });
   }
 }
+// END OF FILE: src/services/analytics.ts

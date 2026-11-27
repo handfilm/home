@@ -263,7 +263,7 @@ export default function TopCommandBar({
         color: 'var(--hh-text)',
       }}
     >
-      <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-8 py-2 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 py-2 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-4 gap-y-2">
         {/* ZONE 1: Left Brand Lockup (Logo + SUPER BOLD Tagline Beneath) */}
         <a
           href="#home"

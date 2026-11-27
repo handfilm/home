@@ -403,7 +403,7 @@ function AppShell({
 
   return (
     <div
-      className={`min-h-screen relative hh-theme-transition ${activeGradeObj?.cls || ''} ${
+      className={`min-h-[100dvh] flex flex-col relative overflow-x-clip hh-theme-transition ${activeGradeObj?.cls || ''} ${
         language === 'bn' ? 'bangla-text' : ''
       }`}
       style={{
@@ -467,7 +467,7 @@ function AppShell({
       />
 
       {/* Non-Destructive Zero-Latency Keep-Alive Views */}
-      <main className="relative z-10">
+      <main className={activeTab === 'ecosystem' ? 'relative z-10 flex-1' : 'relative z-10 flex-1 pb-24 sm:pb-28'}>
         {/* TAB 1: HOME — Dynamic Enterprise OS */}
         <div
           id="panel-home"
@@ -483,6 +483,7 @@ function AppShell({
             onOpenSyncModal={() => setIsSyncModalOpen(true)}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
             onSetCursorLabel={setCursorLabel}
+            isActiveTab={activeTab === 'home'}
             language={language}
             t={t}
           />

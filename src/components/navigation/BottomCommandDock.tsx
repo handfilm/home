@@ -212,7 +212,7 @@ export default function BottomCommandDock({
   return (
     <aside
       aria-label="Ecosystem Floating Command Dock"
-      className="fixed bottom-3.5 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-1rem)] pointer-events-auto"
+      className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-fit max-w-[min(calc(100vw-1.5rem),48rem)] pointer-events-auto"
     >
       {/* Subtle Stage-Reactive Ambient Halo Behind Dock */}
       <div
@@ -224,7 +224,7 @@ export default function BottomCommandDock({
       />
 
       <div
-        className="relative flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-2 rounded-2xl border backdrop-blur-2xl shadow-2xl hh-theme-transition"
+        className="relative flex items-center gap-1 sm:gap-2 px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl border backdrop-blur-xl shadow-2xl hh-theme-transition max-w-full overflow-x-auto sm:overflow-visible no-scrollbar"
         style={{
           backgroundColor: 'var(--hh-glass-bg)',
           borderColor: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(15,23,42,0.12)',

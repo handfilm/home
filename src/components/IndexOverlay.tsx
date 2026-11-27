@@ -6,6 +6,12 @@ import { TranslationDictionary } from '../i18n/translations';
 import EcosystemMapView from './EcosystemMapView';
 import NewsletterSignup from './NewsletterSignup';
 import { trackEvent } from '../services/analytics';
+import {
+  OFFICIAL_MAILTO_SALES,
+  OFFICIAL_PUBLIC_EMAIL,
+  OFFICIAL_WHATSAPP_DISPLAY,
+  buildOfficialWhatsAppUrl,
+} from '../config/officialContactConfig';
 
 interface IndexOverlayProps {
   isOpen: boolean;
@@ -281,10 +287,26 @@ export default function IndexOverlay({
             color: 'var(--hh-muted)',
           }}
         >
-          <span>Hands &amp; Head Digital Platform · Master OS v3.2</span>
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span>Hands &amp; Head Digital Platform · Master OS v3.2</span>
+            <span aria-hidden="true">·</span>
+            <a href={OFFICIAL_MAILTO_SALES} className="hover:underline normal-case">
+              {OFFICIAL_PUBLIC_EMAIL}
+            </a>
+            <span aria-hidden="true">·</span>
+            <a
+              href={buildOfficialWhatsAppUrl('general')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              WA {OFFICIAL_WHATSAPP_DISPLAY}
+            </a>
+          </span>
           <span>Press ESC or click outside to close</span>
         </div>
       </div>
     </div>
   );
 }
+// END OF FILE: src/components/IndexOverlay.tsx

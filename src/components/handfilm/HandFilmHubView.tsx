@@ -719,7 +719,7 @@ export default function HandFilmHubView({
 
   return (
     <div
-      className={`relative min-h-screen w-full pt-[130px] md:pt-[80px] pb-40 font-inter hh-theme-transition ${
+      className={`relative min-h-[100dvh] w-full pt-[128px] md:pt-[78px] pb-36 sm:pb-40 font-inter hh-theme-transition ${
         language === 'bn' ? 'bangla-text' : ''
       }`}
       style={{
@@ -751,10 +751,11 @@ export default function HandFilmHubView({
           backgroundColor: 'var(--hh-header-bg)',
         }}
       >
-        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
-          <div className="flex items-center justify-between gap-4 py-2.5">
+        <div className="mx-auto w-full max-w-[1840px] px-4 sm:px-6 lg:px-10">
+          {/* Desktop Single-Row Sub-Nav */}
+          <div className="hidden lg:flex items-center justify-between gap-3 py-2">
             {/* Left Brand Mark */}
-            <div className="flex items-center gap-3 min-w-0 shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0 shrink-0">
               <a
                 href={buildStoryboardUrl('')}
                 target="_blank"
@@ -773,7 +774,7 @@ export default function HandFilmHubView({
                 </span>
               </a>
               <span
-                className="hidden 2xl:inline font-space-mono text-[11px] whitespace-nowrap"
+                className="hidden xl:inline font-space-mono text-[11px] whitespace-nowrap"
                 style={{ color: 'var(--hh-muted)' }}
               >
                 WebGL2 Creator Engine
@@ -783,7 +784,7 @@ export default function HandFilmHubView({
             {/* Center Interactive Dropdown Triggers */}
             <nav
               aria-label="HandFilm Product Showcase Navigation"
-              className="hidden lg:flex items-center gap-1"
+              className="flex items-center gap-0.5 xl:gap-1 min-w-0 overflow-x-auto no-scrollbar"
             >
               {MEGA_MENU_GROUPS.map((group) => {
                 const isOpen = openMenu === group.key;
@@ -794,7 +795,7 @@ export default function HandFilmHubView({
                     aria-expanded={isOpen}
                     onMouseEnter={() => handleOpenHoverMenu(group.key)}
                     onClick={() => setOpenMenu(isOpen ? null : group.key)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
                     style={{
                       backgroundColor: isOpen ? 'var(--hh-surface-2)' : 'transparent',
                       color: isOpen ? 'var(--hh-text)' : 'var(--hh-muted)',
@@ -815,7 +816,7 @@ export default function HandFilmHubView({
                 type="button"
                 onMouseEnter={() => setOpenMenu(null)}
                 onClick={() => scrollToSection('handfilm-discover')}
-                className="px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="px-2.5 xl:px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 style={{ color: 'var(--hh-muted)' }}
               >
                 {t.handfilm.subnav.discover}
@@ -825,7 +826,7 @@ export default function HandFilmHubView({
                 type="button"
                 onMouseEnter={() => setOpenMenu(null)}
                 onClick={() => scrollToSection('handfilm-pricing')}
-                className="px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="px-2.5 xl:px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 style={{ color: 'var(--hh-muted)' }}
               >
                 {t.handfilm.subnav.pricing}
@@ -833,7 +834,7 @@ export default function HandFilmHubView({
             </nav>
 
             {/* Right Action CTAs */}
-            <div className="flex items-center gap-2.5 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -841,7 +842,7 @@ export default function HandFilmHubView({
                   setIsDownloadModalOpen(true);
                   trackEvent('HANDFILM_OPEN_DOWNLOAD_MODAL', { source: 'subnav' });
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 style={{
                   backgroundColor: 'var(--hh-surface)',
                   borderColor: 'var(--hh-border)',
@@ -857,7 +858,7 @@ export default function HandFilmHubView({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackStoryboardLaunch('subnav_try_online', buildStoryboardUrl(''))}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
                 style={{
                   backgroundColor: 'var(--hh-accent)',
                   color: 'var(--hh-accent-ink)',
@@ -869,8 +870,33 @@ export default function HandFilmHubView({
             </div>
           </div>
 
-          {/* Mobile/Tablet Compact Sub-Nav Strip */}
-          <div className="flex lg:hidden items-center gap-1.5 overflow-x-auto pb-2.5 no-scrollbar">
+          {/* Tablet/Mobile Horizontally Scrollable Unified Sub-Nav Strip */}
+          <div className="flex lg:hidden items-center gap-2 overflow-x-auto py-2 no-scrollbar">
+            <a
+              href={buildStoryboardUrl('')}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackStoryboardLaunch('subnav_brand', buildStoryboardUrl(''))}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition-colors whitespace-nowrap shrink-0"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-accent)',
+                color: 'var(--hh-text)',
+              }}
+            >
+              <Film className="w-3 h-3" style={{ color: 'var(--hh-accent)' }} />
+              <span className="font-space-mono text-[10.5px] font-bold tracking-[0.1em] uppercase">
+                {t.handfilm.studioLabel}
+              </span>
+            </a>
+
+            <span
+              className="font-space-mono text-[10.5px] whitespace-nowrap shrink-0 px-1"
+              style={{ color: 'var(--hh-muted)' }}
+            >
+              WebGL2 Creator Engine
+            </span>
+
             {MEGA_MENU_GROUPS.map((group) => {
               const isOpen = openMenu === group.key;
               return (
@@ -891,6 +917,7 @@ export default function HandFilmHubView({
                 </button>
               );
             })}
+
             <button
               type="button"
               onClick={() => scrollToSection('handfilm-discover')}
@@ -903,6 +930,7 @@ export default function HandFilmHubView({
             >
               {t.handfilm.subnav.discover}
             </button>
+
             <button
               type="button"
               onClick={() => scrollToSection('handfilm-pricing')}
@@ -915,6 +943,39 @@ export default function HandFilmHubView({
             >
               {t.handfilm.subnav.pricing}
             </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOpenMenu(null);
+                setIsDownloadModalOpen(true);
+                trackEvent('HANDFILM_OPEN_DOWNLOAD_MODAL', { source: 'subnav_mobile' });
+              }}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 cursor-pointer"
+              style={{
+                backgroundColor: 'var(--hh-surface)',
+                borderColor: 'var(--hh-border)',
+                color: 'var(--hh-text)',
+              }}
+            >
+              <Download className="w-3 h-3" style={{ color: 'var(--hh-accent-2)' }} />
+              <span>{t.handfilm.downloadBtn}</span>
+            </button>
+
+            <a
+              href={buildStoryboardUrl('')}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackStoryboardLaunch('subnav_try_online_mobile', buildStoryboardUrl(''))}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0"
+              style={{
+                backgroundColor: 'var(--hh-accent)',
+                color: 'var(--hh-accent-ink)',
+              }}
+            >
+              <span>{t.handfilm.tryOnline}</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </a>
           </div>
         </div>
 
@@ -928,7 +989,7 @@ export default function HandFilmHubView({
               backgroundColor: 'var(--hh-glass-bg)',
             }}
           >
-            <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12 py-6">
+            <div className="mx-auto w-full max-w-[1840px] px-4 sm:px-6 lg:px-10 py-5">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* Left Context */}
                 <div
@@ -1040,17 +1101,17 @@ export default function HandFilmHubView({
       </div>
 
       {/* Main Content Container */}
-      <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
+      <div className="relative z-10 mx-auto w-full max-w-[1840px] px-4 sm:px-6 lg:px-10">
         {/* ════════════════════════════════════════════════════════════════════════
-            B. HERO SHOWCASE & 5 MINIMALIST 9:16 HOVER-REVEAL CARDS
+            B. HERO SHOWCASE & 5 ULTRA-RESPONSIVE VIEWPORT-PROPORTIONAL CARDS
         ════════════════════════════════════════════════════════════════════════ */}
         <section
           aria-labelledby="handfilm-hero-title"
-          className="pt-10 sm:pt-14 pb-12 border-b"
+          className="py-3 md:py-5 pb-6 md:pb-8 border-b"
           style={{ borderColor: 'var(--hh-border)' }}
         >
-          <div className="max-w-4xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-2.5 font-space-mono text-[11px] uppercase tracking-[0.2em]">
+          <div className="max-w-4xl mx-auto text-center space-y-2 sm:space-y-2.5">
+            <div className="inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 font-space-mono text-[10.5px] uppercase tracking-[0.18em]">
               <span style={{ color: 'var(--hh-accent-2)' }} className="font-semibold">
                 {t.handfilm.studioLabel}
               </span>
@@ -1064,9 +1125,9 @@ export default function HandFilmHubView({
 
             <h1
               id="handfilm-hero-title"
-              className="font-bold tracking-tight leading-[0.98]"
+              className="font-bold tracking-tight leading-[1.04]"
               style={{
-                fontSize: 'clamp(2.5rem, 5.4vw, 4.75rem)',
+                fontSize: 'clamp(1.75rem, 3.2vw, 3.25rem)',
                 textWrap: 'balance',
                 color: 'var(--hh-text)',
               }}
@@ -1080,30 +1141,30 @@ export default function HandFilmHubView({
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--hh-muted)' }}>
+            <p className="text-sm sm:text-[15px] max-w-2xl mx-auto leading-snug" style={{ color: 'var(--hh-muted)' }}>
               {t.handfilm.heroSubline}
             </p>
 
             {/* Hero Primary & Secondary CTAs */}
-            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 pt-1">
               <a
                 href={buildStoryboardUrl('')}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackStoryboardLaunch('hero_try_online', buildStoryboardUrl(''))}
                 onMouseEnter={() => onSetCursorLabel?.('LAUNCH STORYBOARD ↗')}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold transition-all hover:scale-[1.02] whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all hover:scale-[1.02] whitespace-nowrap shrink-0"
                 style={{
                   backgroundColor: 'var(--hh-accent)',
                   color: 'var(--hh-accent-ink)',
                   boxShadow: isDark
-                    ? '0 12px 32px rgba(6, 182, 212, 0.28)'
-                    : '0 12px 28px rgba(2, 132, 199, 0.22)',
+                    ? '0 10px 28px rgba(6, 182, 212, 0.26)'
+                    : '0 10px 24px rgba(2, 132, 199, 0.20)',
                 }}
               >
-                <Play className="w-4 h-4 fill-current" />
+                <Play className="w-3.5 h-3.5 fill-current" />
                 <span>{t.handfilm.tryOnline}</span>
-                <ArrowUpRight className="w-4 h-4" />
+                <ArrowUpRight className="w-3.5 h-3.5" />
               </a>
 
               <button
@@ -1113,20 +1174,20 @@ export default function HandFilmHubView({
                   trackEvent('HANDFILM_OPEN_DOWNLOAD_MODAL', { source: 'hero' });
                 }}
                 onMouseEnter={() => onSetCursorLabel?.('GET DESKTOP / APK')}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl border text-sm font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 style={{
                   backgroundColor: 'var(--hh-surface)',
                   borderColor: 'var(--hh-border)',
                   color: 'var(--hh-text)',
                 }}
               >
-                <Download className="w-4 h-4" style={{ color: 'var(--hh-accent-2)' }} />
+                <Download className="w-3.5 h-3.5" style={{ color: 'var(--hh-accent-2)' }} />
                 <span>{t.handfilm.downloadBtn}</span>
               </button>
             </div>
 
             <div
-              className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 font-space-mono text-[11px]"
+              className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 pt-0.5 font-space-mono text-[10.5px]"
               style={{ color: 'var(--hh-muted)' }}
             >
               <span>Zero-Install Browser NLE</span>
@@ -1141,8 +1202,8 @@ export default function HandFilmHubView({
             </div>
           </div>
 
-          {/* 5 Vertical 9:16 CapCut-Style Minimalist Hover-Reveal Cards */}
-          <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+          {/* 5 Viewport-Proportional CapCut-Style Minimalist Hover-Reveal Cards */}
+          <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 lg:gap-4">
             {VERTICAL_SHOWCASE_CARDS.map((card) => {
               const isExpanded = expandedVerticalId === card.id;
               return (
@@ -1150,7 +1211,7 @@ export default function HandFilmHubView({
                   key={card.id}
                   onMouseEnter={() => onSetCursorLabel?.(`OPEN ${card.title.toUpperCase()} ↗`)}
                   onClick={() => setExpandedVerticalId(isExpanded ? null : card.id)}
-                  className={`group relative min-h-[380px] aspect-[9/16] rounded-[20px] overflow-hidden border bg-gradient-to-b ${card.fallbackGradient} transition-all duration-300 ease-out hover:-translate-y-1 cursor-pointer`}
+                  className={`group relative h-[clamp(220px,36vh,360px)] rounded-[20px] overflow-hidden border bg-gradient-to-b ${card.fallbackGradient} transition-all duration-300 ease-out hover:-translate-y-1 cursor-pointer`}
                   style={{
                     borderColor: 'var(--hh-border)',
                     boxShadow: 'var(--hh-card-shadow)',
@@ -1169,8 +1230,8 @@ export default function HandFilmHubView({
                   />
 
                   {/* Resting Minimal Badge Only */}
-                  <div className="relative z-10 p-4 flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-1 rounded-full bg-black/55 backdrop-blur-md border border-white/15 font-space-mono text-[10px] font-bold uppercase tracking-wider text-[#06b6d4]">
+                  <div className="relative z-10 p-3 sm:p-3.5 flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15 font-space-mono text-[10px] font-bold uppercase tracking-wider text-[#06b6d4]">
                       {card.kicker}
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-black/45 backdrop-blur-md font-space-mono text-[9.5px] text-zinc-200 tabular-nums">
@@ -1178,15 +1239,15 @@ export default function HandFilmHubView({
                     </span>
                   </div>
 
-                  {/* Resting Minimal 2-Word Title Only */}
+                  {/* Resting Minimal 2-Word Title Pinned Cleanly Inside Bottom Gradient */}
                   <div
-                    className={`absolute bottom-0 left-0 right-0 z-10 p-5 transition-all duration-300 ease-out ${
+                    className={`absolute bottom-0 left-0 right-0 z-10 p-4 transition-all duration-300 ease-out ${
                       isExpanded
                         ? 'opacity-0 translate-y-4 pointer-events-none'
                         : 'group-hover:opacity-0 group-hover:translate-y-4'
                     }`}
                   >
-                    <h2 className="text-2xl font-bold tracking-tight text-white leading-tight">
+                    <h2 className="text-lg xl:text-xl font-bold tracking-tight text-white leading-tight drop-shadow-sm">
                       {card.title}
                     </h2>
                   </div>
@@ -1194,18 +1255,22 @@ export default function HandFilmHubView({
                   {/* Hover / Tap Glassmorphic Detail Reveal Drawer */}
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className={`absolute inset-x-2.5 bottom-2.5 z-20 rounded-2xl p-4 backdrop-blur-2xl bg-black/82 border border-white/25 text-white transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] space-y-3 ${
+                    className={`absolute inset-x-2 bottom-2 z-20 rounded-xl p-3 backdrop-blur-2xl bg-black/82 border border-white/25 text-white transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] space-y-2 ${
                       isExpanded
                         ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
                         : 'opacity-0 translate-y-6 scale-95 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-lg font-black text-white leading-tight">{card.title}</span>
-                      <span className="font-space-mono text-[10px] font-bold text-[#06b6d4]">{card.duration}</span>
+                      <span className="text-sm sm:text-base font-black text-white leading-tight truncate">
+                        {card.title}
+                      </span>
+                      <span className="font-space-mono text-[10px] font-bold text-[#06b6d4] shrink-0">
+                        {card.duration}
+                      </span>
                     </div>
 
-                    <p className="text-[13px] text-zinc-100 leading-snug line-clamp-2 font-medium">
+                    <p className="text-xs text-zinc-100 leading-snug line-clamp-2 font-medium">
                       {card.description}
                     </p>
 
@@ -1214,14 +1279,14 @@ export default function HandFilmHubView({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => trackStoryboardLaunch(`vertical_card_${card.id}`, card.href)}
-                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-extrabold transition-transform hover:scale-[1.02]"
+                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-extrabold transition-transform hover:scale-[1.02]"
                       style={{
                         backgroundColor: 'var(--hh-accent)',
                         color: 'var(--hh-accent-ink)',
                       }}
                     >
                       <span>{t.handfilm.launchStoryboard}</span>
-                      <ArrowUpRight className="w-4 h-4" />
+                      <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
                   </div>
                 </div>
@@ -2084,15 +2149,15 @@ export default function HandFilmHubView({
       </div>
 
       {/* FLOATING BOTTOM PILL BAR */}
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1.5rem)] max-w-xl pointer-events-auto">
+      <div className="fixed bottom-[4.75rem] sm:bottom-[5.25rem] left-1/2 -translate-x-1/2 z-40 w-[calc(100vw-1.5rem)] max-w-3xl pointer-events-auto">
         <div
-          className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl backdrop-blur-xl border shadow-2xl"
+          className="flex items-center justify-between gap-2.5 sm:gap-3 px-3 sm:px-4 py-2 rounded-2xl backdrop-blur-xl border shadow-2xl"
           style={{
             backgroundColor: 'var(--hh-glass-bg)',
             borderColor: 'var(--hh-border)',
           }}
         >
-          <div className="flex items-center gap-2.5 min-w-0 pl-1">
+          <div className="flex items-center gap-2 min-w-0 pl-1">
             <span className="font-space-mono text-xs font-bold tracking-wider shrink-0" style={{ color: 'var(--hh-text)' }}>
               HANDFILM
             </span>
@@ -2107,14 +2172,14 @@ export default function HandFilmHubView({
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackStoryboardLaunch('floating_bottom_pill', buildStoryboardUrl(''))}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-transform hover:scale-[1.02] whitespace-nowrap shrink-0"
             style={{
               backgroundColor: 'var(--hh-accent)',
               color: 'var(--hh-accent-ink)',
             }}
           >
             <span>{t.handfilm.tryOnline}</span>
-            <ArrowUpRight className="w-4 h-4" />
+            <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>

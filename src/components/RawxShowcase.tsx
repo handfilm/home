@@ -25,6 +25,12 @@ import { copyRawxDropShareLink } from '../services/deepLinkService';
 import { trackEvent } from '../services/analytics';
 import DynamicPhotoManagerModal from './DynamicPhotoManagerModal';
 import RawxProductDrawer from './rawx/RawxProductDrawer';
+import {
+  OFFICIAL_MAILTO_SALES,
+  OFFICIAL_PUBLIC_EMAIL,
+  OFFICIAL_WHATSAPP_DISPLAY,
+  buildOfficialWhatsAppUrl,
+} from '../config/officialContactConfig';
 import { Language, TRANSLATIONS, TranslationDictionary } from '../i18n/translations';
 import {
   Play,
@@ -91,7 +97,7 @@ function DropBlockHeader({
 
   return (
     <div
-      className="group/drop rounded-2xl border p-4 sm:p-5 transition-all duration-300 ease-out hh-theme-transition"
+      className="group/drop rounded-2xl border px-3.5 py-2.5 sm:px-4 sm:py-3 transition-all duration-300 ease-out hh-theme-transition"
       style={{
         backgroundColor: 'var(--hh-surface)',
         borderColor: 'var(--hh-border)',
@@ -99,10 +105,10 @@ function DropBlockHeader({
       }}
     >
       {/* Minimalist Resting Header: Badge + Bold Title + Price + Quick Toggle */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
           <span
-            className="px-2.5 py-1 rounded-md border font-space-mono text-[10px] font-bold uppercase tracking-wider shrink-0"
+            className="px-2.5 py-0.5 rounded-md border font-space-mono text-[10px] font-bold uppercase tracking-wider shrink-0"
             style={{
               backgroundColor: 'var(--hh-bg)',
               borderColor: 'var(--hh-accent)',
@@ -113,16 +119,16 @@ function DropBlockHeader({
           </span>
 
           <h2
-            className="font-bebas text-2xl sm:text-3xl tracking-wide leading-none truncate"
-            style={{ color: 'var(--hh-text)' }}
+            className="font-bebas tracking-wide leading-none truncate"
+            style={{ color: 'var(--hh-text)', fontSize: 'clamp(1.35rem, 2.1vw, 1.85rem)' }}
           >
             {dropMeta.title}
           </h2>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           <span
-            className="font-bebas text-2xl tabular-nums leading-none"
+            className="font-bebas text-xl sm:text-2xl tabular-nums leading-none"
             style={{ color: 'var(--hh-text)' }}
           >
             {dropMeta.priceDisplay}
@@ -285,6 +291,44 @@ export default function RawxShowcase({
   t = TRANSLATIONS.en,
 }: RawxShowcaseProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const filmstripRef = useRef<HTMLDivElement | null>(null);
+  const filmstripDragRef = useRef<{
+    isDown: boolean;
+    startX: number;
+    scrollLeft: number;
+    moved: boolean;
+  }>({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+    moved: false,
+  });
+
+  const handleFilmstripPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = filmstripRef.current;
+    if (!el || e.pointerType === 'touch') return;
+    filmstripDragRef.current = {
+      isDown: true,
+      startX: e.clientX,
+      scrollLeft: el.scrollLeft,
+      moved: false,
+    };
+  };
+
+  const handleFilmstripPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = filmstripDragRef.current;
+    const el = filmstripRef.current;
+    if (!drag.isDown || !el) return;
+    const dx = e.clientX - drag.startX;
+    if (Math.abs(dx) > 5) {
+      drag.moved = true;
+    }
+    el.scrollLeft = drag.scrollLeft - dx;
+  };
+
+  const handleFilmstripPointerUp = () => {
+    filmstripDragRef.current.isDown = false;
+  };
 
   // Dynamic Sliders Media State with localStorage persistence
   const [slidersData, setSlidersData] = useState<AllSlidersData>(() => getStoredSlidersData());
@@ -776,9 +820,9 @@ export default function RawxShowcase({
   return (
     <div
       ref={rootRef}
-      className={`w-full font-mono pb-32 space-y-12 overflow-y-auto hh-theme-transition ${
+      className={`min-h-[100dvh] w-full font-mono pb-28 sm:pb-32 space-y-4 sm:space-y-6 hh-theme-transition ${
         language === 'bn' ? 'bangla-text' : ''
-      } ${isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-4' : 'mt-[130px] md:mt-[80px]'}`}
+      } ${isTheaterMode ? 'fixed inset-0 z-[130] mt-0 pt-3 overflow-y-auto' : 'pt-[128px] md:pt-[78px]'}`}
       style={{
         backgroundColor: 'var(--hh-bg)',
         color: 'var(--hh-text)',
@@ -786,7 +830,7 @@ export default function RawxShowcase({
     >
       {/* Ticker Tape */}
       <div
-        className="w-full overflow-hidden h-8 border-y flex items-center"
+        className="w-full overflow-hidden h-7 border-y flex items-center"
         style={{
           backgroundColor: 'var(--hh-surface)',
           borderColor: 'var(--hh-border)',
@@ -808,18 +852,18 @@ export default function RawxShowcase({
         </div>
       </div>
 
-      {/* A. RAWx Brand Command Header — Low Text, Minimal Right URL, Bigger Buttons */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-2">
+      {/* A. RAWx Brand Command Header — Full-Width Fluid Scale-to-Fit */}
+      <section className="w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10">
         <div
-          className="rounded-2xl border p-5 sm:p-7 flex flex-col xl:flex-row xl:items-center justify-between gap-6 hh-theme-transition"
+          className="rounded-2xl border px-4 py-3 sm:px-5 sm:py-3.5 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4 hh-theme-transition"
           style={{
             backgroundColor: 'var(--hh-surface)',
             borderColor: 'var(--hh-border)',
             boxShadow: 'var(--hh-card-shadow)',
           }}
         >
-          <div className="space-y-2 max-w-xl">
-            <div className="flex flex-wrap items-center gap-2.5 text-[10.5px] font-space-mono uppercase tracking-[0.18em]">
+          <div className="space-y-1 max-w-xl">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-space-mono uppercase tracking-[0.18em]">
               <span className="font-bold" style={{ color: 'var(--hh-accent)' }}>
                 19 SLIDER LABS
               </span>
@@ -828,8 +872,11 @@ export default function RawxShowcase({
             </div>
 
             <h1
-              className="font-bebas text-4xl sm:text-5xl tracking-wide leading-none"
-              style={{ color: 'var(--hh-text)' }}
+              className="font-bebas tracking-wide leading-none"
+              style={{
+                color: 'var(--hh-text)',
+                fontSize: 'clamp(1.75rem, 2.8vw, 2.75rem)',
+              }}
             >
               <span className="normal-case" style={{ color: 'var(--hh-accent)' }}>
                 RAWx
@@ -838,8 +885,8 @@ export default function RawxShowcase({
             </h1>
           </div>
 
-          {/* Right Bigger Icon-Forward Command Controls */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {/* Right Icon-Forward Command Controls */}
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             {onBackToEcosystem && (
               <a
                 href="#apps"
@@ -847,7 +894,7 @@ export default function RawxShowcase({
                   e.preventDefault();
                   onBackToEcosystem();
                 }}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-space-mono tracking-wider uppercase transition-all cursor-pointer font-bold whitespace-nowrap hover:scale-[1.02]"
+                className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-space-mono tracking-wider uppercase transition-all cursor-pointer font-bold whitespace-nowrap hover:scale-[1.02]"
                 style={{
                   backgroundColor: 'var(--hh-bg)',
                   borderColor: 'var(--hh-border)',
@@ -863,7 +910,7 @@ export default function RawxShowcase({
               onClick={() => setIsSavedTrayOpen((prev) => !prev)}
               aria-label={t.rawx.savedLookbook}
               title={t.rawx.savedLookbook}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl border text-xs font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap font-bold hover:scale-[1.02]"
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-space-mono tracking-wider uppercase cursor-pointer transition-all whitespace-nowrap font-bold hover:scale-[1.02]"
               style={{
                 backgroundColor: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-surface-2)' : 'var(--hh-bg)',
                 borderColor: isSavedTrayOpen || savedDropIds.length > 0 ? 'var(--hh-accent)' : 'var(--hh-border)',
@@ -879,7 +926,7 @@ export default function RawxShowcase({
               onClick={() => setIsAutoplayActive((prev) => !prev)}
               aria-label={isAutoplayActive ? t.rawx.autoplayOn : t.rawx.autoplayPaused}
               title={isAutoplayActive ? t.rawx.autoplayOn : t.rawx.autoplayPaused}
-              className="w-11 h-11 rounded-xl border flex items-center justify-center transition-all cursor-pointer hover:scale-105"
+              className="w-10 h-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer hover:scale-105"
               style={{
                 backgroundColor: 'var(--hh-bg)',
                 borderColor: isAutoplayActive ? '#10b981' : 'var(--hh-accent)',
@@ -894,7 +941,7 @@ export default function RawxShowcase({
               onClick={handleToggleTheaterMode}
               aria-label={isTheaterMode ? t.rawx.theaterExit : t.rawx.theaterEnter}
               title={isTheaterMode ? t.rawx.theaterExit : t.rawx.theaterEnter}
-              className="w-11 h-11 rounded-xl border flex items-center justify-center cursor-pointer transition-all hover:scale-105"
+              className="w-10 h-10 rounded-xl border flex items-center justify-center cursor-pointer transition-all hover:scale-105"
               style={{
                 backgroundColor: isTheaterMode ? 'var(--hh-accent)' : 'var(--hh-bg)',
                 borderColor: isTheaterMode ? 'var(--hh-accent)' : 'var(--hh-border)',
@@ -907,7 +954,7 @@ export default function RawxShowcase({
             <button
               type="button"
               onClick={() => openPhotoManagerFor('s1')}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl font-space-mono font-extrabold text-xs tracking-wider uppercase transition-all cursor-pointer shadow-md whitespace-nowrap hover:scale-[1.02]"
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-space-mono font-extrabold text-xs tracking-wider uppercase transition-all cursor-pointer shadow-md whitespace-nowrap hover:scale-[1.02]"
               style={{
                 backgroundColor: 'var(--hh-accent)',
                 color: 'var(--hh-accent-ink)',
@@ -922,7 +969,7 @@ export default function RawxShowcase({
               onClick={() => onOpenLightbox(allCurrentLightboxItems, 0)}
               aria-label={t.rawx.lightbox}
               title={t.rawx.lightbox}
-              className="w-11 h-11 rounded-xl border flex items-center justify-center cursor-pointer transition-all hover:scale-105"
+              className="w-10 h-10 rounded-xl border flex items-center justify-center cursor-pointer transition-all hover:scale-105"
               style={{
                 backgroundColor: 'var(--hh-bg)',
                 borderColor: 'var(--hh-border)',
@@ -1006,17 +1053,17 @@ export default function RawxShowcase({
       {/* Sticky Collection Filter Strip & S01-S19 Quick Jump Bar */}
       <div
         className={`sticky ${
-          isTheaterMode ? 'top-0' : 'top-[60px]'
-        } z-40 backdrop-blur-md border-y px-4 sm:px-8 py-3 shadow-xl hh-theme-transition`}
+          isTheaterMode ? 'top-0' : 'top-[128px] md:top-[78px]'
+        } z-40 backdrop-blur-md border-y px-4 sm:px-6 lg:px-10 py-2 shadow-xl hh-theme-transition`}
         style={{
           backgroundColor: 'var(--hh-header-bg)',
           borderColor: 'var(--hh-border)',
         }}
       >
-        <div className="max-w-7xl mx-auto space-y-2.5">
+        <div className="w-full max-w-[1840px] mx-auto space-y-1.5">
           {/* Collection Filter Pills + Search */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
               {RAWX_COLLECTION_FILTERS.map((cat) => {
                 const count = collectionCounts[cat] || 0;
                 const active = selectedCollection === cat;
@@ -1072,7 +1119,7 @@ export default function RawxShowcase({
           </div>
 
           {/* S01-S19 Quick-Jump Bar */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
             <span
               className="text-[9px] tracking-widest uppercase flex-shrink-0 mr-1 hidden lg:inline"
               style={{ color: 'var(--hh-muted)' }}
@@ -1136,7 +1183,7 @@ export default function RawxShowcase({
            §01 · MASTER HERO · 21:9 CINEMATIC
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s1') && (
-        <section id="sec-01" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-01" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s1}
             engineSpec="01 · MASTER HERO · 21:9 CINEMATIC"
@@ -1151,7 +1198,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl group">
+          <div className="relative h-[clamp(300px,52vh,580px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl group">
             <div
               className="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.18,1)]"
               style={{ transform: `translateX(-${s1Idx * 100}%)` }}
@@ -1219,18 +1266,79 @@ export default function RawxShowcase({
             />
           </div>
 
-          <div className="flex gap-1 h-14 overflow-x-auto bg-[#0a0a0a] p-1 border border-[#1c1c1c] rounded scrollbar-none">
-            {slidersData.s1.map((slide, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setS1Idx(idx)}
-                className={`flex-shrink-0 w-24 h-full bg-cover bg-center transition-all cursor-pointer relative ${
-                  idx === s1Idx ? 'opacity-100 ring-2 ring-[#c8b89a]' : 'opacity-40 hover:opacity-80'
-                }`}
-                style={{ backgroundImage: `url('${slide.url}')` }}
-              />
-            ))}
+          {/* Bottom 19-Drop & Active Frame Draggable Thumbnail Filmstrip */}
+          <div
+            ref={filmstripRef}
+            onPointerDown={handleFilmstripPointerDown}
+            onPointerMove={handleFilmstripPointerMove}
+            onPointerUp={handleFilmstripPointerUp}
+            onPointerCancel={handleFilmstripPointerUp}
+            onPointerLeave={handleFilmstripPointerUp}
+            aria-label="RAWx Drop 01 frames and 19-drop lookbook filmstrip"
+            className="flex items-center gap-1.5 h-14 sm:h-16 overflow-x-auto bg-[#0a0a0a] p-1.5 border border-[#1c1c1c] rounded-lg no-scrollbar cursor-grab active:cursor-grabbing select-none"
+          >
+            {slidersData.s1.map((slide, idx) => {
+              const isCurrentFrame = idx === s1Idx;
+              return (
+                <button
+                  key={`s1-frame-${idx}`}
+                  type="button"
+                  onClick={() => {
+                    if (filmstripDragRef.current.moved) return;
+                    setS1Idx(idx);
+                  }}
+                  title={`S01 Frame ${String(idx + 1).padStart(2, '0')} — ${slide.title || 'RAWx Drop 01'}`}
+                  aria-label={`Select Drop 01 frame ${idx + 1}`}
+                  aria-current={isCurrentFrame ? 'true' : undefined}
+                  className={`flex-shrink-0 w-24 sm:w-28 h-full rounded overflow-hidden bg-cover bg-center transition-all cursor-pointer relative ${
+                    isCurrentFrame
+                      ? 'opacity-100 ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[#0a0a0a]'
+                      : 'opacity-50 hover:opacity-90'
+                  }`}
+                  style={{ backgroundImage: `url('${slide.url}')` }}
+                >
+                  <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/75 font-space-mono text-[8.5px] font-bold text-amber-300 tabular-nums">
+                    S01·{String(idx + 1).padStart(2, '0')}
+                  </span>
+                </button>
+              );
+            })}
+
+            <div
+              aria-hidden="true"
+              className="w-[1px] h-8 bg-white/15 shrink-0 mx-1"
+            />
+
+            {RAWX_DROP_ORDER.slice(1).map((dropKey) => {
+              const meta = mergedDrops[dropKey];
+              const dropSlides = getSlidesForDropKey(slidersData, dropKey);
+              const thumbUrl = dropSlides[0]?.url || slidersData.s1[0]?.url || '';
+              const isActiveDrop = activeSectionId === meta.domId;
+              return (
+                <button
+                  key={`filmstrip-${meta.dropId}`}
+                  type="button"
+                  onClick={() => {
+                    if (filmstripDragRef.current.moved) return;
+                    scrollToDropSection(dropKey);
+                  }}
+                  title={`${meta.dropCode}: ${meta.title}`}
+                  aria-label={`Jump to ${meta.dropCode} ${meta.title}`}
+                  aria-current={isActiveDrop ? 'true' : undefined}
+                  className={`flex-shrink-0 w-20 sm:w-24 h-full rounded overflow-hidden bg-cover bg-center transition-all cursor-pointer relative ${
+                    isActiveDrop
+                      ? 'opacity-100 ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[#0a0a0a]'
+                      : 'opacity-55 hover:opacity-95'
+                  }`}
+                  style={{ backgroundImage: `url('${thumbUrl}')` }}
+                >
+                  <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
+                  <span className="absolute bottom-1 left-1 px-1 py-0.5 rounded bg-black/75 font-space-mono text-[8.5px] font-bold text-white tabular-nums">
+                    {meta.dropId.toUpperCase()}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
       )}
@@ -1239,7 +1347,7 @@ export default function RawxShowcase({
            §02 · SQUARE MATRIX · 4-COL VERTICAL
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s2a') && (
-        <section id="sec-02" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-02" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s2a}
             engineSpec="02 · SQUARE MATRIX · 1:1 · VERTICAL SLIDE"
@@ -1425,7 +1533,7 @@ export default function RawxShowcase({
            §03 · ULTRA WIDE CINEMATIC 32:9 · AUTO
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s3') && (
-        <section id="sec-03" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-03" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s3}
             engineSpec="03 · ULTRA WIDE CINEMATIC · 32:9 · AUTO BROADCAST"
@@ -1440,7 +1548,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[32/9] sm:aspect-[32/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(220px,36vh,420px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             <div
               className="flex h-full transition-transform duration-700"
               style={{ transform: `translateX(-${s3Idx * 100}%)` }}
@@ -1486,7 +1594,7 @@ export default function RawxShowcase({
            §04 · ASYMMETRIC SPLIT · DUAL FORMAT
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s4a') && (
-        <section id="sec-04" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-04" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s4a}
             engineSpec="04 · ASYMMETRIC SPLIT · DUAL FORMAT"
@@ -1592,7 +1700,7 @@ export default function RawxShowcase({
            §05 · PORTRAIT TRIPTYCH · 9:16 VERTICAL
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s5a') && (
-        <section id="sec-05" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-05" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s5a}
             engineSpec="05 · PORTRAIT TRIPTYCH · 9:16 · VERTICAL SLIDER"
@@ -1734,7 +1842,7 @@ export default function RawxShowcase({
            §06 · CROSSFADE HERO · 21:9 · AUTO
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s6') && (
-        <section id="sec-06" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-06" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s6}
             engineSpec="06 · AUTO BROADCAST · 21:9 · CROSSFADE"
@@ -1749,7 +1857,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,48vh,540px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             {slidersData.s6.map((slide, idx) => (
               <div
                 key={idx}
@@ -1782,7 +1890,7 @@ export default function RawxShowcase({
            §07 · PORTRAIT GRID · 4:5 · HORIZONTAL
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s7a') && (
-        <section id="sec-07" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-07" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s7a}
             engineSpec="07 · PORTRAIT GRID · 4:5 · HORIZONTAL SWIPE"
@@ -1860,7 +1968,7 @@ export default function RawxShowcase({
            §08 · DUAL LANDSCAPE · 16:9 VERTICAL
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s8a') && (
-        <section id="sec-08" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-08" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s8a}
             engineSpec="08 · DUAL LANDSCAPE · 16:9 · VERTICAL SLIDE"
@@ -1961,7 +2069,7 @@ export default function RawxShowcase({
            §09 · STANDARD HERO · 16:9
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s9') && (
-        <section id="sec-09" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-09" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s9}
             engineSpec="09 · STANDARD HERO · 16:9 EDITORIAL"
@@ -1976,7 +2084,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-video bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,50vh,560px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             <div
               className="flex h-full transition-transform duration-700"
               style={{ transform: `translateX(-${s9Idx * 100}%)` }}
@@ -2037,7 +2145,7 @@ export default function RawxShowcase({
            §10 · FOOTER BANNER · 8:1
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s10') && (
-        <section id="sec-10" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-10" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s10}
             engineSpec="10 · FOOTER BANNER · 8:1 ULTRA WIDE SLICE"
@@ -2052,7 +2160,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[8/1] sm:aspect-[8/1] bg-[#111111] overflow-hidden rounded shadow-xl">
+          <div className="relative h-[clamp(110px,18vh,200px)] w-full bg-[#111111] overflow-hidden rounded shadow-xl">
             <div
               className="flex h-full transition-transform duration-500"
               style={{ transform: `translateX(-${s10Idx * 100}%)` }}
@@ -2099,7 +2207,7 @@ export default function RawxShowcase({
            §11 · BEFORE / AFTER GRADE COMPARISON
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s11') && (
-        <section id="sec-11" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-11" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s11}
             engineSpec="11 · BEFORE / AFTER · GRADE COMPARISON DRAG"
@@ -2142,7 +2250,7 @@ export default function RawxShowcase({
             onTouchStart={() => (isBaDragging.current = true)}
             onTouchEnd={() => (isBaDragging.current = false)}
             onTouchMove={(e) => handleBaMove(e.touches[0].clientX)}
-            className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded cursor-ew-resize select-none shadow-2xl"
+            className="relative h-[clamp(280px,48vh,540px)] w-full bg-[#111111] overflow-hidden rounded cursor-ew-resize select-none shadow-2xl"
           >
             <div
               className="absolute inset-0 bg-cover bg-center"
@@ -2187,7 +2295,7 @@ export default function RawxShowcase({
            §12 · VIDEO SLIDE · 21:9 · MUTED AUTOPLAY
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('s12') && (
-        <section id="sec-12" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-12" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.s12}
             engineSpec="12 · VIDEO SLIDE · 21:9 · MUTED AUTOPLAY"
@@ -2202,7 +2310,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,48vh,540px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             <div
               className="flex h-full transition-transform duration-700"
               style={{ transform: `translateX(-${s12Idx * 100}%)` }}
@@ -2265,7 +2373,7 @@ export default function RawxShowcase({
            §13 (A) · ZOOM-BURST · 21:9 SCALE POP
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('sA') && (
-        <section id="sec-a" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-a" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.sA}
             engineSpec="13 · ZOOM-BURST · 21:9 · SCALE POP TRANSITION"
@@ -2280,7 +2388,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,48vh,540px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             {slidersData.sA.map((slide, idx) => (
               <div
                 key={idx}
@@ -2337,7 +2445,7 @@ export default function RawxShowcase({
            §14 (B) · STAGGER REVEAL GRID 3×2
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('sB') && (
-        <section id="sec-b" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-b" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.sB}
             engineSpec="14 · STAGGER REVEAL GRID · 3×2 · CASCADE SEQUENCE"
@@ -2352,7 +2460,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[16/7] bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,48vh,540px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             <div className="grid grid-cols-2 sm:grid-cols-3 grid-rows-2 gap-0.5 h-full">
               {slidersData.sB.cells.map((cell, i) => (
                 <div
@@ -2387,7 +2495,7 @@ export default function RawxShowcase({
            §15 (C) · COUNTDOWN RING TIMER AUTO · 16:9
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('sC') && (
-        <section id="sec-c" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-c" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.sC}
             engineSpec="15 · COUNTDOWN RING · 16:9 · SVG TIMER AUTO"
@@ -2402,7 +2510,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-video bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,50vh,560px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             <div
               className="flex h-full transition-transform duration-700"
               style={{ transform: `translateX(-${cdIdx * 100}%)` }}
@@ -2469,7 +2577,7 @@ export default function RawxShowcase({
            §16 (D) · SPLIT-PANEL DUAL-AXIS
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('sD') && (
-        <section id="sec-d" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-d" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.sD}
             engineSpec="16 · SPLIT-PANEL · DUAL AXIS · OPPOSED MOTION"
@@ -2484,7 +2592,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[16/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,50vh,560px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5 h-full">
               {/* Left */}
               <div className="relative overflow-hidden bg-[#161512]">
@@ -2578,7 +2686,7 @@ export default function RawxShowcase({
            §17 (E) · INERTIA FILMSTRIP · MOMENTUM DRAG
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('sE') && (
-        <section id="sec-e" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-e" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.sE}
             engineSpec="17 · INERTIA FILMSTRIP · MOMENTUM DRAG · FOCUS EXPAND"
@@ -2601,7 +2709,7 @@ export default function RawxShowcase({
             onTouchStart={(e) => handleInertiaMouseDown(e.touches[0].clientX)}
             onTouchMove={(e) => handleInertiaMouseMove(e.touches[0].clientX)}
             onTouchEnd={handleInertiaMouseUp}
-            className="relative aspect-[21/6] bg-[#111111] overflow-hidden rounded cursor-grab active:cursor-grabbing select-none shadow-2xl"
+            className="relative h-[clamp(220px,36vh,420px)] w-full bg-[#111111] overflow-hidden rounded cursor-grab active:cursor-grabbing select-none shadow-2xl"
           >
             <div
               className="flex gap-1 h-full will-change-transform transition-transform duration-75 ease-out"
@@ -2642,7 +2750,7 @@ export default function RawxShowcase({
            §18 (F) · WIPE TRANSITION · 21:9
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('sF') && (
-        <section id="sec-f" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-f" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.sF}
             engineSpec="18 · WIPE-TRANSITION · 21:9 · DIRECTIONAL REVEAL"
@@ -2657,7 +2765,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[21/9] bg-[#111111] overflow-hidden rounded shadow-2xl">
+          <div className="relative h-[clamp(280px,48vh,540px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl">
             {slidersData.sF.map((slide, idx) => (
               <div
                 key={idx}
@@ -2716,7 +2824,7 @@ export default function RawxShowcase({
            §19 (G) · RAWx FORGE · 316L BRACELET & HIDE ARCHIVE
       ════════════════════════════════════════════ */}
       {visibleDropSet.has('sG') && sGSlides.length > 0 && (
-        <section id="sec-g" className="space-y-3 px-4 sm:px-8 max-w-7xl mx-auto scroll-mt-36">
+        <section id="sec-g" className="space-y-2.5 w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 scroll-mt-44">
           <DropBlockHeader
             dropMeta={mergedDrops.sG}
             engineSpec="19 · HARDWARE ARCHIVE · 16:9 · PRECISION DECK"
@@ -2731,7 +2839,7 @@ export default function RawxShowcase({
             t={t}
           />
 
-          <div className="relative aspect-[16/9] bg-[#111111] overflow-hidden rounded shadow-2xl border border-[#C8A96A]/20">
+          <div className="relative h-[clamp(280px,50vh,560px)] w-full bg-[#111111] overflow-hidden rounded shadow-2xl border border-[#C8A96A]/20">
             <div
               className="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.18,1)]"
               style={{ transform: `translateX(-${sGIdx * 100}%)` }}
@@ -2802,7 +2910,7 @@ export default function RawxShowcase({
 
       {/* Semantic Ecosystem Subdomain Index Footer */}
       <footer
-        className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 border-t flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.18em] uppercase"
+        className="w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-10 pt-8 border-t flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.18em] uppercase"
         style={{
           borderColor: 'var(--hh-border)',
           color: 'var(--hh-muted)',
@@ -2839,6 +2947,22 @@ export default function RawxShowcase({
           >
             b2b.handsandhead.com ↗
           </a>
+          <a
+            href={OFFICIAL_MAILTO_SALES}
+            className="hover:underline transition-colors normal-case"
+            style={{ color: 'var(--hh-muted)' }}
+          >
+            {OFFICIAL_PUBLIC_EMAIL}
+          </a>
+          <a
+            href={buildOfficialWhatsAppUrl('rawx')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline transition-colors"
+            style={{ color: 'var(--hh-muted)' }}
+          >
+            WA {OFFICIAL_WHATSAPP_DISPLAY} ↗
+          </a>
         </nav>
       </footer>
 
@@ -2868,3 +2992,4 @@ export default function RawxShowcase({
     </div>
   );
 }
+// END OF FILE: src/components/RawxShowcase.tsx

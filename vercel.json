@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/llms.txt", "destination": "https://api.handsandhead.com/llms.txt" },
+    { "source": "/sitemap-video.xml", "destination": "https://api.handsandhead.com/sitemap-video.xml" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

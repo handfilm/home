@@ -3,6 +3,7 @@ import { ColorGrade, DropMetadata, RawxSizingType, SlideData } from '../../types
 import { GRADES } from '../../data/initialData';
 import { LightboxItem } from '../LightboxModal';
 import { trackEvent } from '../../services/analytics';
+import { buildOfficialWhatsAppUrl } from '../../config/officialContactConfig';
 import {
   X,
   Maximize2,
@@ -38,8 +39,6 @@ const SIZE_OPTIONS: Record<RawxSizingType, readonly string[]> = {
   footwear: ['EU 41', 'EU 42', 'EU 43', 'EU 44'],
 };
 
-const WHATSAPP_NUMBER = import.meta.env?.VITE_WHATSAPP_NUMBER || '';
-
 function buildRawxWhatsAppUrl(params: {
   dropMeta: DropMetadata;
   size: string;
@@ -56,12 +55,7 @@ function buildRawxWhatsAppUrl(params: {
     `Price Est.: ${dropMeta.priceDisplay} each (${dropMeta.preorderWindow})`,
     `Drop Link: ${shareUrl}`,
   ];
-  const encoded = encodeURIComponent(lines.join('\n'));
-  if (WHATSAPP_NUMBER.trim()) {
-    const cleanNum = WHATSAPP_NUMBER.replace(/[^\d]/g, '');
-    return `https://wa.me/${cleanNum}?text=${encoded}`;
-  }
-  return `https://wa.me/?text=${encoded}`;
+  return buildOfficialWhatsAppUrl('rawx', lines.join('\n'));
 }
 
 export default function RawxProductDrawer({

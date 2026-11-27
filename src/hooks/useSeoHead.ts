@@ -1,8 +1,21 @@
 import { useEffect } from 'react';
 import { ActiveTab, SectionItem } from '../types';
+import {
+  JsonLdNode,
+  OFFICIAL_LLMS_TXT_URL,
+  OFFICIAL_SEO_FEED_URL,
+  OFFICIAL_SITE_ORIGIN,
+  buildFallbackSeoShowcaseNodes,
+  buildOfficialOrganizationSchema,
+} from '../config/officialContactConfig';
 
-const SITE_ORIGIN = 'https://handsandhead.com';
+const SITE_ORIGIN = OFFICIAL_SITE_ORIGIN;
 const BRAND_NAME = 'HANDS & HEAD';
+const LIVE_JSONLD_SCRIPT_ID = 'hh-live-seo-jsonld';
+const SEO_FEED_TIMEOUT_MS = 4500;
+
+let seoFeedBootstrapped = false;
+let cachedLiveGraphNodes: readonly JsonLdNode[] | null = null;
 
 interface SeoConfig {
   title: string;
@@ -190,6 +203,227 @@ function upsertCanonical(href: string): void {
   }
 }
 
+function upsertLlmsAlternateLink(href: string): void {
+  if (typeof document === 'undefined') return;
+  let link = document.head.querySelector<HTMLLinkElement>(
+    'link[rel="alternate"][type="text/plain"][title="LLMs Context"]'
+  );
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', 'alternate');
+    link.setAttribute('type', 'text/plain');
+    link.setAttribute('title', 'LLMs Context');
+    document.head.appendChild(link);
+  }
+  if (link.getAttribute('href') !== href) {
+    link.setAttribute('href', href);
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeVideoNode(raw: Record<string, unknown>, idx: number): JsonLdNode {
+  const title =
+    typeof raw.name === 'string'
+      ? raw.name
+      : typeof raw.title === 'string'
+      ? raw.title
+      : `HANDS & HEAD Showcase Video ${idx + 1}`;
+  const description =
+    typeof raw.description === 'string'
+      ? raw.description
+      : 'Official video showcase from HANDS & HEAD (HANDFILM, GapCut, GapShot, BumBit, GapToon, RAWx).';
+  const thumbnailUrl =
+    typeof raw.thumbnailUrl === 'string'
+      ? raw.thumbnailUrl
+      : typeof raw.thumbnail === 'string'
+      ? raw.thumbnail
+      : `${SITE_ORIGIN}/og-image.jpg`;
+  const contentUrl =
+    typeof raw.contentUrl === 'string'
+      ? raw.contentUrl
+      : typeof raw.url === 'string'
+      ? raw.url
+      : 'https://storyboard.handsandhead.com/';
+  const uploadDate =
+    typeof raw.uploadDate === 'string'
+      ? raw.uploadDate
+      : typeof raw.publishedAt === 'string'
+      ? raw.publishedAt
+      : new Date().toISOString();
+
+  return {
+    ...raw,
+    '@type': 'VideoObject',
+    name: title,
+    description,
+    thumbnailUrl,
+    contentUrl,
+    uploadDate,
+    publisher: isRecord(raw.publisher) ? raw.publisher : { '@id': `${SITE_ORIGIN}/#organization` },
+  };
+}
+
+function normalizeProductNode(raw: Record<string, unknown>, idx: number): JsonLdNode {
+  const name =
+    typeof raw.name === 'string'
+      ? raw.name
+      : typeof raw.title === 'string'
+      ? raw.title
+      : `RAWx Drop ${idx + 1}`;
+  const description =
+    typeof raw.description === 'string'
+      ? raw.description
+      : 'RAWx direct-from-source leather, 316L stainless steel hardware & heavyweight apparel by HANDS & HEAD.';
+  const image =
+    typeof raw.image === 'string' || Array.isArray(raw.image)
+      ? raw.image
+      : typeof raw.imageUrl === 'string'
+      ? raw.imageUrl
+      : `${SITE_ORIGIN}/og-image.jpg`;
+
+  const hasValidOffers = isRecord(raw.offers);
+  const priceRaw =
+    typeof raw.price === 'number' || typeof raw.price === 'string' ? String(raw.price) : '0';
+  const currency =
+    typeof raw.priceCurrency === 'string'
+      ? raw.priceCurrency
+      : typeof raw.currency === 'string'
+      ? raw.currency
+      : 'USD';
+  const productUrl =
+    typeof raw.url === 'string' ? raw.url : `${SITE_ORIGIN}/#rawx`;
+
+  return {
+    ...raw,
+    '@type': 'Product',
+    name,
+    description,
+    image,
+    brand: isRecord(raw.brand)
+      ? raw.brand
+      : {
+          '@type': 'Brand',
+          name: 'RAWx',
+          url: 'https://rawx.handsandhead.com/',
+        },
+    offers: hasValidOffers
+      ? raw.offers
+      : {
+          '@type': 'Offer',
+          url: productUrl,
+          priceCurrency: currency,
+          price: priceRaw,
+          availability: 'https://schema.org/InStock',
+          seller: { '@id': `${SITE_ORIGIN}/#organization` },
+        },
+  };
+}
+
+function extractLiveFeedNodes(payload: unknown): readonly JsonLdNode[] {
+  if (!isRecord(payload)) return [];
+
+  const root = isRecord(payload.data) ? payload.data : payload;
+  const collected: JsonLdNode[] = [];
+
+  if (Array.isArray(root['@graph'])) {
+    for (const item of root['@graph']) {
+      if (!isRecord(item)) continue;
+      const nodeType = typeof item['@type'] === 'string' ? item['@type'] : '';
+      if (nodeType === 'VideoObject') {
+        collected.push(normalizeVideoNode(item, collected.length));
+      } else if (nodeType === 'Product') {
+        collected.push(normalizeProductNode(item, collected.length));
+      } else if (nodeType && nodeType !== 'Organization') {
+        collected.push(item);
+      }
+    }
+  }
+
+  const videoArrays = [root.videos, root.videoObjects];
+  for (const list of videoArrays) {
+    if (Array.isArray(list)) {
+      list.forEach((entry, idx) => {
+        if (isRecord(entry)) {
+          collected.push(normalizeVideoNode(entry, idx));
+        }
+      });
+    }
+  }
+
+  const productArrays = [root.products, root.drops];
+  for (const list of productArrays) {
+    if (Array.isArray(list)) {
+      list.forEach((entry, idx) => {
+        if (isRecord(entry)) {
+          collected.push(normalizeProductNode(entry, idx));
+        }
+      });
+    }
+  }
+
+  return collected;
+}
+
+function upsertJsonLdGraph(nodes: readonly JsonLdNode[]): void {
+  if (typeof document === 'undefined') return;
+  let script = document.getElementById(LIVE_JSONLD_SCRIPT_ID) as HTMLScriptElement | null;
+  if (!script) {
+    script = document.createElement('script');
+    script.id = LIVE_JSONLD_SCRIPT_ID;
+    script.type = 'application/ld+json';
+    document.head.appendChild(script);
+  }
+
+  const documentPayload = {
+    '@context': 'https://schema.org',
+    '@graph': [buildOfficialOrganizationSchema(), ...nodes],
+  };
+
+  // Safe JSON-LD serialization preventing accidental script-tag breakouts
+  const serialized = JSON.stringify(documentPayload).replace(/</g, '\\u003c');
+  if (script.textContent !== serialized) {
+    script.textContent = serialized;
+  }
+}
+
+async function hydrateLiveSeoFeed(): Promise<void> {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  // Immediately inject the graceful static fallback so Organization, VideoObject & Product
+  // schemas are guaranteed present even before network resolution or when offline.
+  upsertLlmsAlternateLink(OFFICIAL_LLMS_TXT_URL);
+  upsertJsonLdGraph(cachedLiveGraphNodes ?? buildFallbackSeoShowcaseNodes());
+
+  if (seoFeedBootstrapped) return;
+  seoFeedBootstrapped = true;
+
+  const controller = new AbortController();
+  const timerId = window.setTimeout(() => controller.abort(), SEO_FEED_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(OFFICIAL_SEO_FEED_URL, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    if (!response.ok) return;
+
+    const json: unknown = await response.json();
+    const liveNodes = extractLiveFeedNodes(json);
+    if (liveNodes.length > 0) {
+      cachedLiveGraphNodes = liveNodes;
+      upsertJsonLdGraph(liveNodes);
+    }
+  } catch {
+    // Graceful static fallback already injected; keep zero UI or console disruption.
+  } finally {
+    window.clearTimeout(timerId);
+  }
+}
+
 interface SectionSummary {
   id: string;
   title: string;
@@ -334,6 +568,7 @@ export function useSeoHead({
     upsertMeta('name', 'twitter:title', config.title);
     upsertMeta('name', 'twitter:description', config.description);
     upsertMeta('name', 'twitter:url', config.canonical);
+    upsertLlmsAlternateLink(OFFICIAL_LLMS_TXT_URL);
   }, [
     activeTab,
     sectionId,
@@ -345,4 +580,9 @@ export function useSeoHead({
     sectionSubtitle,
     sectionsCount,
   ]);
+
+  useEffect(() => {
+    void hydrateLiveSeoFeed();
+  }, []);
 }
+// END OF FILE: src/hooks/useSeoHead.ts
